@@ -11,9 +11,16 @@
   --bg-surface: #F8F9FA;
   --bg-card: #FFFFFF;
   --card-border: 1px solid #E2E4E7;
+  --footer-bg: #EEF3FF;
+  --hero-start: #8EC5FC;
+  --hero-end: #E0C3FC;
+  --accordion-border: #d1d5db;
+  --text-on-accent: #fff;
 
   --text: #111827;
   --text-muted: #58627A;
+  --nav-text: var(--text);
+  --nav-hover: var(--secondary);
 
   /* ----- Dark palette ----- */
   --primary-d: #A9A1FF;
@@ -24,6 +31,10 @@
   --bg-card-d: rgba(18,25,38,.55);
   --text-d: #E3E8F7;
   --text-muted-d: #8693B4;
+  --footer-bg-d: #0C101A;
+  --hero-start-d: #001934;
+  --hero-end-d: #432889;
+  --accordion-border-d: #273043;
 
   /* Global */
   --radius: 20px;
@@ -38,8 +49,14 @@
     --accent: var(--accent-d);
     --bg: var(--bg-d);
     --bg-card: var(--bg-card-d);
+    --footer-bg: var(--footer-bg-d);
+    --hero-start: var(--hero-start-d);
+    --hero-end: var(--hero-end-d);
+    --accordion-border: var(--accordion-border-d);
     --text: var(--text-d);
     --text-muted: var(--text-muted-d);
+    --nav-text: var(--text-d);
+    --nav-hover: var(--secondary-d);
   }
 }
 
@@ -50,6 +67,7 @@ html, body {
   color: var(--text);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  transition: background-color .3s, color .3s;
 }
 body.dark {
   background: var(--bg-d);
@@ -85,7 +103,7 @@ body.dark .glass {
   background: linear-gradient(110deg, rgba(255,255,255,1), rgba(244,247,255,1));
   backdrop-filter: blur(24px);
   box-shadow: var(--shadow);
-  transition: background var(--transition);
+  transition: background var(--transition), color var(--transition);
 }
 body.dark .navbar {
   background: linear-gradient(110deg, rgba(11,17,32,.65), rgba(11,17,32,.45));
@@ -109,12 +127,9 @@ body.dark .navbar {
   position: relative;
   font-weight: 500;
   text-decoration: none;
-  color: var(--text);
+  color: var(--nav-text);
   padding: 0.4rem 0;
   transition: color var(--transition);
-}
-body.dark .nav-desktop a {
-  color: var(--text-d);
 }
 .nav-desktop a::after {
   content: '';
@@ -129,16 +144,19 @@ body.dark .nav-desktop a {
 .nav-desktop a:hover::after {
   width: 100%;
 }
+.nav-desktop a:hover {
+  color: var(--nav-hover);
+}
 .nav-desktop .btn {
   background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
+  color: var(--text-on-accent);
   padding: 0.55rem 1.1rem;
   border-radius: 40px;
   font-size: 0.9rem;
   margin-left: 1rem;
   box-shadow: 0 3px 10px rgba(123,97,255,.3);
   text-decoration: none;
-  transition: filter var(--transition), transform var(--transition);
+  transition: filter var(--transition), transform var(--transition), background-color var(--transition), color var(--transition);
 }
 .nav-desktop .btn:hover {
   filter: brightness(1.15);
@@ -156,7 +174,7 @@ body.dark .nav-desktop a {
 }
 .btn {
   background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
+  color: var(--text-on-accent);
   box-shadow: 0 6px 18px rgba(123,97,255,.35);
 }
 .btn:hover {
@@ -182,7 +200,7 @@ body.dark .btn-secondary:hover {
 /* ===== Theme toggle & hamburger ===== */
 .theme-toggle {
   background: var(--primary);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -248,7 +266,7 @@ body.dark .hamburger span {
   border-top-left-radius: var(--radius);
   border-bottom-left-radius: var(--radius);
   box-shadow: -4px 0 12px rgba(0,0,0,.1);
-  transition: right var(--transition);
+  transition: right var(--transition), background-color var(--transition), color var(--transition);
   z-index: 1000;
 }
 body.dark .sidebar {
@@ -270,21 +288,18 @@ body.dark .sidebar {
   padding: 0.75rem 1.25rem;
   border-radius: var(--radius);
   font-weight: 600;
-  color: var(--text);
+  color: var(--nav-text);
   text-decoration: none;
   background: transparent;
   transition: background var(--transition), color var(--transition);
 }
-body.dark .sidebar nav a {
-  color: var(--text-d);
-}
 .sidebar nav a:hover {
   background: rgba(123,97,255,.1);
-  color: var(--primary);
+  color: var(--nav-hover);
 }
 .sidebar nav .btn {
   background: var(--primary);
-  color: #fff;
+  color: var(--text-on-accent);
   text-align: center;
 }
 .sidebar nav .btn:hover {
@@ -309,13 +324,13 @@ body.dark .sidebar nav a {
 .hero {
   text-align: center;
   padding: 7rem 1.5rem 5rem;
-  background: linear-gradient(135deg, #8EC5FC 0%, #E0C3FC 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--hero-start) 0%, var(--hero-end) 100%);
+  color: var(--text-on-accent);
   position: relative;
   overflow: hidden;
 }
 body.dark .hero {
-  background: linear-gradient(135deg, #001934 0%, #432889 100%);
+  background: linear-gradient(135deg, var(--hero-start-d) 0%, var(--hero-end-d) 100%);
 }
 .hero h1 {
   font-size: 2.9rem;
@@ -434,12 +449,12 @@ body.dark .hero {
   padding: 0 1rem;
 }
 .accordion-item {
-  border-top: 1px solid #d1d5db;
+  border-top: 1px solid var(--accordion-border);
   padding: 1rem 0;
   cursor: pointer;
 }
 body.dark .accordion-item {
-  border-top: 1px solid #273043;
+  border-top: 1px solid var(--accordion-border-d);
 }
 .accordion-item h4 {
   font-size: 1.1rem;
@@ -499,10 +514,10 @@ footer {
   text-align: center;
   padding: 2rem 1rem;
   font-size: .9rem;
-  background: #EEF3FF;
+  background: var(--footer-bg);
 }
 body.dark footer {
-  background: #0C101A;
+  background: var(--footer-bg-d);
 }
 footer nav a {
   margin: 0 .9rem;
