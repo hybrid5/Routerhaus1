@@ -57,8 +57,21 @@ function showToast(msg, type = 'success') {
   }, 3400);
 }
 
-/* ---------- DOM Ready ---------- */
-document.addEventListener('DOMContentLoaded', () => {
+/* ---------- Partials ---------- */
+async function loadPartials() {
+  const headHolder = document.getElementById('header-placeholder');
+  if (headHolder) {
+    const h = await fetch('header.html');
+    headHolder.outerHTML = await h.text();
+  }
+  const footHolder = document.getElementById('footer-placeholder');
+  if (footHolder) {
+    const f = await fetch('footer.html');
+    footHolder.outerHTML = await f.text();
+  }
+}
+
+function initUI() {
   const body       = document.body,
         header     = document.querySelector('.navbar'),
         hamburger  = document.getElementById('hamburger-menu'),
@@ -103,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const applyTheme = isDark => {
     body.classList.toggle('dark', isDark);
     localStorage.setItem('rh-theme', isDark ? 'dark' : 'light');
-    themeToggle.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+    themeToggle.textContent = isDark ? 'Light Mode' : 'Dark Mode';
     showToast(isDark ? 'Dark mode on' : 'Light mode on', 'info');
   };
 
@@ -115,4 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
   themeToggle.addEventListener('click', () =>
     applyTheme(!body.classList.contains('dark'))
   );
+}
+
+/* ---------- DOM Ready ---------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadPartials();
+  initUI();
 });

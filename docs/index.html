@@ -11,45 +11,19 @@
 
   <!-- Fonts & Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="main.css" />
 </head>
 <body>
-  <!-- ===== Header ===== -->
-  <header class="navbar">
-    <div class="logo">Router<span>Haus</span></div>
+  <div id="header-placeholder"></div>
 
-    <nav class="nav-desktop">
-      <a href="#how">How It Works</a>
-      <a href="#why">Why RouterHaus</a>
-      <a href="#enterprise"> Enterprise</a>
-      <a href="#faq">FAQ</a>
-      <a href="#start" class="btn">Start</a>
-    </nav>
-
-    <button id="hamburger-menu" class="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
-      <span></span><span></span><span></span>
-    </button>
-  </header>
-
-  <!-- ===== Sidebar ===== -->
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-        <button id="theme-toggle" class="theme-toggle">Light Mode</button>
-    <nav>
-      <a href="#how">How It Works</a>
-      <a href="#why">Why RouterHaus</a>
-      <a href="#faq">FAQ</a>
-      <a href="#start" class="btn">Start</a>
-    </nav>
-  </aside>
-  <div id="sidebar-overlay" class="overlay" tabindex="-1" aria-hidden="true"></div>
-
+  <main>
   <!-- ===== Hero ===== -->
   <section class="hero">
     <h1>Lightning-Fast Wi-Fi, Zero Guesswork</h1>
     <p>Your personalised network in under 60 seconds — for homes, apartments, and offices.</p>
     <div class="hero-actions">
-      <a href="#why" class="btn">Start Recommendation</a>
-      <a href="#enterprise" class="btn-secondary">Consult an Expert</a>
+      <a href="kits.html" class="btn">Start Recommendation</a>
+      <a href="consult.html" class="btn-secondary">Consult an Expert</a>
     </div>
   </section>
 
@@ -170,15 +144,13 @@
   <section class="footer-cta" id="start">
     <h2>Design Your Network</h2>
     <p>From a 1-bed flat to a full campus — we’ve got you covered.</p>
-    <a href="#why" class="btn">Start Matching →</a>
-    <a href="#enterprise" class="btn-secondary">Enterprise Consult</a>
+    <a href="kits.html" class="btn">Start Matching →</a>
+    <a href="consult.html" class="btn-secondary">Enterprise Consult</a>
   </section>
 
-  <!-- ===== Footer ===== -->
-  <footer>
-    <p>© 2025 RouterHaus. Built for real networks.</p>
-    <nav><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></nav>
-  </footer>
+  </main>
+
+  <div id="footer-placeholder"></div>
 
   <script src="scripts.js" defer></script>
 </body>

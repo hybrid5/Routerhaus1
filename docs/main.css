@@ -1,5 +1,5 @@
 /* ============================
-   RouterHaus v1 – styles.css
+   RouterHaus v1 – main.css
    ============================ */
 :root{
   /* ----- Light palette ----- */
@@ -516,8 +516,3 @@ footer nav a:hover {
   color: var(--primary);
 }
 
-/* ===== Responsive ===== */
-@media(max-width:768px){
-  .nav-desktop { display: none; }
-  .hamburger { display: flex; }
-}
