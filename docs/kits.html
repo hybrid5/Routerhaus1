@@ -12,6 +12,7 @@
   <!-- Fonts & Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="assets/css/kits.css" />
 </head>
 <body>
   <div id="header-placeholder"></div>
@@ -24,32 +25,44 @@
     <p>Explore our top router picks for home and professional networks.</p>
   </section>
 
-  <section class="kit-filters">
+  <button id="filterToggle" class="filter-toggle" aria-expanded="false" aria-controls="kitFilterSection">Filters</button>
+  <section id="kitFilterSection" class="kit-filters">
+    <label for="wifiFilter">Wi-Fi</label>
     <select id="wifiFilter">
-      <option value="">Wi-Fi</option>
+      <option value="">Any</option>
       <option value="5">5</option>
       <option value="6">6</option>
       <option value="6E">6E</option>
       <option value="7">7</option>
     </select>
+
+    <label for="envFilter">Environment</label>
     <select id="envFilter">
-      <option value="">Environment</option>
+      <option value="">Any</option>
       <option value="Apartment">Apartment</option>
       <option value="House">House</option>
       <option value="SMB">SMB</option>
       <option value="Enterprise">Enterprise</option>
     </select>
+
+    <label for="accessFilter">Access</label>
     <select id="accessFilter">
-      <option value="">Access</option>
+      <option value="">Any</option>
       <option value="Cable">Cable</option>
       <option value="Fiber">Fiber</option>
       <option value="5G">5G</option>
     </select>
+
+    <label for="speedFilter">Min WAN speed (Mbps)</label>
     <input id="speedFilter" type="number" placeholder="Mbps" />
+
+    <label for="meshFilter">Mesh-ready</label>
     <select id="meshFilter">
       <option value="">Any</option>
       <option value="mesh">Mesh-ready only</option>
     </select>
+
+    <button id="clearFilters" type="button">Clear filters</button>
   </section>
 
   <div id="kitResults" class="product-grid"></div>
