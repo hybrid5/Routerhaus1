@@ -26,7 +26,7 @@
   </section>
 
   <button id="filterToggle" class="filter-toggle" aria-expanded="false" aria-controls="kitFilterSection">Filters</button>
-  <section id="kitFilterSection" class="kit-filters">
+  <aside id="kitFilterSection" class="kit-filters filters lg:w-64 space-y-4 lg:sticky lg:top-24">
     <label for="wifiFilter">Wi-Fi</label>
     <select id="wifiFilter">
       <option value="">Any</option>
@@ -63,9 +63,9 @@
     </select>
 
     <button id="clearFilters" type="button">Clear filters</button>
-  </section>
+  </aside>
 
-  <div id="kitResults" class="product-grid"></div>
+  <div id="kitResults" class="kit-grid grid gap-6 lg:grid-cols-3"></div>
 
 
   <!-- ===== Consumer Picks ===== -->
@@ -75,21 +75,21 @@
       <article class="product glass">
         <img src="Deco-BE25.png" alt="TP-Link Deco BE25" />
         <h4>TP-Link Deco BE25</h4>
-        <p class="tag">Apartments & small homes</p>
+        <p class="tag"><span class="chip">Apartments & small homes</span></p>
         <p>≈ 6,600 sq ft • $249.99</p>
         <a href="index.html" class="btn-secondary">View</a>
       </article>
       <article class="product glass">
         <img src="google-nest-wi-fi.png" alt="Google Nest Wi-Fi" />
         <h4>Google Nest Wi-Fi Pro 3-pack</h4>
-        <p class="tag">Seamless setup</p>
+        <p class="tag"><span class="chip">Seamless setup</span></p>
         <p>≈ 6,600 sq ft • $399.99</p>
         <a href="index.html" class="btn-secondary">View</a>
       </article>
       <article class="product glass">
         <img src="ASUS-BE98.png" alt="Asus ROG GT-BE98" />
         <h4>Asus ROG GT-BE98 Pro</h4>
-        <p class="tag">Gaming & performance</p>
+        <p class="tag"><span class="chip">Gaming & performance</span></p>
         <p>≈ 4,800 sq ft • $629.99</p>
         <a href="index.html" class="btn-secondary">View</a>
       </article>
@@ -103,21 +103,21 @@
       <article class="product glass">
         <img src="Ubiquiti-Dream-Router.png" alt="Ubiquiti UniFi Dream Router" />
         <h4>UniFi Dream Router</h4>
-        <p class="tag">VLANs & remote control</p>
+        <p class="tag"><span class="chip">VLANs & remote control</span></p>
         <p>Custom scale • $199</p>
         <a href="consult.html" class="btn-secondary">Consult</a>
       </article>
       <article class="product glass">
         <img src="Synology-RT6600ax-Router.png" alt="Synology RT6600AX" />
         <h4>Synology RT6600AX</h4>
-        <p class="tag">SMB security</p>
+        <p class="tag"><span class="chip">SMB security</span></p>
         <p>≈ 3 000 sq ft • $329.99</p>
         <a href="consult.html" class="btn-secondary">Consult</a>
       </article>
       <article class="product glass">
         <img src="mikrotik-rb5009.png" alt="MikroTik RB5009" />
         <h4>MikroTik RB5009</h4>
-        <p class="tag">Custom routing</p>
+        <p class="tag"><span class="chip">Custom routing</span></p>
         <p>Modular • $219</p>
         <a href="consult.html" class="btn-secondary">Consult</a>
       </article>

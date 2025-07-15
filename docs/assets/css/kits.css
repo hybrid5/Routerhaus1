@@ -63,6 +63,44 @@ html[data-theme='dark'] .glass {
   border-radius: var(--radius);
 }
 
+.kit-grid {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* filter input styles */
+.filters select,
+.filters input {
+  width: 100%;
+  border: 1px solid var(--accordion-border);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+html[data-theme='dark'] .filters select,
+html[data-theme='dark'] .filters input {
+  background: var(--surface);
+  border-color: rgba(255,255,255,.15);
+  color: var(--text-primary);
+}
+
+.filters button {
+  width: 100%;
+  border: 1px solid var(--accordion-border);
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.filters button:hover {
+  filter: brightness(1.05);
+}
+html[data-theme='dark'] .filters button {
+  background: var(--surface);
+  border-color: rgba(255,255,255,.15);
+  color: var(--text-primary);
+}
+
 @media (min-width: 768px) {
   .kit-filters {
     flex-direction: column;
