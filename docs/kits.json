@@ -1,0 +1,90 @@
+[
+  {
+    "model": "TP-Link Deco BE25",
+    "wifiStandard": "6E",
+    "coverageSqft": 6600,
+    "environmentPreset": "Apartment",
+    "maxWanSpeedMbps": 2500,
+    "accessSupport": ["Cable", "Fiber"],
+    "priceUsd": 249.99,
+    "meshReady": true,
+    "bestFor": ["Simple mesh", "Apartments"]
+  },
+  {
+    "model": "Google Nest Wi-Fi Pro",
+    "wifiStandard": "6E",
+    "coverageSqft": 6600,
+    "environmentPreset": "House",
+    "maxWanSpeedMbps": 1000,
+    "accessSupport": ["Cable", "Fiber"],
+    "priceUsd": 399.99,
+    "meshReady": true,
+    "bestFor": ["Ease of use"]
+  },
+  {
+    "model": "Asus ROG GT-BE98 Pro",
+    "wifiStandard": "7",
+    "coverageSqft": 4800,
+    "environmentPreset": "House",
+    "maxWanSpeedMbps": 10000,
+    "accessSupport": ["Cable", "Fiber"],
+    "priceUsd": 629.99,
+    "meshReady": false,
+    "bestFor": ["Gaming", "Performance"]
+  },
+  {
+    "model": "UniFi Dream Router",
+    "wifiStandard": "6",
+    "coverageSqft": 3500,
+    "environmentPreset": "SMB",
+    "maxWanSpeedMbps": 1000,
+    "accessSupport": ["Cable", "Fiber"],
+    "priceUsd": 199.00,
+    "meshReady": true,
+    "bestFor": ["VLANs", "Remote management"]
+  },
+  {
+    "model": "Synology RT6600ax",
+    "wifiStandard": "6",
+    "coverageSqft": 3000,
+    "environmentPreset": "SMB",
+    "maxWanSpeedMbps": 2500,
+    "accessSupport": ["Cable", "Fiber"],
+    "priceUsd": 329.99,
+    "meshReady": true,
+    "bestFor": ["SMB security"]
+  },
+  {
+    "model": "MikroTik RB5009",
+    "wifiStandard": "6",
+    "coverageSqft": 2000,
+    "environmentPreset": "Enterprise",
+    "maxWanSpeedMbps": 10000,
+    "accessSupport": ["Cable", "Fiber"],
+    "priceUsd": 219.00,
+    "meshReady": false,
+    "bestFor": ["Custom routing"]
+  },
+  {
+    "model": "Netgear Orbi 970",
+    "wifiStandard": "7",
+    "coverageSqft": 10000,
+    "environmentPreset": "House",
+    "maxWanSpeedMbps": 10000,
+    "accessSupport": ["Cable", "Fiber"],
+    "priceUsd": 1699.99,
+    "meshReady": true,
+    "bestFor": ["Large homes", "Tri-band"]
+  },
+  {
+    "model": "Inseego Wavemaker PRO",
+    "wifiStandard": "6",
+    "coverageSqft": 2500,
+    "environmentPreset": "SMB",
+    "maxWanSpeedMbps": 1000,
+    "accessSupport": ["5G"],
+    "priceUsd": 799.00,
+    "meshReady": false,
+    "bestFor": ["5G failover"]
+  }
+]
