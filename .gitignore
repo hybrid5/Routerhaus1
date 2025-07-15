@@ -1,0 +1,13 @@
+# Node dependencies
+node_modules/
+
+# Local Tailwind CLI binary
+/tailwindcss
+
+# System files
+.DS_Store
+
+# Build outputs
+assets/css/main.css
+blog/
+
