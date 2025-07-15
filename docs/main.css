@@ -2,58 +2,52 @@
    RouterHaus v1 – main.css
    ============================ */
 :root{
-  /* ----- Light palette ----- */
+  --bg: #FFFFFF;
+  --surface: #F8F9FA;
+  --card: #FFFFFF;
+  --text-primary: #111827;
+  --text-muted: #58627A;
+  --nav-text: #111827;
+  --nav-hover: #1939A5;
+  --accent: #F667FF;
   --primary: #7B61FF;
   --secondary: #1939A5;
-  --accent: #F667FF;
+  --footer-bg: #EEF3FF;
+  --hero-start: #8EC5FC;
+  --hero-end: #E0C3FC;
+  --accordion-border: #d1d5db;
+  --text-on-accent: #fff;
 
-  --bg: #FFFFFF;
-  --bg-surface: #F8F9FA;
-  --bg-card: #FFFFFF;
-  --card-border: 1px solid #E2E4E7;
-
-  --text: #111827;
-  --text-muted: #58627A;
-
-  /* ----- Dark palette ----- */
-  --primary-d: #A9A1FF;
-  --secondary-d: #94B0FF;
-  --accent-d: #FF9AFF;
-
-  --bg-d: #0B1120;
-  --bg-card-d: rgba(18,25,38,.55);
-  --text-d: #E3E8F7;
-  --text-muted-d: #8693B4;
-
-  /* Global */
   --radius: 20px;
   --shadow: 0 8px 24px rgba(0,0,0,.05);
   --transition: all .28s cubic-bezier(.4,.0,.2,1);
 }
 
-@media (prefers-color-scheme: dark){
-  :root{
-    --primary: var(--primary-d);
-    --secondary: var(--secondary-d);
-    --accent: var(--accent-d);
-    --bg: var(--bg-d);
-    --bg-card: var(--bg-card-d);
-    --text: var(--text-d);
-    --text-muted: var(--text-muted-d);
-  }
+html[data-theme='dark']{
+  --bg: #0B1120;
+  --surface: #101723;
+  --card: rgba(18,25,38,.55);
+  --text-primary: #E3E8F7;
+  --text-muted: #8693B4;
+  --nav-text: #E3E8F7;
+  --nav-hover: #94B0FF;
+  --accent: #FF9AFF;
+  --primary: #A9A1FF;
+  --secondary: #94B0FF;
+  --footer-bg: #0C101A;
+  --hero-start: #001934;
+  --hero-end: #432889;
+  --accordion-border: #273043;
 }
 
 html, body {
   margin: 0;
   font-family: 'Plus Jakarta Sans','Inter',sans-serif;
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-primary);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
-}
-body.dark {
-  background: var(--bg-d);
-  color: var(--text-d);
+  transition: background-color .3s, color .3s;
 }
 img {
   max-width: 100%;
@@ -63,13 +57,13 @@ img {
 
 /* Glass utility */
 .glass {
-  background: var(--bg-card);
+  background: var(--card);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   border: var(--card-border);
 }
-body.dark .glass {
-  background: var(--bg-card-d);
+html[data-theme='dark'] .glass {
+  background: var(--card);
   border: 1px solid rgba(255,255,255,.08);
 }
 
@@ -85,9 +79,9 @@ body.dark .glass {
   background: linear-gradient(110deg, rgba(255,255,255,1), rgba(244,247,255,1));
   backdrop-filter: blur(24px);
   box-shadow: var(--shadow);
-  transition: background var(--transition);
+  transition: background var(--transition), color var(--transition);
 }
-body.dark .navbar {
+html[data-theme='dark'] .navbar {
   background: linear-gradient(110deg, rgba(11,17,32,.65), rgba(11,17,32,.45));
 }
 .logo {
@@ -109,12 +103,9 @@ body.dark .navbar {
   position: relative;
   font-weight: 500;
   text-decoration: none;
-  color: var(--text);
+  color: var(--nav-text);
   padding: 0.4rem 0;
   transition: color var(--transition);
-}
-body.dark .nav-desktop a {
-  color: var(--text-d);
 }
 .nav-desktop a::after {
   content: '';
@@ -129,16 +120,19 @@ body.dark .nav-desktop a {
 .nav-desktop a:hover::after {
   width: 100%;
 }
+.nav-desktop a:hover {
+  color: var(--nav-hover);
+}
 .nav-desktop .btn {
   background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
+  color: var(--text-on-accent);
   padding: 0.55rem 1.1rem;
   border-radius: 40px;
   font-size: 0.9rem;
   margin-left: 1rem;
   box-shadow: 0 3px 10px rgba(123,97,255,.3);
   text-decoration: none;
-  transition: filter var(--transition), transform var(--transition);
+  transition: filter var(--transition), transform var(--transition), background-color var(--transition), color var(--transition);
 }
 .nav-desktop .btn:hover {
   filter: brightness(1.15);
@@ -156,7 +150,7 @@ body.dark .nav-desktop a {
 }
 .btn {
   background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
+  color: var(--text-on-accent);
   box-shadow: 0 6px 18px rgba(123,97,255,.35);
 }
 .btn:hover {
@@ -171,18 +165,18 @@ body.dark .nav-desktop a {
 .btn-secondary:hover {
   background: rgba(123,97,255,.1);
 }
-body.dark .btn-secondary {
-  border-color: var(--primary-d);
-  color: var(--primary-d);
+html[data-theme='dark'] .btn-secondary {
+  border-color: var(--primary);
+  color: var(--primary);
 }
-body.dark .btn-secondary:hover {
+html[data-theme='dark'] .btn-secondary:hover {
   background: rgba(169,161,255,.12);
 }
 
 /* ===== Theme toggle & hamburger ===== */
 .theme-toggle {
   background: var(--primary);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -210,12 +204,12 @@ body.dark .btn-secondary:hover {
 .hamburger span {
   width: 26px;
   height: 3px;
-  background: var(--text);
+  background: var(--text-primary);
   border-radius: 2px;
   transition: var(--transition);
 }
-body.dark .hamburger span {
-  background: var(--text-d);
+html[data-theme='dark'] .hamburger span {
+  background: var(--text-primary);
 }
 .hamburger.active span:nth-child(1) {
   transform: rotate(45deg) translate(6px,6px);
@@ -239,7 +233,7 @@ body.dark .hamburger span {
   width: 85%;
   max-width: 320px;
   height: calc(100% - 70px);
-  background: var(--bg-card);
+  background: var(--card);
   backdrop-filter: blur(18px);
   padding: 2.5rem 1.75rem;
   display: flex;
@@ -248,11 +242,11 @@ body.dark .hamburger span {
   border-top-left-radius: var(--radius);
   border-bottom-left-radius: var(--radius);
   box-shadow: -4px 0 12px rgba(0,0,0,.1);
-  transition: right var(--transition);
+  transition: right var(--transition), background-color var(--transition), color var(--transition);
   z-index: 1000;
 }
-body.dark .sidebar {
-  background: var(--bg-card-d);
+html[data-theme='dark'] .sidebar {
+  background: var(--card);
 }
 .sidebar.active {
   right: 0;
@@ -270,21 +264,18 @@ body.dark .sidebar {
   padding: 0.75rem 1.25rem;
   border-radius: var(--radius);
   font-weight: 600;
-  color: var(--text);
+  color: var(--nav-text);
   text-decoration: none;
   background: transparent;
   transition: background var(--transition), color var(--transition);
 }
-body.dark .sidebar nav a {
-  color: var(--text-d);
-}
 .sidebar nav a:hover {
   background: rgba(123,97,255,.1);
-  color: var(--primary);
+  color: var(--nav-hover);
 }
 .sidebar nav .btn {
   background: var(--primary);
-  color: #fff;
+  color: var(--text-on-accent);
   text-align: center;
 }
 .sidebar nav .btn:hover {
@@ -309,13 +300,13 @@ body.dark .sidebar nav a {
 .hero {
   text-align: center;
   padding: 7rem 1.5rem 5rem;
-  background: linear-gradient(135deg, #8EC5FC 0%, #E0C3FC 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--hero-start) 0%, var(--hero-end) 100%);
+  color: var(--text-on-accent);
   position: relative;
   overflow: hidden;
 }
-body.dark .hero {
-  background: linear-gradient(135deg, #001934 0%, #432889 100%);
+html[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, var(--hero-start) 0%, var(--hero-end) 100%);
 }
 .hero h1 {
   font-size: 2.9rem;
@@ -434,20 +425,20 @@ body.dark .hero {
   padding: 0 1rem;
 }
 .accordion-item {
-  border-top: 1px solid #d1d5db;
+  border-top: 1px solid var(--accordion-border);
   padding: 1rem 0;
   cursor: pointer;
 }
-body.dark .accordion-item {
-  border-top: 1px solid #273043;
+html[data-theme='dark'] .accordion-item {
+  border-top: 1px solid var(--accordion-border);
 }
 .accordion-item h4 {
   font-size: 1.1rem;
   margin: 0;
-  color: var(--text);
+  color: var(--text-primary);
 }
-body.dark .accordion-item h4 {
-  color: var(--text-d);
+html[data-theme='dark'] .accordion-item h4 {
+  color: var(--text-primary);
 }
 .accordion-item span {
   float: right;
@@ -463,8 +454,8 @@ body.dark .accordion-item h4 {
   margin: .6rem 0 0;
   color: var(--text-muted);
 }
-body.dark .accordion-item p {
-  color: var(--text-muted-d);
+html[data-theme='dark'] .accordion-item p {
+  color: var(--text-muted);
 }
 .accordion-item.open p {
   display: block;
@@ -474,10 +465,10 @@ body.dark .accordion-item p {
 .footer-cta {
   text-align: center;
   padding: 4rem 1.5rem;
-  background: var(--bg-card);
+  background: var(--card);
 }
-body.dark .footer-cta {
-  background: var(--bg-card-d);
+html[data-theme='dark'] .footer-cta {
+  background: var(--card);
 }
 .footer-cta h2 {
   font-size: 1.9rem;
@@ -487,8 +478,8 @@ body.dark .footer-cta {
   color: var(--text-muted);
   margin: 0 0 1.5rem;
 }
-body.dark .footer-cta p {
-  color: var(--text-muted-d);
+html[data-theme='dark'] .footer-cta p {
+  color: var(--text-muted);
 }
 .footer-cta a.btn {
   margin-right: 1rem;
@@ -499,18 +490,18 @@ footer {
   text-align: center;
   padding: 2rem 1rem;
   font-size: .9rem;
-  background: #EEF3FF;
+  background: var(--footer-bg);
 }
-body.dark footer {
-  background: #0C101A;
+html[data-theme='dark'] footer {
+  background: var(--footer-bg);
 }
 footer nav a {
   margin: 0 .9rem;
   text-decoration: none;
   color: var(--text-muted);
 }
-body.dark footer nav a {
-  color: var(--text-muted-d);
+html[data-theme='dark'] footer nav a {
+  color: var(--text-muted);
 }
 footer nav a:hover {
   color: var(--primary);

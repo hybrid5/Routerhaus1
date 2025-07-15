@@ -72,8 +72,7 @@ async function loadPartials() {
 }
 
 function initUI() {
-  const body       = document.body,
-        header     = document.querySelector('.navbar'),
+  const header     = document.querySelector('.navbar'),
         hamburger  = document.getElementById('hamburger-menu'),
         sidebar    = document.getElementById('sidebar'),
         overlay    = document.getElementById('sidebar-overlay'),
@@ -114,7 +113,7 @@ function initUI() {
 
   /* Theme toggle */
   const applyTheme = isDark => {
-    body.classList.toggle('dark', isDark);
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
     localStorage.setItem('rh-theme', isDark ? 'dark' : 'light');
     themeToggle.textContent = isDark ? 'Light Mode' : 'Dark Mode';
     showToast(isDark ? 'Dark mode on' : 'Light mode on', 'info');
@@ -126,7 +125,7 @@ function initUI() {
   applyTheme(pref === 'dark');
 
   themeToggle.addEventListener('click', () =>
-    applyTheme(!body.classList.contains('dark'))
+    applyTheme(document.documentElement.dataset.theme !== 'dark')
   );
 }
 
