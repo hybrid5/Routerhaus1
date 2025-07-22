@@ -6,19 +6,23 @@
     "environmentPreset": "Apartment",
     "maxWanSpeedMbps": 2500,
     "accessSupport": ["Cable", "Fiber"],
-    "priceUsd": 249.99,
     "meshReady": true,
+    "priceUsd": 249.99,
+    "deviceLoad": "6–15",
+    "primaryUse": ["Smart-Home", "All-Purpose"],
     "bestFor": ["Simple mesh", "Apartments"]
   },
   {
-    "model": "Google Nest Wi-Fi Pro",
+    "model": "Google Nest Wi‑Fi Pro",
     "wifiStandard": "6E",
     "coverageSqft": 6600,
     "environmentPreset": "House",
     "maxWanSpeedMbps": 1000,
     "accessSupport": ["Cable", "Fiber"],
-    "priceUsd": 399.99,
     "meshReady": true,
+    "priceUsd": 399.99,
+    "deviceLoad": "6–15",
+    "primaryUse": ["All-Purpose"],
     "bestFor": ["Ease of use"]
   },
   {
@@ -28,8 +32,10 @@
     "environmentPreset": "House",
     "maxWanSpeedMbps": 10000,
     "accessSupport": ["Cable", "Fiber"],
-    "priceUsd": 629.99,
     "meshReady": false,
+    "priceUsd": 629.99,
+    "deviceLoad": "16+",
+    "primaryUse": ["Gaming"],
     "bestFor": ["Gaming", "Performance"]
   },
   {
@@ -39,8 +45,10 @@
     "environmentPreset": "SMB",
     "maxWanSpeedMbps": 1000,
     "accessSupport": ["Cable", "Fiber"],
-    "priceUsd": 199.00,
     "meshReady": true,
+    "priceUsd": 199.00,
+    "deviceLoad": "6–15",
+    "primaryUse": ["Work-From-Home"],
     "bestFor": ["VLANs", "Remote management"]
   },
   {
@@ -50,8 +58,10 @@
     "environmentPreset": "SMB",
     "maxWanSpeedMbps": 2500,
     "accessSupport": ["Cable", "Fiber"],
-    "priceUsd": 329.99,
     "meshReady": true,
+    "priceUsd": 329.99,
+    "deviceLoad": "6–15",
+    "primaryUse": ["Work-From-Home"],
     "bestFor": ["SMB security"]
   },
   {
@@ -61,8 +71,10 @@
     "environmentPreset": "Enterprise",
     "maxWanSpeedMbps": 10000,
     "accessSupport": ["Cable", "Fiber"],
-    "priceUsd": 219.00,
     "meshReady": false,
+    "priceUsd": 219.00,
+    "deviceLoad": "1–5",
+    "primaryUse": ["Work-From-Home"],
     "bestFor": ["Custom routing"]
   },
   {
@@ -72,9 +84,11 @@
     "environmentPreset": "House",
     "maxWanSpeedMbps": 10000,
     "accessSupport": ["Cable", "Fiber"],
-    "priceUsd": 1699.99,
     "meshReady": true,
-    "bestFor": ["Large homes", "Tri-band"]
+    "priceUsd": 1699.99,
+    "deviceLoad": "16+",
+    "primaryUse": ["All-Purpose"],
+    "bestFor": ["Large homes", "Tri‑band"]
   },
   {
     "model": "Inseego Wavemaker PRO",
@@ -82,9 +96,11 @@
     "coverageSqft": 2500,
     "environmentPreset": "SMB",
     "maxWanSpeedMbps": 1000,
-    "accessSupport": ["5G"],
-    "priceUsd": 799.00,
+    "accessSupport": ["5G Wireless"],
     "meshReady": false,
+    "priceUsd": 799.00,
+    "deviceLoad": "1–5",
+    "primaryUse": ["Work-From-Home"],
     "bestFor": ["5G failover"]
   }
 ]
