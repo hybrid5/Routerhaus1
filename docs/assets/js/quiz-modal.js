@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('form:', form);
   const closeBtns = modal ? modal.querySelectorAll('.quiz-close') : [];
   console.log('closeBtns:', closeBtns);
+=======
+document.addEventListener('DOMContentLoaded', () => {
+  const openBtn = document.getElementById('startQuizBtn');
+  const modal = document.getElementById('quizModal');
+  const form = document.getElementById('quizForm');
+  const closeBtns = modal ? modal.querySelectorAll('.quiz-close') : [];
   let focusables = [];
   let firstFocus, lastFocus;
 
@@ -35,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
         options.map(o => `<option value="${o}">${o}</option>`).join('');
       aside.insertBefore(label, clearBtn);
       aside.insertBefore(select, clearBtn);
+      aside.appendChild(label);
+      aside.appendChild(select);
     }
     return select;
   }
@@ -77,6 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
     closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+  if (openBtn && modal && form) {
+    openBtn.addEventListener('click', () => modal.classList.add('active'));
+    closeBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
+
     form.addEventListener('submit', e => {
       e.preventDefault();
       const home = form.quizHomeSize.value;
@@ -91,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (typeof applyFilters === 'function') applyFilters();
       closeModal();
+      modal.classList.remove('active');
     });
   }
 });
