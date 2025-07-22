@@ -103,7 +103,6 @@
     "primaryUse": ["Work-From-Home"],
     "bestFor": ["5G failover"]
   }
-  /* ──────────── ASUS ──────────── */
   {
     "model": "ASUS RT‑AX82U",
     "wifiStandard": "6",
@@ -209,7 +208,6 @@
     "bestFor": ["Whole‑home mesh", "Dedicated backhaul"]
   },
 
-  /* ──────────── NETGEAR ──────────── */
   {
     "model": "Netgear Nighthawk RS600",
     "wifiStandard": "7",
@@ -380,7 +378,6 @@
     "bestFor": ["Ultimate Wi‑Fi 7 mesh", "Large homes"]
   },
 
-  /* ──────────── TP‑Link ──────────── */
   {
     "model": "TP‑Link Archer AX10",
     "wifiStandard": "6",
@@ -538,7 +535,6 @@
     "bestFor": ["Ultimate mesh", "Luxury estates"]
   },
 
-  /* ──────────── Linksys ──────────── */
   {
     "model": "Linksys Hydra Pro 6 (MR5500)",
     "wifiStandard": "6",
@@ -618,7 +614,6 @@
     "bestFor": ["Pro‑grade mesh", "Easy app setup"]
   },
 
-  /* ──────────── Ubiquiti ──────────── */
   {
     "model": "AmpliFi Alien",
     "wifiStandard": "6",
@@ -672,7 +667,6 @@
     "bestFor": ["Advanced routing", "Separate AP flexibility"]
   },
 
-  /* ──────────── Synology ──────────── */
   {
     "model": "Synology RT6600ax",
     "wifiStandard": "6",
@@ -700,7 +694,6 @@
     "bestFor": ["Cost‑effective SRM", "Mesh node"]
   },
 
-  /* ──────────── MikroTik ──────────── */
   {
     "model": "MikroTik hAP ax³",
     "wifiStandard": "6",
@@ -754,7 +747,6 @@
     "bestFor": ["Custom wired routing", "Home lab"]
   },
 
-  /* ──────────── D‑Link ──────────── */
   {
     "model": "D‑Link EXO DIR‑X5460",
     "wifiStandard": "6",
@@ -795,7 +787,6 @@
     "bestFor": ["Basic AX1800", "Low budget"]
   },
 
-  /* ──────────── Other Notable ──────────── */
   {
     "model": "Google Nest Wi‑Fi Pro (3‑pack)",
     "wifiStandard": "6E",
