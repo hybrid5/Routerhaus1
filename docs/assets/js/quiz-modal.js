@@ -11,12 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('form:', form);
   const closeBtns = modal ? modal.querySelectorAll('.quiz-close') : [];
   console.log('closeBtns:', closeBtns);
-=======
-document.addEventListener('DOMContentLoaded', () => {
-  const openBtn = document.getElementById('startQuizBtn');
-  const modal = document.getElementById('quizModal');
-  const form = document.getElementById('quizForm');
-  const closeBtns = modal ? modal.querySelectorAll('.quiz-close') : [];
+
   let focusables = [];
   let firstFocus, lastFocus;
 
@@ -32,17 +27,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const aside = document.getElementById('kitFilterSection');
       if (!aside) return null;
       const clearBtn = document.getElementById('clearFilters');
+
       const label = document.createElement('label');
       label.setAttribute('for', id);
       label.textContent = labelText;
+
       select = document.createElement('select');
       select.id = id;
       select.innerHTML = '<option value="">Any</option>' +
         options.map(o => `<option value="${o}">${o}</option>`).join('');
+
       aside.insertBefore(label, clearBtn);
       aside.insertBefore(select, clearBtn);
-      aside.appendChild(label);
-      aside.appendChild(select);
+
+      const key = id.replace('Filter', '');
+      if (window.elements && elements[key] === null) {
+        elements[key] = select;
+        select.addEventListener('change', () => {
+          if (typeof saveFilters === 'function') saveFilters();
+          if (typeof applyFilters === 'function') applyFilters();
+        });
+      }
     }
     return select;
   }
@@ -83,11 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openBtn && modal && form) {
     openBtn.addEventListener('click', openModal);
     closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
-    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-
-  if (openBtn && modal && form) {
-    openBtn.addEventListener('click', () => modal.classList.add('active'));
-    closeBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
+    });
 
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -98,12 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const envSelect = document.getElementById('envFilter');
       if (envSelect) envSelect.value = envMap[home] || home;
 
-      ensureFilter('deviceFilter', 'Device Load', ['1–5','6–15','16+']).value = devices;
-      ensureFilter('usageFilter', 'Primary Use', ['Family Streaming','Gaming','Work-From-Home','Smart-Home','All-Purpose']).value = usage;
+      ensureFilter('deviceFilter', 'Device Load', ['1–5', '6–15', '16+']).value = devices;
+      ensureFilter('usageFilter', 'Primary Use', ['Family Streaming', 'Gaming', 'Work-From-Home', 'Smart-Home', 'All-Purpose']).value = usage;
 
       if (typeof applyFilters === 'function') applyFilters();
       closeModal();
-      modal.classList.remove('active');
     });
   }
 });
