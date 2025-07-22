@@ -8,6 +8,8 @@ const elements = {
   access: document.getElementById('accessFilter'),
   speed: document.getElementById('speedFilter'),
   mesh: document.getElementById('meshFilter'),
+  device: document.getElementById('deviceFilter'),
+  usage: document.getElementById('usageFilter'),
   results: document.getElementById('kitResults')
 };
 
@@ -28,12 +30,16 @@ function applyFilters() {
   const access = elements.access.value;
   const speed = parseInt(elements.speed.value, 10);
   const mesh = elements.mesh.value === 'mesh';
+  const device = elements.device ? elements.device.value : '';
+  const usage = elements.usage ? elements.usage.value : '';
 
   if (wifi) res = res.filter(k => k.wifiStandard === wifi);
   if (env) res = res.filter(k => k.environmentPreset === env);
   if (access) res = res.filter(k => k.accessSupport.includes(access));
   if (!isNaN(speed)) res = res.filter(k => k.maxWanSpeedMbps >= speed);
   if (mesh) res = res.filter(k => k.meshReady);
+  if (device) res = res.filter(k => k.deviceLoad ? k.deviceLoad === device : true);
+  if (usage) res = res.filter(k => k.primaryUse ? k.primaryUse.includes(usage) : true);
 
   res = [...res].sort((a, b) => a.priceUsd - b.priceUsd);
 
@@ -52,8 +58,8 @@ const STORE_KEY = 'rh-kit-filters';
 
 function saveFilters() {
   const data = {};
-  ['wifi','env','access','speed','mesh'].forEach(k => {
-    data[k] = elements[k].value;
+  ['wifi','env','access','speed','mesh','device','usage'].forEach(k => {
+    if (elements[k]) data[k] = elements[k].value;
   });
   localStorage.setItem(STORE_KEY, JSON.stringify(data));
 }
@@ -63,8 +69,8 @@ function loadFilters() {
   if (saved) {
     try {
       const data = JSON.parse(saved);
-      ['wifi','env','access','speed','mesh'].forEach(k => {
-        if (data[k] !== undefined) elements[k].value = data[k];
+      ['wifi','env','access','speed','mesh','device','usage'].forEach(k => {
+        if (data[k] !== undefined && elements[k]) elements[k].value = data[k];
       });
     } catch(e) {}
   }
@@ -82,14 +88,18 @@ async function init() {
   }
 }
 
-['wifi','env','access','speed','mesh'].forEach(id =>
-  elements[id].addEventListener('change', () => { saveFilters(); applyFilters(); })
-);
+['wifi','env','access','speed','mesh','device','usage'].forEach(id => {
+  if (elements[id]) {
+    elements[id].addEventListener('change', () => { saveFilters(); applyFilters(); });
+  }
+});
 
 const clearBtn = document.getElementById('clearFilters');
 if (clearBtn) {
   clearBtn.addEventListener('click', () => {
-    ['wifi','env','access','speed','mesh'].forEach(k => elements[k].value = '');
+    ['wifi','env','access','speed','mesh','device','usage'].forEach(k => {
+      if (elements[k]) elements[k].value = '';
+    });
     localStorage.removeItem(STORE_KEY);
     applyFilters();
   });

@@ -141,3 +141,49 @@ html[data-theme='dark'] .filters button {
 .accordion-item.open p {
   display: block;
 }
+
+/* Quiz modal overlay */
+#quizModal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.6);
+  z-index: 1200;
+}
+#quizModal.active { display: flex; }
+#quizModal .modal-content {
+  background: var(--card);
+  color: var(--text-primary);
+  padding: 2rem;
+  border-radius: var(--radius);
+  position: relative;
+  width: 90%;
+  max-width: 500px;
+}
+#quizModal .modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+#quizModal label {
+  display: block;
+  margin-top: 1rem;
+}
+#quizModal select {
+  width: 100%;
+  margin-top: .25rem;
+  padding: .5rem;
+}
+#quizModal .modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
