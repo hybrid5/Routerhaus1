@@ -23,7 +23,40 @@
   <section class="hero">
     <h1>Find Your Perfect Kit</h1>
     <p>Explore our top router picks for home and professional networks.</p>
+    <div class="hero-actions">
+      <button id="startQuizBtn" class="btn" type="button">Start Recommendation</button>
+    </div>
   </section>
+
+  <div id="quizModal" class="quiz-modal">
+    <form id="quizForm" class="modal-content">
+      <h2>Quick Quiz</h2>
+      <label for="quizHomeSize">Home Size</label>
+      <select id="quizHomeSize" name="quizHomeSize" required>
+        <option value="Apartment/Small">Apartment/Small</option>
+        <option value="2–3 Bedroom">2–3 Bedroom</option>
+        <option value="Large/Multi-floor">Large/Multi-floor</option>
+      </select>
+      <label for="quizDeviceLoad">Device Load</label>
+      <select id="quizDeviceLoad" name="quizDeviceLoad" required>
+        <option value="1–5">1–5</option>
+        <option value="6–15">6–15</option>
+        <option value="16+">16+</option>
+      </select>
+      <label for="quizPrimaryUse">Primary Use</label>
+      <select id="quizPrimaryUse" name="quizPrimaryUse" required>
+        <option value="Family Streaming">Family Streaming</option>
+        <option value="Gaming">Gaming</option>
+        <option value="Work-From-Home">Work-From-Home</option>
+        <option value="Smart-Home">Smart-Home</option>
+        <option value="All-Purpose">All-Purpose</option>
+      </select>
+      <div class="modal-actions">
+        <button type="submit" class="btn">Apply</button>
+        <button type="button" class="btn-secondary quiz-close">Close</button>
+      </div>
+    </form>
+  </div>
 
   <button id="filterToggle" class="filter-toggle" aria-expanded="false" aria-controls="kitFilterSection">Filters</button>
   <aside id="kitFilterSection" class="kit-filters filters lg:w-64 space-y-4 lg:sticky lg:top-24">
@@ -140,5 +173,6 @@
 
   <script src="scripts.js" defer></script>
   <script src="assets/js/kits.js" defer></script>
+  <script src="assets/js/quiz-modal.js" defer></script>
 </body>
 </html>
