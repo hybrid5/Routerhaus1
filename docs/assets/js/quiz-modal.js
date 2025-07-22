@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('quizModal');
   const form = document.getElementById('quizForm');
   const closeBtns = modal ? modal.querySelectorAll('.quiz-close') : [];
+  let focusables = [];
+  let firstFocus, lastFocus;
 
   const envMap = {
     'Apartment/Small': 'Apartment',
@@ -17,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!select) {
       const aside = document.getElementById('kitFilterSection');
       if (!aside) return null;
+      const clearBtn = document.getElementById('clearFilters');
       const label = document.createElement('label');
       label.setAttribute('for', id);
       label.textContent = labelText;
@@ -24,12 +27,51 @@ document.addEventListener('DOMContentLoaded', () => {
       select.id = id;
       select.innerHTML = '<option value="">Any</option>' +
         options.map(o => `<option value="${o}">${o}</option>`).join('');
+      aside.insertBefore(label, clearBtn);
+      aside.insertBefore(select, clearBtn);
       aside.appendChild(label);
       aside.appendChild(select);
     }
     return select;
   }
 
+  function trapFocus(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+    } else if (e.key === 'Tab' && focusables.length) {
+      if (e.shiftKey && document.activeElement === firstFocus) {
+        e.preventDefault();
+        lastFocus.focus();
+      } else if (!e.shiftKey && document.activeElement === lastFocus) {
+        e.preventDefault();
+        firstFocus.focus();
+      }
+    }
+  }
+
+  function openModal() {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    focusables = modal.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    firstFocus = focusables[0];
+    lastFocus = focusables[focusables.length - 1];
+    firstFocus.focus();
+    document.addEventListener('keydown', trapFocus);
+  }
+
+  function closeModal() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', trapFocus);
+    if (openBtn) openBtn.focus();
+  }
+
+  if (openBtn && modal && form) {
+    openBtn.addEventListener('click', openModal);
+    closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
   if (openBtn && modal && form) {
     openBtn.addEventListener('click', () => modal.classList.add('active'));
     closeBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
@@ -47,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ensureFilter('usageFilter', 'Primary Use', ['Family Streaming','Gaming','Work-From-Home','Smart-Home','All-Purpose']).value = usage;
 
       if (typeof applyFilters === 'function') applyFilters();
+      closeModal();
       modal.classList.remove('active');
     });
   }
