@@ -650,6 +650,58 @@
     "bestFor": ["Rack‑mount gateway", "UniFi OS apps"]
   },
   {
+    "model": "UniFi Express 7 (UX7)",
+    "wifiStandard": "7",
+    "coverageSqft": 2500,
+    "environmentPreset": "House",
+    "maxWanSpeedMbps": 10000,
+    "accessSupport": ["Cable", "Fiber"],
+    "meshReady": true,
+    "priceUsd": 199.00,
+    "deviceLoad": "6–15",
+    "primaryUse": ["All-Purpose"],
+    "bestFor": ["Wi‑Fi 7 gateway", "Compact mesh seed"]
+  },
+  {
+    "model": "UniFi Express (UX)",
+    "wifiStandard": "6",
+    "coverageSqft": 2200,
+    "environmentPreset": "Apartment",
+    "maxWanSpeedMbps": 1000,
+    "accessSupport": ["Cable", "Fiber"],
+    "meshReady": true,
+    "priceUsd": 149.00,
+    "deviceLoad": "6–15",
+    "primaryUse": ["All-Purpose"],
+    "bestFor": ["Budget UniFi", "Entry gateway"]
+  },
+  {
+    "model": "Dream Router 7 (UDR7)",
+    "wifiStandard": "7",
+    "coverageSqft": 3500,
+    "environmentPreset": "House",
+    "maxWanSpeedMbps": 10000,
+    "accessSupport": ["Cable", "Fiber"],
+    "meshReady": true,
+    "priceUsd": 279.00,
+    "deviceLoad": "16+",
+    "primaryUse": ["All-Purpose"],
+    "bestFor": ["Wi‑Fi 7 + PoE", "Prosumer homes"]
+  },
+  {
+    "model": "Dream Wall (UDW)",
+    "wifiStandard": "6",
+    "coverageSqft": 3500,
+    "environmentPreset": "House",
+    "maxWanSpeedMbps": 10000,
+    "accessSupport": ["Cable", "Fiber"],
+    "meshReady": true,
+    "priceUsd": 999.00,
+    "deviceLoad": "16+",
+    "primaryUse": ["All-Purpose"],
+    "bestFor": ["Wall‑mount gateway", "Large home PoE"]
+  },
+  {
     "model": "EdgeRouter X + UniFi AP",
     "wifiStandard": "6",
     "coverageSqft": 1500,
