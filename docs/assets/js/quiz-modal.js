@@ -1,5 +1,17 @@
 "use strict";
 
+console.log('quiz-modal.js loaded');
+
+document.addEventListener('DOMContentLoaded', () => {
+  const openBtn = document.getElementById('startQuizBtn');
+  console.log('openBtn:', openBtn);
+  const modal = document.getElementById('quizModal');
+  console.log('modal:', modal);
+  const form = document.getElementById('quizForm');
+  console.log('form:', form);
+  const closeBtns = modal ? modal.querySelectorAll('.quiz-close') : [];
+  console.log('closeBtns:', closeBtns);
+=======
 document.addEventListener('DOMContentLoaded', () => {
   const openBtn = document.getElementById('startQuizBtn');
   const modal = document.getElementById('quizModal');
@@ -72,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     openBtn.addEventListener('click', openModal);
     closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
   if (openBtn && modal && form) {
     openBtn.addEventListener('click', () => modal.classList.add('active'));
     closeBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
