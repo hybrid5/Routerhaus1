@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
         options.map(o => `<option value="${o}">${o}</option>`).join('');
       aside.insertBefore(label, clearBtn);
       aside.insertBefore(select, clearBtn);
+      aside.appendChild(label);
+      aside.appendChild(select);
     }
     return select;
   }
@@ -70,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     openBtn.addEventListener('click', openModal);
     closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  if (openBtn && modal && form) {
+    openBtn.addEventListener('click', () => modal.classList.add('active'));
+    closeBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
 
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -85,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (typeof applyFilters === 'function') applyFilters();
       closeModal();
+      modal.classList.remove('active');
     });
   }
 });
