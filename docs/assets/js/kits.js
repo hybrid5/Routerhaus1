@@ -79,7 +79,7 @@ function loadFilters() {
 async function init() {
   loadFilters();
   try {
-    const resp = await fetch('kits.json');
+    const resp = await fetch('routers_full_combined.json');
     if (!resp.ok) throw new Error('Fetch failed');
     kitsData = await resp.json();
     applyFilters();
