@@ -1,4 +1,6 @@
 /* RouterHaus Kits — Quiz modal + mapping */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const dlg = document.getElementById('quizModal');
 const openBtn = document.getElementById('openQuiz');
 const closeBtns = $$('.modal-close', dlg);
