@@ -112,6 +112,11 @@ body{
 /* ---------- LAYOUT ---------- */
 .container{ max-width: 1200px; margin-inline: auto; padding: 16px; }
 
+/* Wider container on very large screens */
+@media (min-width: 1440px){
+  .container{ max-width: 1560px; }
+}
+
 .kits-layout{
   display: grid;
   grid-template-columns: 320px minmax(0,1fr);
@@ -226,20 +231,36 @@ details.facet[open] .chev{ transform: rotate(180deg); }
   margin-bottom:8px; padding:8px 12px;
   border-radius: var(--radius-lg);
   border:1px solid var(--border);
+  flex-wrap: wrap; /* allow clean wrapping with sort + recos + filters */
 }
 .toolbar.glass{ background: color-mix(in oklab, var(--card) 70%, var(--glass-tint)); }
-.sort{ display:flex; align-items:center; gap:8px; }
+.sort{ display:flex; align-items:center; gap:8px; flex-wrap: wrap; }
 .sort select{
   padding:.45rem .6rem; border-radius: 10px;
   background: var(--surface);
   border:1px solid var(--border); color: var(--text-1);
 }
 
+/* Mobile header Filters button (hidden by default; shown ≤980px) */
+#openFiltersHeader{
+  display:none;
+}
+@media (max-width: 980px){
+  #openFiltersHeader{
+    display:inline-flex; align-items:center; gap:6px;
+    border-radius: 12px; padding:.5rem .8rem;
+    background: var(--surface); border:1px solid var(--border);
+  }
+}
+
 /* ---------- GRID & CARDS ---------- */
 .product-grid{
-  display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:12px;
+  display:grid;
+  /* >=3 across on desktop with auto-fit */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap:12px;
 }
-@media (max-width: 1200px){ .product-grid{ grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } }
+@media (max-width: 1200px){ .product-grid{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } }
 @media (max-width: 640px){ .product-grid{ grid-template-columns: 1fr; } }
 
 .product{
@@ -271,7 +292,7 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 .product .priceRow{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .priceRow .price{ font-weight: 900; letter-spacing:.2px; }
 
-/* Compare bar */
+/* Compare bar (mobile fallback) */
 .compare{
   position: fixed; bottom: 12px; left: 12px; right: 12px;
   display:flex; align-items:center; gap:8px; padding: 8px 10px;
@@ -293,6 +314,31 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 /* ---------- RECOMMENDATIONS ---------- */
 .recommendations{ margin-block: 8px 16px; }
 .recommendations:empty{ display:none; }
+
+/* ---------- PAGINATION ---------- */
+.pagination{
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  margin-top: 8px; flex-wrap: wrap;
+}
+.pagination .page{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width: 36px; height: 36px; padding: 0 10px;
+  border-radius: 12px; border:1px solid var(--border);
+  background: var(--surface); color: var(--text-1);
+  font-weight: 700; cursor: pointer;
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+}
+.pagination .page:hover{ transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.pagination .page.active{
+  background: var(--primary); color:#0b1020;
+  border-color: color-mix(in oklab, var(--primary) 45%, #0000);
+}
+.pagination .prev, .pagination .next{
+  padding: 0 .75rem; min-width: 44px;
+}
+.pagination .disabled{
+  opacity:.5; pointer-events:none;
+}
 
 /* ---------- MOBILE FILTERS (FAB + DRAWER) ---------- */
 .fab{
@@ -337,13 +383,34 @@ html[data-theme="dark"] .drawer .drawer-panel{ background: color-mix(in oklab, v
 /* Only show FAB/drawer below breakpoint */
 @media (min-width: 981px){
   .fab, #filtersDrawer{ display:none !important; }
+  /* Hide bottom fixed compare bar on desktop */
+  .compare{ display:none !important; }
+  /* Results don’t need bottom padding on desktop since compare bar is hidden */
+  .results{ padding-bottom: 0; }
 }
 
 /* Collapse sidebar on mobile */
 @media (max-width: 980px){
   .kits-layout{ grid-template-columns: 1fr; }
   .filters-rail{ display:none; }
+
+  /* When header filter button is present, hide old FAB */
+  .fab{ display:none !important; }
 }
+
+/* ---------- SIDEBAR COMPARE PANEL (desktop) ---------- */
+#comparePanel{
+  margin-top: 10px;
+}
+#comparePanel .compare-items{
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+#comparePanel .item{
+  padding:.35rem .5rem; border-radius:999px;
+  background: var(--surface); border:1px solid var(--border);
+  font-size:.85rem;
+}
+#clearCompare.btn.small{ margin-top: 6px; }
 
 /* ---------- MODAL (QUIZ) ---------- */
 .modal{
