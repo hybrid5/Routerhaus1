@@ -585,3 +585,34 @@ html[data-theme="dark"] .modal-actions{
   overflow:hidden; clip:rect(0,0,0,0); border:0;
 }
 .hide{ display:none !important; }
+
+/* ---------- DESKTOP HEADER SIZE TWEAKS ---------- */
+@media (min-width: 1024px){
+  .content{
+    padding-block: 16px 20px;      /* a bit more breathing room */
+  }
+  .page-header{
+    margin-block: 18px 12px;       /* taller header row */
+  }
+  .header-actions{
+    gap: 10px;                     /* space between buttons */
+  }
+  .header-actions .btn{
+    padding: .7rem 1rem;           /* larger targets */
+    font-size: .95rem;
+  }
+  #openQuiz.btn.primary{
+    font-weight: 800;              /* make primary CTA pop slightly more */
+  }
+}
+
+/* XL screens: nudge again without touching mobile/tablet */
+@media (min-width: 1440px){
+  .content{
+    padding-block: 20px 24px;
+  }
+  .header-actions .btn{
+    padding: .8rem 1.1rem;
+    font-size: 1rem;
+  }
+}
