@@ -3,9 +3,10 @@
  * - Reads kits.json (configurable via window.RH_CONFIG.jsonUrl)
  * - Derives: brand, coverageBucket, wanTier, priceBucket, wifiScore
  * - Facets: Brand, Wi-Fi Gen, Mesh, WAN Tier, Coverage, Device Load, Primary Use, Access, Price
- * - URL sync + localStorage
+ * - URL sync + localStorage (+ page & pageSize)
  * - Quiz wiring sets facets so results update immediately
  * - Dropdown facet (<details>) persistence + badges
+ * - Pagination + desktop/sidebar compare + mobile compare bar
  */
 
 const $ = (sel, root=document) => root.querySelector(sel);
@@ -20,6 +21,9 @@ const state = {
   active: {}, // facet -> Set(values)
   sort: 'relevance',
   quiz: null,
+  page: 1,
+  pageSize: 12,
+  totalPages: 1,
 };
 
 const elements = {
@@ -38,14 +42,28 @@ const elements = {
   drawerMount: $('#drawerFormMount'),
   applyDrawer: $('#applyDrawer'),
   activeCount: $('#activeCount'),
+
+  // Compare (mobile bar)
   compareDrawer: $('#compareDrawer'),
   compareItems: $('#compareItems'),
+  clearCompareMobile: $('#clearCompareMobile'),
+
+  // Sidebar compare (desktop)
+  comparePanelItems: $('#compareItemsPanel'),
   clearCompare: $('#clearCompare'),
+
   toggleRecos: $('#toggleRecos'),
   kitsError: $('#kitsError'),
   kitsStatus: $('#kitsStatus'),
   expandAll: $('#expandAll'),
   collapseAll: $('#collapseAll'),
+
+  // Pagination
+  paginationTop: $('#paginationTop'),
+  paginationBottom: $('#paginationBottom'),
+
+  // Mobile header Filters button
+  openFiltersHeader: $('#openFiltersHeader'),
 };
 
 // --- Utilities ---
@@ -111,7 +129,7 @@ function derive(item){
   out.wifiGen = wifiNormalize(out.wifiStandard || out.wifiGen || '');
   out.wifiScore = wifiRank(out.wifiGen);
 
-  // mesh ecosystem guess from model (rough)
+  // mesh ecosystem guess
   if (out.meshReady && !out.meshEco){
     if (brand==='ASUS') out.meshEco = 'AiMesh';
     else if (brand==='NETGEAR') out.meshEco = 'Orbi';
@@ -138,8 +156,9 @@ function getConfig(){
   const conf = {
     active: {},
     sort: params.get('sort') || localStorage.getItem('kits.sort') || 'relevance',
+    page: Number(params.get('page') || 1),
+    pageSize: Number(params.get('pageSize') || localStorage.getItem('kits.pageSize') || 12),
   };
-  // facet params in form f_brand=ASUS,TP-Link
   for (const [k,v] of params.entries()){
     if (k.startsWith('f_')){
       conf.active[k.slice(2)] = new Set(decodeURIComponent(v).split(',').filter(Boolean));
@@ -151,6 +170,8 @@ function getConfig(){
 function saveToURL(){
   const params = new URLSearchParams();
   params.set('sort', state.sort);
+  params.set('page', String(state.page));
+  params.set('pageSize', String(state.pageSize));
   for (const [facet, set] of Object.entries(state.active)){
     if (set && set.size){
       params.set('f_'+facet, encodeURIComponent([...set].join(',')));
@@ -159,6 +180,7 @@ function saveToURL(){
   const qs = params.toString();
   history.replaceState(null,'','?'+qs);
   localStorage.setItem('kits.sort', state.sort);
+  localStorage.setItem('kits.pageSize', String(state.pageSize));
 }
 
 function debounce(fn, ms=80){
@@ -231,7 +253,7 @@ function renderQuick(){
   elements.quickChips.innerHTML = chips.join('');
 }
 
-// ---- <details> (dropdown) persistence + badges ----
+// ---- <details> persistence + badges ----
 function loadFacetOpenState(key, fallback=true){
   const k = `facet.open.${key}`;
   const v = localStorage.getItem(k);
@@ -256,7 +278,7 @@ function setFacetBadge(idOrEl, facetKey){
   el.style.visibility = n ? 'visible' : 'hidden';
 }
 
-// --- Filtering & sorting ---
+// --- Filtering, sorting, pagination ---
 function applyFilters(){
   const act = state.active;
   let res = state.data;
@@ -274,9 +296,8 @@ function applyFilters(){
       });
     }
   }
-
   state.filtered = sortItems(res);
-  render();
+  paginateAndRender();
 }
 
 function tierRank(t){ return ['≤1G','2.5G','5G','10G','SFP+'].indexOf(t); }
@@ -301,6 +322,46 @@ function sortItems(items){
       arr.sort((a,b)=> (Number(b._score||0) - Number(a._score||0)) || (b.wifiScore - a.wifiScore) || ((Number(a.priceUsd)||9e9) - (Number(b.priceUsd)||9e9)));
   }
   return arr;
+}
+
+function paginateAndRender(){
+  // facet counts (for building options)
+  state.facetCounts = computeFacetCounts(state.data);
+  renderQuick();
+  renderFacet('brand','facet-brand');
+  renderFacet('wifiGen','facet-wifiGen');
+  renderFacet('meshReady','facet-meshReady');
+  renderFacet('meshEco','facet-meshEco');
+  renderFacet('wanTier','facet-wanTier');
+  renderFacet('coverageBucket','facet-coverageBucket');
+  renderFacet('deviceLoad','facet-deviceLoad');
+  renderFacet('primaryUse','facet-primaryUse');
+  renderFacet('access','facet-access');
+  renderFacet('priceBucket','facet-priceBucket');
+
+  // pagination math
+  state.totalPages = Math.max(1, Math.ceil(state.filtered.length / state.pageSize));
+  if (state.page > state.totalPages) state.page = state.totalPages;
+  const start = (state.page - 1) * state.pageSize;
+  const pageItems = state.filtered.slice(start, start + state.pageSize);
+
+  // header/status
+  elements.matchCount.textContent = `${state.filtered.length} matches • Page ${state.page}/${state.totalPages}`;
+  elements.kitsStatus && (elements.kitsStatus.textContent = `${state.filtered.length} kits loaded`);
+
+  // chips & badges
+  renderActiveChips();
+  updateFacetBadges();
+
+  // cards + recos
+  renderCards(pageItems, elements.results);
+  renderRecs();
+
+  // pagination UIs
+  renderPagination(elements.paginationTop);
+  renderPagination(elements.paginationBottom);
+
+  saveToURL();
 }
 
 // --- Rendering ---
@@ -359,6 +420,48 @@ function renderCards(list, mount){
   mount.appendChild(frag);
 }
 
+function renderPagination(mount){
+  if (!mount) return;
+  const { page, totalPages } = state;
+  if (totalPages <= 1){ mount.innerHTML = ''; return; }
+
+  const btn = (label, p, extraClass='', disabled=false) =>
+    `<button class="page ${extraClass} ${disabled?'disabled':''}" data-page="${p}" ${disabled?'tabindex="-1" aria-disabled="true"':''}>${label}</button>`;
+
+  const maxButtons = 7; // compact
+  let start = Math.max(1, page - Math.floor(maxButtons/2));
+  let end = Math.min(totalPages, start + maxButtons - 1);
+  if (end - start + 1 < maxButtons) start = Math.max(1, end - maxButtons + 1);
+
+  const parts = [];
+  parts.push(btn('Prev', page-1, 'prev', page===1));
+  if (start > 1){
+    parts.push(btn('1', 1));
+    if (start > 2) parts.push(`<span class="page ellipsis" aria-hidden="true">…</span>`);
+  }
+  for (let p=start; p<=end; p++){
+    parts.push(btn(String(p), p, p===page?'active':''));
+  }
+  if (end < totalPages){
+    if (end < totalPages-1) parts.push(`<span class="page ellipsis" aria-hidden="true">…</span>`);
+    parts.push(btn(String(totalPages), totalPages));
+  }
+  parts.push(btn('Next', page+1, 'next', page===totalPages));
+
+  mount.innerHTML = parts.join('');
+
+  mount.addEventListener('click', (e)=>{
+    const b = e.target.closest('.page[data-page]');
+    if (!b || b.classList.contains('disabled')) return;
+    const newPage = Number(b.dataset.page);
+    if (newPage>=1 && newPage<=state.totalPages && newPage!==state.page){
+      state.page = newPage;
+      paginateAndRender(); // no re-filter needed
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, { once:true }); // rebind each render (simple and safe)
+}
+
 function renderActiveChips(){
   const chips = [];
   for (const [facet, set] of Object.entries(state.active)){
@@ -373,7 +476,6 @@ function renderActiveChips(){
 }
 
 function updateFacetBadges(){
-  // If your HTML has badge elements like <span id="badge-brand">…</span>
   setFacetBadge('badge-brand', 'brand');
   setFacetBadge('badge-wifiGen', 'wifiGen');
   setFacetBadge('badge-meshReady', 'meshReady');
@@ -383,30 +485,6 @@ function updateFacetBadges(){
   setFacetBadge('badge-primaryUse', 'primaryUse');
   setFacetBadge('badge-access', 'access');
   setFacetBadge('badge-priceBucket', 'priceBucket');
-}
-
-function render(){
-  // facet counts for building options
-  state.facetCounts = computeFacetCounts(state.data);
-  renderQuick();
-  renderFacet('brand','facet-brand');
-  renderFacet('wifiGen','facet-wifiGen');
-  renderFacet('meshReady','facet-meshReady');
-  renderFacet('meshEco','facet-meshEco');
-  renderFacet('wanTier','facet-wanTier');
-  renderFacet('coverageBucket','facet-coverageBucket');
-  renderFacet('deviceLoad','facet-deviceLoad');
-  renderFacet('primaryUse','facet-primaryUse');
-  renderFacet('access','facet-access');
-  renderFacet('priceBucket','facet-priceBucket');
-
-  elements.matchCount.textContent = `${state.filtered.length} matches`;
-  elements.kitsStatus && (elements.kitsStatus.textContent = `${state.filtered.length} kits loaded`);
-  renderActiveChips();
-  updateFacetBadges();
-  renderCards(state.filtered, elements.results);
-  renderRecs();
-  saveToURL();
 }
 
 function renderRecs(){
@@ -431,10 +509,23 @@ function toggleCompare(x){
 
 function renderCompare(){
   const arr = [...state.compare];
-  if (!arr.length){ elements.compareDrawer.hidden = true; return; }
   const items = arr.map(slug => state.data.find(d=>d.slug===slug)).filter(Boolean);
-  elements.compareItems.innerHTML = items.map(x=>`<div class="item">${x.brand} ${x.model} · Wi-Fi ${x.wifiGen} · ${x.wanTier} · ${x.coverageSqft?Number(x.coverageSqft).toLocaleString():''} sq ft</div>`).join('');
-  elements.compareDrawer.hidden = false;
+  const isDesktop = matchMedia('(min-width: 981px)').matches;
+
+  // Desktop sidebar panel
+  if (elements.comparePanelItems){
+    elements.comparePanelItems.innerHTML = items.map(x=>`
+      <div class="item">${x.brand} ${x.model} · Wi-Fi ${x.wifiGen} · ${x.wanTier}${x.coverageSqft?` · ${Number(x.coverageSqft).toLocaleString()} sq ft`:''}</div>
+    `).join('');
+  }
+
+  // Mobile bottom bar
+  if (elements.compareItems){
+    elements.compareItems.innerHTML = items.map(x=>`
+      <div class="item">${x.brand} ${x.model}</div>
+    `).join('');
+    elements.compareDrawer.hidden = items.length === 0 || isDesktop; // hide on desktop
+  }
 }
 
 // --- Event wiring ---
@@ -445,6 +536,7 @@ function handleFacetChange(e){
     const val = String(t.value);
     state.active[facet] ??= new Set();
     if (t.checked) state.active[facet].add(val); else state.active[facet].delete(val);
+    state.page = 1;                 // reset page on filter change
     applyFilters();
   }
 }
@@ -456,6 +548,7 @@ function handleQuickClick(e){
   const val = btn.dataset.val;
   state.active[facet] ??= new Set();
   if (state.active[facet].has(val)) state.active[facet].delete(val); else state.active[facet].add(val);
+  state.page = 1;
   applyFilters();
 }
 
@@ -464,13 +557,15 @@ function handleActiveChip(e){
   if (!chip) return;
   const [facet, val] = chip.dataset.remove.split(':');
   state.active[facet]?.delete(val);
+  state.page = 1;
   applyFilters();
 }
 
 function handleSort(){
   state.sort = elements.sortSelect.value;
+  state.page = 1; // reset when sort changes
   state.filtered = sortItems(state.filtered);
-  render();
+  paginateAndRender();
 }
 
 function openDrawer(open){
@@ -500,6 +595,7 @@ function resetAll(){
   state.sort = 'relevance';
   state.compare.clear();
   state.quiz = null;
+  state.page = 1;
   if (elements.sortSelect) elements.sortSelect.value = 'relevance';
   applyFilters();
 }
@@ -543,6 +639,7 @@ function applyQuizResult(result, opts={}){
 
   // Sort by relevance and show recommendations
   state.sort = 'relevance';
+  state.page = 1;
   if (elements.sortSelect) elements.sortSelect.value = 'relevance';
   if (elements.toggleRecos) elements.toggleRecos.checked = true;
 
@@ -557,6 +654,17 @@ function applyQuizResult(result, opts={}){
 // Expose for quiz-modal.js
 window.__kits = { applyQuizResult, state };
 
+// --- Page size: adaptive (optional enhancement) ---
+function computePageSize(){
+  const w = window.innerWidth;
+  // rough mapping: larger screens show more
+  if (w >= 1600) return 18;
+  if (w >= 1280) return 15;
+  if (w >= 1024) return 12;
+  if (w >= 640)  return 9;
+  return 6;
+}
+
 // --- Init ---
 async function init(){
   try {
@@ -566,9 +674,13 @@ async function init(){
     const raw = await res.json();
     state.data = raw.map(derive);
 
+    // URL + local prefs
     const urlConf = getConfig();
     state.sort = urlConf.sort;
     state.active = urlConf.active;
+    state.page = Number.isFinite(urlConf.page) && urlConf.page > 0 ? urlConf.page : 1;
+    state.pageSize = Number.isFinite(urlConf.pageSize) && urlConf.pageSize > 0 ? urlConf.pageSize : computePageSize();
+
     if (elements.sortSelect) elements.sortSelect.value = state.sort;
 
     state.facetCounts = computeFacetCounts(state.data);
@@ -583,13 +695,20 @@ async function init(){
     elements.sortSelect.addEventListener('change', handleSort);
     elements.copyLink.addEventListener('click', copyLink);
     elements.resetAll.addEventListener('click', resetAll);
+
+    // Open filters (FAB + header)
     elements.filtersFab.addEventListener('click', ()=> openDrawer(true));
+    elements.openFiltersHeader?.addEventListener('click', ()=> openDrawer(true));
     elements.drawer.addEventListener('click', (e)=>{
       if (e.target.closest('[data-close-drawer]')) openDrawer(false);
     });
-    elements.applyDrawer.addEventListener('click', ()=>{ openDrawer(false); applyFilters(); });
+    elements.applyDrawer.addEventListener('click', ()=>{ openDrawer(false); state.page=1; applyFilters(); });
 
-    elements.clearCompare.addEventListener('click', ()=>{ state.compare.clear(); renderCompare(); });
+    // Compare clears
+    elements.clearCompare?.addEventListener('click', ()=>{ state.compare.clear(); renderCompare(); });
+    elements.clearCompareMobile?.addEventListener('click', ()=>{ state.compare.clear(); renderCompare(); });
+
+    // Toggle recos
     elements.toggleRecos?.addEventListener('change', renderRecs);
 
     // Expand/Collapse all (optional buttons)
@@ -604,9 +723,21 @@ async function init(){
       });
     });
 
+    // Adaptive page size on resize (repage only)
+    const onResize = debounce(()=>{
+      const newSize = computePageSize();
+      if (newSize !== state.pageSize){
+        state.pageSize = newSize;
+        state.page = 1;
+        paginateAndRender();
+      }
+    }, 120);
+    window.addEventListener('resize', onResize);
+
     // initial render
     state.filtered = sortItems(state.data);
-    applyFilters();
+    paginateAndRender();
+    renderCompare();
   } catch (e) {
     console.error(e);
     if (elements.kitsError){
