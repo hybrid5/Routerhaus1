@@ -26,6 +26,12 @@
         <small id="matchCount" aria-live="polite"></small>
       </div>
 
+      <!-- Optional expand/collapse helpers -->
+      <div class="facet-toolbar">
+        <button type="button" id="expandAll" class="btn small">Expand all</button>
+        <button type="button" id="collapseAll" class="btn small">Collapse all</button>
+      </div>
+
       <!-- FORM & FACETS (IDs expected by kits.js) -->
       <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
         <!-- Quick picks -->
@@ -36,43 +42,88 @@
 
         <div class="divider"></div>
 
-        <section class="facet" data-facet="brand">
-          <h3>Brand</h3>
+        <!-- Brand -->
+        <details class="facet" data-facet="brand" open>
+          <summary>
+            <span>Brand</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-brand">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
           <div class="options" id="facet-brand"></div>
-        </section>
+        </details>
 
-        <section class="facet" data-facet="wifi">
-          <h3>Wi-Fi</h3>
+        <!-- Wi-Fi -->
+        <details class="facet" data-facet="wifi" open>
+          <summary>
+            <span>Wi-Fi</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-wifiGen">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
           <div class="options two-cols" id="facet-wifiGen"></div>
           <div class="options two-cols" id="facet-wifiBands"></div>
-        </section>
+        </details>
 
-        <section class="facet" data-facet="mesh">
-          <h3>Mesh</h3>
+        <!-- Mesh -->
+        <details class="facet" data-facet="mesh" open>
+          <summary>
+            <span>Mesh</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-meshReady">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
           <div class="options" id="facet-meshReady"></div>
           <div class="options" id="facet-meshEco"></div>
-        </section>
+        </details>
 
-        <section class="facet" data-facet="ports">
-          <h3>Ports</h3>
+        <!-- Ports -->
+        <details class="facet" data-facet="ports">
+          <summary>
+            <span>Ports</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-wanTier">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
           <div class="options two-cols" id="facet-wanTier"></div>
+          <!-- (Optional placeholders kept for future) -->
           <div class="options two-cols" id="facet-lanCount"></div>
           <div class="options two-cols" id="facet-multiGigLan"></div>
           <div class="options two-cols" id="facet-usb"></div>
-        </section>
+        </details>
 
-        <section class="facet" data-facet="fit">
-          <h3>Use & Fit</h3>
+        <!-- Use & Fit -->
+        <details class="facet" data-facet="fit" open>
+          <summary>
+            <span>Use &amp; Fit</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-coverageBucket">0</span>
+              <span class="badge count" id="badge-deviceLoad">0</span>
+              <span class="badge count" id="badge-primaryUse">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
           <div class="options two-cols" id="facet-coverageBucket"></div>
           <div class="options two-cols" id="facet-deviceLoad"></div>
           <div class="options" id="facet-primaryUse"></div>
           <div class="options two-cols" id="facet-access"></div>
-        </section>
+        </details>
 
-        <section class="facet" data-facet="commerce">
-          <h3>Price</h3>
+        <!-- Price -->
+        <details class="facet" data-facet="commerce">
+          <summary>
+            <span>Price</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-priceBucket">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
           <div class="options two-cols" id="facet-priceBucket"></div>
-        </section>
+        </details>
       </form>
     </aside>
 
@@ -155,7 +206,7 @@
     <div id="compareItems" class="compare-items"></div>
   </aside>
 
-  <!-- Quiz modal -->
+  <!-- Quiz modal (native dialog) -->
   <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
     <div class="modal-content">
       <header class="modal-header">
