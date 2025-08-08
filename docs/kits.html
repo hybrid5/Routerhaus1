@@ -13,25 +13,11 @@
   <!-- Theme Toggle -->
   <script>
 (function () {
-  const KEY = 'rh.theme';
   const root = document.documentElement;
-  const saved = localStorage.getItem(KEY);
-
-  if (saved === 'light' || saved === 'dark') {
-    root.setAttribute('data-theme', saved);
-    return;
-  }
-
-  // No saved preference → follow system
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-
-  // Update if system theme changes and no user override
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem(KEY)) {
-      root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-    }
-  });
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  const apply = () => root.setAttribute('data-theme', media.matches ? 'dark' : 'light');
+  apply();
+  media.addEventListener('change', apply);
 })();
 </script>
 
