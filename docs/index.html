@@ -1,5 +1,5 @@
 <!-- ===========================
-     RouterHaus v1 – index.html
+     RouterHaus v1 – index.html (updated with CTA deep-link)
      =========================== -->
 <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +8,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="RouterHaus – AI-powered router recommendations for every space." />
   <title>RouterHaus</title>
+
+  <!-- Theme Toggle -->
+  <script>
+(function () {
+  const KEY = 'rh.theme';
+  const root = document.documentElement;
+  const saved = localStorage.getItem(KEY);
+
+  if (saved === 'light' || saved === 'dark') {
+    root.setAttribute('data-theme', saved);
+    return;
+  }
+
+  // No saved preference → follow system
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+
+  // Update if system theme changes and no user override
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem(KEY)) {
+      root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+    }
+  });
+})();
+</script>
 
   <!-- Fonts & Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -22,7 +47,8 @@
     <h1>Lightning-Fast Wi-Fi, Zero Guesswork</h1>
     <p>Your personalised network in under 60 seconds — for homes, apartments, and offices.</p>
     <div class="hero-actions">
-      <a href="kits.html" class="btn">Start Recommendation</a>
+      <!-- Deep-link CTA with quiz trigger -->
+      <a href="kits.html?quiz=1" class="btn">Start Recommendation</a>
       <a href="consult.html" class="btn-secondary">Consult an Expert</a>
     </div>
   </section>
@@ -144,7 +170,8 @@
   <section class="footer-cta" id="start">
     <h2>Design Your Network</h2>
     <p>From a 1-bed flat to a full campus — we’ve got you covered.</p>
-    <a href="kits.html" class="btn">Start Matching →</a>
+    <!-- Deep-link CTA for quiz start -->
+    <a href="kits.html?quiz=1" class="btn">Start Matching →</a>
     <a href="consult.html" class="btn-secondary">Enterprise Consult</a>
   </section>
 

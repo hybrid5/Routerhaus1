@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,13 +10,38 @@
   <!-- Preload JSON -->
   <link rel="preload" href="kits.json" as="fetch" type="application/json" />
 
+  <!-- Theme Toggle -->
+  <script>
+(function () {
+  const KEY = 'rh.theme';
+  const root = document.documentElement;
+  const saved = localStorage.getItem(KEY);
+
+  if (saved === 'light' || saved === 'dark') {
+    root.setAttribute('data-theme', saved);
+    return;
+  }
+
+  // No saved preference → follow system
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+
+  // Update if system theme changes and no user override
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem(KEY)) {
+      root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+    }
+  });
+})();
+</script>
+
   <!-- Styles -->
   <link rel="stylesheet" href="main.css" />
   <link rel="stylesheet" href="assets/css/kits.css" />
 </head>
 <body>
-  <!-- Header partial mounts here -->
-  <div id="header-placeholder"></div>
+  <!-- Header partial mounts BEFORE main to avoid CLS -->
+  <div id="header-placeholder" data-partial="header.html"></div>
 
   <main class="container kits-layout">
     <!-- ===== Desktop filter rail ===== -->
@@ -29,13 +54,17 @@
       <div class="facet-toolbar">
         <button type="button" id="expandAll" class="btn small">Expand all</button>
         <button type="button" id="collapseAll" class="btn small">Collapse all</button>
+        <button type="button" id="clearAllFacets" class="btn small ghost">Clear all</button>
       </div>
 
       <!-- FORM & FACETS -->
       <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
         <!-- Quick picks -->
         <section class="facet" data-facet="quick">
-          <h3>Quick picks</h3>
+          <div class="facet-head">
+            <h3>Quick picks</h3>
+            <button type="button" class="btn tiny facet-clear" data-clear="quick">Clear</button>
+          </div>
           <div class="chips" id="quickChips"></div>
         </section>
 
@@ -50,6 +79,9 @@
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="brand" aria-label="Clear Brand">Clear</button>
+          </div>
           <div class="options" id="facet-brand"></div>
         </details>
 
@@ -62,6 +94,9 @@
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="wifi" aria-label="Clear Wi-Fi">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-wifiGen"></div>
           <div class="options two-cols" id="facet-wifiBands"></div>
         </details>
@@ -75,6 +110,9 @@
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="mesh" aria-label="Clear Mesh">Clear</button>
+          </div>
           <div class="options" id="facet-meshReady"></div>
           <div class="options" id="facet-meshEco"></div>
         </details>
@@ -88,6 +126,9 @@
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="ports" aria-label="Clear Ports">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-wanTier"></div>
           <div class="options two-cols" id="facet-lanCount"></div>
           <div class="options two-cols" id="facet-multiGigLan"></div>
@@ -105,6 +146,9 @@
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="fit" aria-label="Clear Use &amp; Fit">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-coverageBucket"></div>
           <div class="options two-cols" id="facet-deviceLoad"></div>
           <div class="options" id="facet-primaryUse"></div>
@@ -120,21 +164,28 @@
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="commerce" aria-label="Clear Price">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-priceBucket"></div>
         </details>
 
         <!-- Compare Panel (desktop) -->
         <section id="comparePanel" class="facet" data-facet="compare">
-          <h3>Compare</h3>
+          <div class="facet-head">
+            <h3>Compare</h3>
+            <button id="clearCompare" class="btn tiny ghost" type="button">Clear</button>
+          </div>
           <div id="compareItemsPanel" class="compare-items"></div>
-          <button id="clearCompare" class="btn small ghost" type="button">Clear</button>
         </section>
       </form>
     </aside>
 
     <!-- ===== Mobile filter FAB & drawer ===== -->
-    <button id="filtersFab" class="fab">Filters <span id="activeCount" class="badge">0</span></button>
-    <div id="filtersDrawer" class="drawer" aria-hidden="true" aria-labelledby="drawerTitle">
+    <button id="filtersFab" class="fab" aria-controls="filtersDrawer" aria-expanded="false">
+      Filters <span id="activeCount" class="badge">0</span>
+    </button>
+    <div id="filtersDrawer" class="drawer" aria-hidden="true" aria-labelledby="drawerTitle" role="dialog">
       <div class="drawer-panel glass">
         <div class="drawer-header">
           <h2 id="drawerTitle">Filters</h2>
@@ -153,19 +204,19 @@
     <!-- ===== Content ===== -->
     <section class="content" aria-live="polite">
       <header class="page-header">
-        <h1 class="brand">RouterHaus <span class="subtle">Kits</span></h1>
         <div class="header-actions">
           <button id="openQuiz" class="btn primary" type="button">Find my kit</button>
+          <button id="editQuiz" class="btn ghost" type="button" hidden>Edit answers</button>
           <button id="copyLink" class="btn glass" type="button">Copy link</button>
           <button id="resetAll" class="btn ghost" type="button">Reset</button>
         </div>
       </header>
 
-      <!-- Active filters -->
-      <div id="activeChips" class="active-chips"></div>
+      <!-- Active filters (URL-synced, keyboard dismissible via JS) -->
+      <div id="activeChips" class="active-chips" role="list" aria-label="Active filters"></div>
 
       <!-- Toolbar -->
-      <div class="toolbar glass">
+      <div class="toolbar glass" role="region" aria-label="Results toolbar">
         <label class="sort">
           <span>Sort</span>
           <select id="sortSelect" aria-label="Sort results">
@@ -178,36 +229,67 @@
             <option value="reviews-desc">Reviews</option>
           </select>
         </label>
+
+        <label class="pagesize">
+          <span>Per page</span>
+          <select id="pageSizeSelect" aria-label="Results per page">
+            <option value="12" selected>12</option>
+            <option value="24">24</option>
+            <option value="48">48</option>
+          </select>
+        </label>
+
         <label class="toggle">
           <input type="checkbox" id="toggleRecos" checked />
           <span>Show recommendations</span>
         </label>
+
         <button id="openFiltersHeader" class="btn glass" type="button">Filters</button>
       </div>
 
-      <!-- Recos -->
-      <section id="recommendations" class="recommendations">
-        <h2>Recommended for you</h2>
+      <!-- Recommendations (auto-collapse when no matches / toggle off) -->
+      <section id="recommendations" class="recommendations" aria-live="polite">
+        <div class="section-head">
+          <h2>Recommended for you</h2>
+          <small id="recoNote" class="subtle"></small>
+        </div>
         <div id="recoGrid" class="product-grid"></div>
       </section>
 
       <!-- Pagination Top -->
-      <nav id="paginationTop" class="pagination"></nav>
+      <nav id="paginationTop" class="pagination" aria-label="Pagination top"></nav>
 
       <!-- Results -->
-      <section class="results">
+      <section class="results" aria-label="Results">
         <div id="kitsStatus" class="sr-only" role="status" aria-live="polite">Loading kits…</div>
         <div id="kitsError" class="hide" role="alert"></div>
-        <div id="kitResults" class="product-grid"></div>
+
+        <!-- Skeleton loader grid -->
+        <div id="skeletonGrid" class="product-grid skeletons" aria-hidden="true"></div>
+
+        <!-- Real results -->
+        <div id="kitResults" class="product-grid" aria-busy="false"></div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="empty hide" role="note" aria-live="polite">
+          <h3>No matches</h3>
+          <p>Try adjusting filters or pick one of these quick options:</p>
+          <div class="chips" id="emptyQuickChips"></div>
+        </div>
       </section>
 
       <!-- Pagination Bottom -->
-      <nav id="paginationBottom" class="pagination"></nav>
+      <nav id="paginationBottom" class="pagination" aria-label="Pagination bottom"></nav>
     </section>
   </main>
 
-  <!-- Compare bar (mobile only) -->
-  <aside id="compareDrawer" class="compare glass" aria-live="polite" hidden>
+  <!-- Sticky Compare trigger (mobile/any) -->
+  <button id="compareSticky" class="compare-sticky" hidden aria-controls="compareDrawer">
+    Compare (<span id="compareCount">0</span>)
+  </button>
+
+  <!-- Compare bar (mobile) -->
+  <aside id="compareDrawer" class="compare glass" aria-live="polite" hidden role="dialog" aria-label="Compare">
     <div class="compare-header">
       <strong>Compare</strong>
       <button id="clearCompareMobile" class="btn small ghost" type="button">Clear</button>
@@ -253,7 +335,6 @@
           </select>
         </label>
         <footer class="modal-actions">
-          <button type="button" class="btn ghost modal-close">Cancel</button>
           <button type="submit" class="btn primary">See recommendations</button>
         </footer>
       </form>
@@ -275,14 +356,37 @@
         <strong class="price"></strong>
         <div class="ctaRow">
           <a class="btn small" target="_blank" rel="noopener">Buy</a>
-          <button class="icon-btn compare-btn" title="Compare" type="button">+</button>
+          <button class="icon-btn compare-btn" title="Compare" type="button" aria-pressed="false">+</button>
         </div>
       </div>
     </article>
   </template>
 
-  <!-- Footer partial mounts here -->
-  <div id="footer-placeholder"></div>
+  <!-- Skeleton card template -->
+  <template id="skeletonTpl">
+    <article class="product glass skeleton">
+      <div class="product-media shimmer"></div>
+      <header class="product-header">
+        <div class="title shimmer"></div>
+        <div class="chips line shimmer"></div>
+      </header>
+      <ul class="specs">
+        <li class="shimmer"></li>
+        <li class="shimmer"></li>
+        <li class="shimmer"></li>
+      </ul>
+      <div class="priceRow">
+        <div class="price shimmer"></div>
+        <div class="ctaRow">
+          <span class="btn small shimmer"></span>
+          <span class="icon-btn shimmer"></span>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- Footer partial mounts AFTER main -->
+  <div id="footer-placeholder" data-partial="footer.html"></div>
 
   <script>
     window.RH_CONFIG = {
@@ -291,6 +395,7 @@
     };
   </script>
 
+  <!-- App scripts (kits.js wires all behaviors referenced above) -->
   <script src="scripts.js" defer></script>
   <script type="module" src="assets/js/kits.js"></script>
   <script type="module" src="assets/js/quiz-modal.js"></script>
