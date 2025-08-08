@@ -990,9 +990,19 @@
     if (id) toggleCompare(id);
   });
 
+  // --------- Start Recommendation Quiz Modal -------
+  document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(location.search);
+  if (params.get('quiz') === '1') {
+    const btn = document.getElementById('openQuiz');
+    if (btn) btn.click();
+  }
+});
+
   // ---------- Misc wiring ----------
   // Make chips keyboard-friendly already by being buttons; nothing else needed.
 
   // Start
   document.addEventListener('DOMContentLoaded', init);
 })();
+
