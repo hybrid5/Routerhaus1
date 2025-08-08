@@ -12,7 +12,7 @@
 }
 .product-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
   gap: 1rem;
   justify-content: center;
   justify-items: center;
@@ -21,12 +21,10 @@
   padding: 2.2rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  transition: transform var(--transition), box-shadow var(--transition);
-  background: var(--card);
+  transition: transform var(--transition);
 }
 .product:hover {
   transform: translateY(-8px);
-  box-shadow: var(--shadow-hover);
 }
 
 .chip {
@@ -47,7 +45,7 @@
 }
 html[data-theme='dark'] .glass {
   background: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,.08);
 }
 
 .kit-filters {
@@ -78,17 +76,11 @@ html[data-theme='dark'] .glass {
   border: 1px solid var(--accordion-border);
   background: var(--surface);
   color: var(--text-primary);
-  transition: border-color var(--transition), background var(--transition);
-}
-.filters select:focus,
-.filters input:focus {
-  border-color: var(--primary);
-  outline: none;
 }
 html[data-theme='dark'] .filters select,
 html[data-theme='dark'] .filters input {
   background: var(--surface);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255,255,255,.15);
   color: var(--text-primary);
 }
 
@@ -98,14 +90,14 @@ html[data-theme='dark'] .filters input {
   background: var(--surface);
   color: var(--text-primary);
   cursor: pointer;
-  transition: filter var(--transition), background var(--transition);
+  transition: var(--transition);
 }
 .filters button:hover {
   filter: brightness(1.05);
 }
 html[data-theme='dark'] .filters button {
   background: var(--surface);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255,255,255,.15);
   color: var(--text-primary);
 }
 
@@ -136,14 +128,14 @@ html[data-theme='dark'] .filters button {
   float: right;
   font-size: 1.3rem;
   color: var(--primary);
-  transition: transform var(--transition);
+  transition: var(--transition);
 }
 .accordion-item.open span {
   transform: rotate(45deg);
 }
 .accordion-item p {
   display: none;
-  margin: 0.6rem 0 0;
+  margin: .6rem 0 0;
   color: var(--text-muted);
 }
 .accordion-item.open p {
@@ -157,12 +149,10 @@ html[data-theme='dark'] .filters button {
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0,0,0,.6);
   z-index: 1200;
 }
-#quizModal.active {
-  display: flex;
-}
+#quizModal.active { display: flex; }
 #quizModal .modal-content {
   background: var(--card);
   color: var(--text-primary);
@@ -171,7 +161,6 @@ html[data-theme='dark'] .filters button {
   position: relative;
   width: 90%;
   max-width: 500px;
-  box-shadow: var(--shadow);
 }
 #quizModal .modal-close {
   position: absolute;
@@ -189,8 +178,8 @@ html[data-theme='dark'] .filters button {
 }
 #quizModal select {
   width: 100%;
-  margin-top: 0.25rem;
-  padding: 0.5rem;
+  margin-top: .25rem;
+  padding: .5rem;
 }
 #quizModal .modal-actions {
   margin-top: 1.5rem;
