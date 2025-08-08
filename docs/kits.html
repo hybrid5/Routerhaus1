@@ -4,273 +4,379 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RouterHaus · Kits</title>
+  <meta name="description" content="Filter and compare the best router kits for apartments, homes, and offices." />
+  <meta name="color-scheme" content="light dark" />
 
-  <!-- Preloads -->
-  <link rel="preload" href="kits.json" as="fetch" crossorigin="anonymous">
+  <!-- Preload JSON -->
+  <link rel="preload" href="kits.json" as="fetch" type="application/json" />
 
-  <!-- Global styles -->
-  <link rel="stylesheet" href="main.css">
-  <!-- Page styles -->
-  <link rel="stylesheet" href="assets/css/kits.css">
-
-  <!-- Meta -->
-  <meta name="description" content="Filter and compare the best Wi-Fi router kits for your home or office.">
+  <!-- Styles -->
+  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="assets/css/kits.css" />
 </head>
 <body>
-  <!-- Header mount (populated by your site loader, keeps CLS low) -->
-  <div id="header-placeholder" aria-hidden="true"></div>
+  <!-- Header partial mounts BEFORE main to avoid CLS -->
+  <div id="header-placeholder" data-partial="header.html"></div>
 
-  <main id="main" class="container kits-layout" role="main">
-    <!-- Page header -->
-    <header class="page-header">
-      <h1 class="page-title">RouterHaus Kits</h1>
-      <p class="page-subtitle">Answer a few questions or use filters to find your perfect setup.</p>
-      <div class="page-cta">
-        <button id="openQuizBtn" class="btn btn-primary">Start Recommendation</button>
-        <button id="openMobileFiltersBtn" class="btn btn-secondary show-md:hide" aria-controls="filtersDrawer" aria-expanded="false">Filters</button>
+  <main class="container kits-layout">
+    <!-- ===== Desktop filter rail ===== -->
+    <aside id="filtersAside" class="filters-rail glass" aria-label="Filters">
+      <div class="filters-header">
+        <h2>Filters</h2>
+        <small id="matchCount" aria-live="polite"></small>
       </div>
-    </header>
 
-    <div class="content-grid">
-      <!-- Desktop filter rail -->
-      <aside id="filtersAside" class="filters-rail glass hide-sm" aria-label="Filters">
-        <div class="filters-header">
-          <h2 class="filters-title">Filters</h2>
-          <small id="matchCount" class="filters-count" aria-live="polite"></small>
-        </div>
+      <div class="facet-toolbar">
+        <button type="button" id="expandAll" class="btn small">Expand all</button>
+        <button type="button" id="collapseAll" class="btn small">Collapse all</button>
+        <button type="button" id="clearAllFacets" class="btn small ghost">Clear all</button>
+      </div>
 
-        <div class="filters-actions">
-          <button id="expandAllFacets" class="btn-ghost" type="button">Expand all</button>
-          <button id="collapseAllFacets" class="btn-ghost" type="button">Collapse all</button>
-          <button id="clearAllFacets" class="btn-link danger" type="button">Clear all</button>
-        </div>
-
-        <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
-          <!-- Quick chips -->
-          <section class="facet" data-facet="quick">
-            <h3 class="facet__title">Quick picks</h3>
-            <div id="quickChips" class="chips"></div>
-          </section>
-
-          <!-- Brand -->
-          <details class="facet" data-facet="brand" open>
-            <summary class="facet__title">Brand</summary>
-            <button class="facet__clear" type="button" data-clear="brand" aria-label="Clear Brand">Clear</button>
-            <div class="facet__options" id="facet-brand"></div>
-          </details>
-
-          <!-- Wi-Fi Gen -->
-          <details class="facet" data-facet="wifiStandard" open>
-            <summary class="facet__title">Wi-Fi Generation</summary>
-            <button class="facet__clear" type="button" data-clear="wifiStandard" aria-label="Clear Wi-Fi Generation">Clear</button>
-            <div class="facet__options" id="facet-wifiStandard"></div>
-          </details>
-
-          <!-- Mesh -->
-          <details class="facet" data-facet="meshReady">
-            <summary class="facet__title">Mesh</summary>
-            <button class="facet__clear" type="button" data-clear="meshReady" aria-label="Clear Mesh">Clear</button>
-            <div class="facet__options" id="facet-meshReady"></div>
-          </details>
-
-          <!-- WAN Tier -->
-          <details class="facet" data-facet="wanTier">
-            <summary class="facet__title">WAN Tier</summary>
-            <button class="facet__clear" type="button" data-clear="wanTier" aria-label="Clear WAN Tier">Clear</button>
-            <div class="facet__options" id="facet-wanTier"></div>
-          </details>
-
-          <!-- Coverage -->
-          <details class="facet" data-facet="coverageBucket">
-            <summary class="facet__title">Coverage</summary>
-            <button class="facet__clear" type="button" data-clear="coverageBucket" aria-label="Clear Coverage">Clear</button>
-            <div class="facet__options" id="facet-coverageBucket"></div>
-          </details>
-
-          <!-- Device Load -->
-          <details class="facet" data-facet="deviceLoad">
-            <summary class="facet__title">Device Load</summary>
-            <button class="facet__clear" type="button" data-clear="deviceLoad" aria-label="Clear Device Load">Clear</button>
-            <div class="facet__options" id="facet-deviceLoad"></div>
-          </details>
-
-          <!-- Primary Use -->
-          <details class="facet" data-facet="primaryUse">
-            <summary class="facet__title">Primary Use</summary>
-            <button class="facet__clear" type="button" data-clear="primaryUse" aria-label="Clear Primary Use">Clear</button>
-            <div class="facet__options" id="facet-primaryUse"></div>
-          </details>
-
-          <!-- Access -->
-          <details class="facet" data-facet="accessSupport">
-            <summary class="facet__title">Access Type</summary>
-            <button class="facet__clear" type="button" data-clear="accessSupport" aria-label="Clear Access Type">Clear</button>
-            <div class="facet__options" id="facet-accessSupport"></div>
-          </details>
-
-          <!-- Price -->
-          <details class="facet" data-facet="priceBucket">
-            <summary class="facet__title">Price</summary>
-            <button class="facet__clear" type="button" data-clear="priceBucket" aria-label="Clear Price">Clear</button>
-            <div class="facet__options" id="facet-priceBucket"></div>
-          </details>
-        </form>
-
-        <!-- Compare in rail (desktop) -->
-        <section class="compare-panel" aria-label="Compare">
-          <div class="compare-panel__header">
-            <h3 class="compare-title">Compare</h3>
-            <button id="clearCompareBtn" class="btn-link danger" type="button">Clear</button>
+      <!-- FORM & FACETS -->
+      <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
+        <!-- Quick picks -->
+        <section class="facet" data-facet="quick">
+          <div class="facet-head">
+            <h3>Quick picks</h3>
+            <button type="button" class="btn tiny facet-clear" data-clear="quick">Clear</button>
           </div>
-          <div id="compareList" class="compare-list" aria-live="polite"></div>
-          <button id="compareNowBtn" class="btn btn-primary" type="button" disabled>Compare Now</button>
-        </section>
-      </aside>
-
-      <!-- Results column -->
-      <section class="results-col">
-        <!-- Active filter chips -->
-        <div id="activeChips" class="active-chips" aria-live="polite"></div>
-
-        <!-- Results toolbar -->
-        <div class="results-toolbar">
-          <div class="toolbar-left">
-            <label for="sortSelect" class="sr-only">Sort</label>
-            <select id="sortSelect" class="select">
-              <option value="relevance">Sort: Relevance</option>
-              <option value="wifi_desc">Wi-Fi Gen (high → low)</option>
-              <option value="price_asc">Price (low → high)</option>
-              <option value="price_desc">Price (high → low)</option>
-              <option value="coverage_desc">Coverage (high → low)</option>
-              <option value="wan_desc">WAN Tier (high → low)</option>
-              <option value="reviews_desc">Reviews (high → low)</option>
-            </select>
-
-            <label for="pageSizeSelect" class="sr-only">Results per page</label>
-            <select id="pageSizeSelect" class="select page-size">
-              <option value="12">12 / page</option>
-              <option value="24">24 / page</option>
-              <option value="48">48 / page</option>
-            </select>
-          </div>
-
-          <div class="toolbar-right">
-            <label class="toggle">
-              <input id="showRecosToggle" type="checkbox" />
-              <span>Show recommendations</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Top pagination -->
-        <nav id="pagerTop" class="pager" aria-label="Pagination (top)"></nav>
-
-        <!-- Recommendations -->
-        <section id="recoBlock" class="reco-block" hidden>
-          <h2 class="reco-title">Recommended for you</h2>
-          <div id="recoGrid" class="grid grid-recos" role="region" aria-label="Recommended kits"></div>
+          <div class="chips" id="quickChips"></div>
         </section>
 
-        <!-- Results -->
-        <section class="results-wrap">
-          <!-- Loading skeletons -->
-          <div id="resultsSkeleton" class="results-skeleton" aria-hidden="true">
-            <div class="card-skeleton"></div>
-            <div class="card-skeleton"></div>
-            <div class="card-skeleton"></div>
-            <div class="card-skeleton"></div>
-            <div class="card-skeleton"></div>
-            <div class="card-skeleton"></div>
-          </div>
+        <div class="divider"></div>
 
-          <!-- Empty state -->
-          <div id="emptyState" class="empty-state" hidden>
-            <h3>No matches</h3>
-            <p>Try clearing a filter or use a quick pick:</p>
-            <div id="emptyQuickChips" class="chips"></div>
-            <button id="resetAllBtn" class="btn btn-secondary" type="button">Reset all</button>
+        <!-- Brand -->
+        <details class="facet" data-facet="brand" open>
+          <summary>
+            <span>Brand</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-brand">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="brand" aria-label="Clear Brand">Clear</button>
           </div>
+          <div class="options" id="facet-brand"></div>
+        </details>
 
-          <!-- Results grid -->
-          <div id="kitResults" class="grid grid-results" role="region" aria-label="Search results"></div>
+        <!-- Wi-Fi -->
+        <details class="facet" data-facet="wifi" open>
+          <summary>
+            <span>Wi-Fi</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-wifiGen">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="wifi" aria-label="Clear Wi-Fi">Clear</button>
+          </div>
+          <div class="options two-cols" id="facet-wifiGen"></div>
+          <div class="options two-cols" id="facet-wifiBands"></div>
+        </details>
+
+        <!-- Mesh -->
+        <details class="facet" data-facet="mesh" open>
+          <summary>
+            <span>Mesh</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-meshReady">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="mesh" aria-label="Clear Mesh">Clear</button>
+          </div>
+          <div class="options" id="facet-meshReady"></div>
+          <div class="options" id="facet-meshEco"></div>
+        </details>
+
+        <!-- Ports -->
+        <details class="facet" data-facet="ports">
+          <summary>
+            <span>Ports</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-wanTier">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="ports" aria-label="Clear Ports">Clear</button>
+          </div>
+          <div class="options two-cols" id="facet-wanTier"></div>
+          <div class="options two-cols" id="facet-lanCount"></div>
+          <div class="options two-cols" id="facet-multiGigLan"></div>
+          <div class="options two-cols" id="facet-usb"></div>
+        </details>
+
+        <!-- Use & Fit -->
+        <details class="facet" data-facet="fit" open>
+          <summary>
+            <span>Use &amp; Fit</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-coverageBucket">0</span>
+              <span class="badge count" id="badge-deviceLoad">0</span>
+              <span class="badge count" id="badge-primaryUse">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="fit" aria-label="Clear Use &amp; Fit">Clear</button>
+          </div>
+          <div class="options two-cols" id="facet-coverageBucket"></div>
+          <div class="options two-cols" id="facet-deviceLoad"></div>
+          <div class="options" id="facet-primaryUse"></div>
+          <div class="options two-cols" id="facet-access"></div>
+        </details>
+
+        <!-- Price -->
+        <details class="facet" data-facet="commerce">
+          <summary>
+            <span>Price</span>
+            <span class="facet-meta">
+              <span class="badge count" id="badge-priceBucket">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="commerce" aria-label="Clear Price">Clear</button>
+          </div>
+          <div class="options two-cols" id="facet-priceBucket"></div>
+        </details>
+
+        <!-- Compare Panel (desktop) -->
+        <section id="comparePanel" class="facet" data-facet="compare">
+          <div class="facet-head">
+            <h3>Compare</h3>
+            <button id="clearCompare" class="btn tiny ghost" type="button">Clear</button>
+          </div>
+          <div id="compareItemsPanel" class="compare-items"></div>
         </section>
+      </form>
+    </aside>
 
-        <!-- Bottom pagination -->
-        <nav id="pagerBottom" class="pager" aria-label="Pagination (bottom)"></nav>
-      </section>
+    <!-- ===== Mobile filter FAB & drawer ===== -->
+    <button id="filtersFab" class="fab" aria-controls="filtersDrawer" aria-expanded="false">
+      Filters <span id="activeCount" class="badge">0</span>
+    </button>
+    <div id="filtersDrawer" class="drawer" aria-hidden="true" aria-labelledby="drawerTitle" role="dialog">
+      <div class="drawer-panel glass">
+        <div class="drawer-header">
+          <h2 id="drawerTitle">Filters</h2>
+          <button class="icon-btn" data-close-drawer aria-label="Close filters">&times;</button>
+        </div>
+        <div class="drawer-body">
+          <div id="drawerFormMount"></div>
+        </div>
+        <div class="drawer-footer">
+          <button class="btn ghost" data-close-drawer>Cancel</button>
+          <button id="applyDrawer" class="btn primary">Apply</button>
+        </div>
+      </div>
     </div>
+
+    <!-- ===== Content ===== -->
+    <section class="content" aria-live="polite">
+      <header class="page-header">
+        <h1 class="brand">RouterHaus <span class="subtle">Kits</span></h1>
+        <div class="header-actions">
+          <button id="openQuiz" class="btn primary" type="button">Find my kit</button>
+          <button id="editQuiz" class="btn ghost" type="button" hidden>Edit answers</button>
+          <button id="copyLink" class="btn glass" type="button">Copy link</button>
+          <button id="resetAll" class="btn ghost" type="button">Reset</button>
+        </div>
+      </header>
+
+      <!-- Active filters (URL-synced, keyboard dismissible via JS) -->
+      <div id="activeChips" class="active-chips" role="list" aria-label="Active filters"></div>
+
+      <!-- Toolbar -->
+      <div class="toolbar glass" role="region" aria-label="Results toolbar">
+        <label class="sort">
+          <span>Sort</span>
+          <select id="sortSelect" aria-label="Sort results">
+            <option value="relevance">Relevance</option>
+            <option value="wifi-desc">Wi-Fi Gen</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+            <option value="coverage-desc">Coverage</option>
+            <option value="wan-desc">WAN Tier</option>
+            <option value="reviews-desc">Reviews</option>
+          </select>
+        </label>
+
+        <label class="pagesize">
+          <span>Per page</span>
+          <select id="pageSizeSelect" aria-label="Results per page">
+            <option value="12" selected>12</option>
+            <option value="24">24</option>
+            <option value="48">48</option>
+          </select>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="toggleRecos" checked />
+          <span>Show recommendations</span>
+        </label>
+
+        <button id="openFiltersHeader" class="btn glass" type="button">Filters</button>
+      </div>
+
+      <!-- Recommendations (auto-collapse when no matches / toggle off) -->
+      <section id="recommendations" class="recommendations" aria-live="polite">
+        <div class="section-head">
+          <h2>Recommended for you</h2>
+          <small id="recoNote" class="subtle"></small>
+        </div>
+        <div id="recoGrid" class="product-grid"></div>
+      </section>
+
+      <!-- Pagination Top -->
+      <nav id="paginationTop" class="pagination" aria-label="Pagination top"></nav>
+
+      <!-- Results -->
+      <section class="results" aria-label="Results">
+        <div id="kitsStatus" class="sr-only" role="status" aria-live="polite">Loading kits…</div>
+        <div id="kitsError" class="hide" role="alert"></div>
+
+        <!-- Skeleton loader grid -->
+        <div id="skeletonGrid" class="product-grid skeletons" aria-hidden="true"></div>
+
+        <!-- Real results -->
+        <div id="kitResults" class="product-grid" aria-busy="false"></div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="empty hide" role="note" aria-live="polite">
+          <h3>No matches</h3>
+          <p>Try adjusting filters or pick one of these quick options:</p>
+          <div class="chips" id="emptyQuickChips"></div>
+        </div>
+      </section>
+
+      <!-- Pagination Bottom -->
+      <nav id="paginationBottom" class="pagination" aria-label="Pagination bottom"></nav>
+    </section>
   </main>
 
-  <!-- Mobile filters drawer -->
-  <div id="filtersDrawer" class="drawer hide-md" role="dialog" aria-modal="true" aria-labelledby="filtersDrawerTitle" hidden>
-    <div class="drawer__backdrop" data-close="drawer"></div>
-    <div class="drawer__panel glass">
-      <header class="drawer__header">
-        <h2 id="filtersDrawerTitle">Filters</h2>
-        <button class="icon-btn" data-close="drawer" aria-label="Close filters">×</button>
-      </header>
-      <div class="drawer__body">
-        <!-- The desktop #filtersForm is cloned/mounted here by JS for mobile -->
-        <div id="filtersDrawerMount"></div>
-      </div>
-      <footer class="drawer__footer">
-        <button id="applyMobileFilters" class="btn btn-primary" type="button">Apply</button>
-        <button id="clearMobileFilters" class="btn btn-link danger" type="button">Clear all</button>
-      </footer>
-    </div>
-  </div>
+  <!-- Sticky Compare trigger (mobile/any) -->
+  <button id="compareSticky" class="compare-sticky" hidden aria-controls="compareDrawer">
+    Compare (<span id="compareCount">0</span>)
+  </button>
 
-  <!-- Compare drawer (mobile) -->
-  <div id="compareDrawer" class="drawer hide-md" role="dialog" aria-modal="true" aria-labelledby="compareDrawerTitle" hidden>
-    <div class="drawer__backdrop" data-close="compare"></div>
-    <div class="drawer__panel glass">
-      <header class="drawer__header">
-        <h2 id="compareDrawerTitle">Compare</h2>
-        <button class="icon-btn" data-close="compare" aria-label="Close compare">×</button>
-      </header>
-      <div class="drawer__body">
-        <div id="compareListMobile" class="compare-list"></div>
-      </div>
-      <footer class="drawer__footer">
-        <button id="compareNowBtnMobile" class="btn btn-primary" type="button" disabled>Compare Now</button>
-        <button id="clearCompareBtnMobile" class="btn btn-link danger" type="button">Clear</button>
-      </footer>
+  <!-- Compare bar (mobile) -->
+  <aside id="compareDrawer" class="compare glass" aria-live="polite" hidden role="dialog" aria-label="Compare">
+    <div class="compare-header">
+      <strong>Compare</strong>
+      <button id="clearCompareMobile" class="btn small ghost" type="button">Clear</button>
     </div>
-  </div>
+    <div id="compareItems" class="compare-items"></div>
+  </aside>
 
   <!-- Quiz modal -->
-  <dialog id="quizModal" class="modal" aria-labelledby="quizTitle" aria-modal="true">
-    <form method="dialog" class="modal__panel glass" id="quizForm">
-      <header class="modal__header">
-        <h2 id="quizTitle">Quick Recommendation</h2>
-        <button type="button" class="icon-btn" data-close="quiz" aria-label="Close quiz">×</button>
+  <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="quizTitle">Find your best kit</h2>
+        <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
       </header>
-
-      <div class="modal__body" id="quizBody">
-        <!-- quiz-modal.js generates steps/inputs; keep mount -->
-        <div id="quizSteps"></div>
-      </div>
-
-      <footer class="modal__footer">
-        <button type="button" class="btn btn-secondary" data-close="quiz">Cancel</button>
-        <button id="quizSubmitBtn" type="submit" class="btn btn-primary">See Results</button>
-      </footer>
-    </form>
+      <form id="quizForm" class="quiz-body">
+        <label>
+          Home size
+          <select id="qCoverage" required>
+            <option value="">Select...</option>
+            <option value="Apartment/Small">Apartment / Small</option>
+            <option value="2–3 Bedroom">2–3 Bedroom</option>
+            <option value="Large/Multi-floor">Large / Multi-floor</option>
+          </select>
+        </label>
+        <label>
+          Device load
+          <select id="qDevices" required>
+            <option value="">Select...</option>
+            <option value="1–5">1–5</option>
+            <option value="6–15">6–15</option>
+            <option value="16+">16+</option>
+          </select>
+        </label>
+        <label>
+          Primary use
+          <select id="qUse" required>
+            <option value="">Select...</option>
+            <option>All-Purpose</option>
+            <option>Gaming</option>
+            <option>Work-From-Home</option>
+            <option>Smart-Home</option>
+            <option>Family Streaming</option>
+          </select>
+        </label>
+        <footer class="modal-actions">
+          <button type="button" class="btn ghost modal-close">Cancel</button>
+          <button type="submit" class="btn primary">See recommendations</button>
+        </footer>
+      </form>
+    </div>
   </dialog>
 
-  <!-- Footer mount -->
-  <div id="footer-placeholder" aria-hidden="true"></div>
+  <!-- Card template -->
+  <template id="cardTpl">
+    <article class="product glass" data-id="">
+      <div class="product-media">
+        <img loading="lazy" alt="" src="" onerror="this.style.display='none'">
+      </div>
+      <header class="product-header">
+        <h4 class="title"></h4>
+        <div class="chips line"></div>
+      </header>
+      <ul class="specs"></ul>
+      <div class="priceRow">
+        <strong class="price"></strong>
+        <div class="ctaRow">
+          <a class="btn small" target="_blank" rel="noopener">Buy</a>
+          <button class="icon-btn compare-btn" title="Compare" type="button" aria-pressed="false">+</button>
+        </div>
+      </div>
+    </article>
+  </template>
 
-  <!-- Scripts -->
-  <script defer src="assets/js/quiz-modal.js"></script>
-  <script defer src="assets/js/kits.js"></script>
+  <!-- Skeleton card template -->
+  <template id="skeletonTpl">
+    <article class="product glass skeleton">
+      <div class="product-media shimmer"></div>
+      <header class="product-header">
+        <div class="title shimmer"></div>
+        <div class="chips line shimmer"></div>
+      </header>
+      <ul class="specs">
+        <li class="shimmer"></li>
+        <li class="shimmer"></li>
+        <li class="shimmer"></li>
+      </ul>
+      <div class="priceRow">
+        <div class="price shimmer"></div>
+        <div class="ctaRow">
+          <span class="btn small shimmer"></span>
+          <span class="icon-btn shimmer"></span>
+        </div>
+      </div>
+    </article>
+  </template>
 
-  <!-- Progressive enhancement fallback -->
-  <noscript>
-    <div class="noscript">
-      <p>Please enable JavaScript to use filters and see results.</p>
-      <p><a href="kits.json">View raw dataset</a></p>
-    </div>
-  </noscript>
+  <!-- Footer partial mounts AFTER main -->
+  <div id="footer-placeholder" data-partial="footer.html"></div>
+
+  <script>
+    window.RH_CONFIG = {
+      jsonUrl: 'kits.json',
+      enableRecos: true
+    };
+  </script>
+
+  <!-- App scripts (kits.js wires all behaviors referenced above) -->
+  <script src="scripts.js" defer></script>
+  <script type="module" src="assets/js/kits.js"></script>
+  <script type="module" src="assets/js/quiz-modal.js"></script>
+
+  <noscript>Enable JavaScript to load filters and results.</noscript>
 </body>
 </html>
