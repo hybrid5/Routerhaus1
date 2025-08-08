@@ -1,7 +1,7 @@
-/* RouterHaus Kits — Next‑Gen (static, vanilla JS)
- * - Reads kits.json
- * - Derives: brand, coverageBucket, wanTier, priceBucket
- * - Facets: Brand, Wi‑Fi Gen, Mesh, WAN Tier, Coverage, Device Load, Primary Use, Access, Price
+/* RouterHaus Kits — Next-Gen (static, vanilla JS)
+ * - Reads kits.json (configurable via window.RH_CONFIG.jsonUrl)
+ * - Derives: brand, coverageBucket, wanTier, priceBucket, wifiScore
+ * - Facets: Brand, Wi-Fi Gen, Mesh, WAN Tier, Coverage, Device Load, Primary Use, Access, Price
  * - URL sync + localStorage
  * - Recommendations computed after quiz
  */
@@ -40,10 +40,20 @@ const elements = {
   compareItems: $('#compareItems'),
   clearCompare: $('#clearCompare'),
   toggleRecos: $('#toggleRecos'),
+  kitsError: $('#kitsError'),
+  kitsStatus: $('#kitsStatus'),
 };
 
 // --- Utilities ---
 const slug = s => s.toLowerCase().replace(/[^\w]+/g,'-').replace(/(^-|-$)/g,'');
+
+function wifiNormalize(v=''){
+  return String(v).toUpperCase().replace(/WI[-\s]?FI\s*/,'').replace(/^AX/,'6').replace(/^BE/,'7');
+}
+function wifiRank(v){
+  const m = { '7':4, '6E':3, '6':2, '5':1 };
+  return m[wifiNormalize(v)] || 0;
+}
 
 function derive(item){
   const out = {...item};
@@ -51,7 +61,7 @@ function derive(item){
   // brand from model heuristics
   const m = out.model || '';
   const BrandMap = [
-    [/^(TP[\-\u2011\u2013]?Link|TP[\-\u2011\u2013]?‑?Link|TP‑Link)/i, 'TP-Link'],
+    [/^(TP[\-\u2011\u2013]?Link|TP[\-\u2011\u2013]?-?Link|TP-Link)/i, 'TP-Link'],
     [/^(ASUS|ROG)/i, 'ASUS'],
     [/^(NETGEAR|Nighthawk|Orbi)/i, 'NETGEAR'],
     [/^(Linksys|Velop)/i, 'Linksys'],
@@ -87,14 +97,15 @@ function derive(item){
               : '10G';
 
   // priceBucket
-  const price = Number(out.priceUsd||out.msrp||0);
+  const price = Number(out.priceUsd ?? out.msrp ?? 0);
   out.priceBucket = price < 150 ? '<$150'
                     : price < 300 ? '$150–$299'
                     : price < 600 ? '$300–$599'
                     : '$600+';
 
-  // normalize wifi gen
-  out.wifiGen = (out.wifiStandard||'').toString();
+  // normalize wifi gen + score
+  out.wifiGen = wifiNormalize(out.wifiStandard || out.wifiGen || '');
+  out.wifiScore = wifiRank(out.wifiGen);
 
   // mesh ecosystem guess from model (very rough)
   if (out.meshReady && !out.meshEco){
@@ -109,12 +120,13 @@ function derive(item){
   // accessSupport array ensure
   if (!Array.isArray(out.accessSupport)) out.accessSupport = [];
 
-  // device load normalize
+  // device load normalize (fallback)
   if (!out.deviceLoad) {
     const dl = (out.primaryUse||[]).includes('Gaming') ? '6–15' : '1–5';
     out.deviceLoad = dl;
   }
 
+  out.meshReady = !!out.meshReady;
   out.slug = slug(`${out.brand}-${out.model}`);
   return out;
 }
@@ -154,7 +166,7 @@ function debounce(fn, ms=80){
 // --- Facet building ---
 const Facets = {
   brand:     { label: 'Brand',        getter: x=>x.brand },
-  wifiGen:   { label: 'Wi‑Fi Gen',    getter: x=>x.wifiGen },
+  wifiGen:   { label: 'Wi-Fi Gen',    getter: x=>x.wifiGen },
   meshReady: { label: 'Mesh Ready',   getter: x=>x.meshReady ? 'Yes' : 'No' },
   meshEco:   { label: 'Mesh Ecosystem', getter: x=>x.meshEco },
   wanTier:   { label: 'WAN Tier',     getter: x=>x.wanTier },
@@ -246,21 +258,21 @@ function sortItems(items){
   const arr = [...items];
   switch(by){
     case 'wifi-desc':
-      arr.sort((a,b)=> String(b.wifiGen).localeCompare(String(a.wifiGen), undefined, {numeric:true})); break;
+      arr.sort((a,b)=> (b.wifiScore - a.wifiScore) || tierRank(b.wanTier)-tierRank(a.wanTier) || (a.priceUsd??9e9)-(b.priceUsd??9e9)); break;
     case 'price-asc':
-      arr.sort((a,b)=> (a.priceUsd||99999) - (b.priceUsd||99999)); break;
+      arr.sort((a,b)=> (Number(a.priceUsd)||99999) - (Number(b.priceUsd)||99999)); break;
     case 'price-desc':
-      arr.sort((a,b)=> (b.priceUsd||0) - (a.priceUsd||0)); break;
+      arr.sort((a,b)=> (Number(b.priceUsd)||0) - (Number(a.priceUsd)||0)); break;
     case 'coverage-desc':
-      arr.sort((a,b)=> (b.coverageSqft||0) - (a.coverageSqft||0)); break;
+      arr.sort((a,b)=> (Number(b.coverageSqft)||0) - (Number(a.coverageSqft)||0)); break;
     case 'wan-desc':
-      arr.sort((a,b)=> tierRank(b.wanTier) - tierRank(a.wanTier)); break;
+      arr.sort((a,b)=> tierRank(b.wanTier) - tierRank(a.wanTier) || (b.wifiScore-a.wifiScore)); break;
     case 'reviews-desc':
       arr.sort((a,b)=> (b.reviews?.score||0) - (a.reviews?.score||0)); break;
     case 'relevance':
     default:
       // quiz score first if available, else wifi desc then coverage
-      arr.sort((a,b)=> (Number(b._score||0) - Number(a._score||0)) || String(b.wifiGen).localeCompare(String(a.wifiGen), undefined, {numeric:true}) || (b.coverageSqft||0) - (a.coverageSqft||0));
+      arr.sort((a,b)=> (Number(b._score||0) - Number(a._score||0)) || (b.wifiScore - a.wifiScore) || ((Number(a.priceUsd)||9e9) - (Number(b.priceUsd)||9e9)));
   }
   return arr;
 }
@@ -268,11 +280,11 @@ function sortItems(items){
 // --- Rendering ---
 function specBullets(x){
   const chips = [];
-  if (x.wifiGen) chips.push(`Wi‑Fi ${x.wifiGen}`);
+  if (x.wifiGen) chips.push(`Wi-Fi ${x.wifiGen}`);
   if (x.meshReady) chips.push(`Mesh`);
   if (x.wanTier) chips.push(`${x.wanTier} WAN`);
   const specs = [
-    x.coverageSqft ? `${x.coverageSqft.toLocaleString()} sq ft` : null,
+    x.coverageSqft ? `${Number(x.coverageSqft).toLocaleString()} sq ft` : null,
     x.meshEco ? `${x.meshEco} mesh` : null,
     x.accessSupport?.length ? x.accessSupport.join(' / ') : null,
   ].filter(Boolean);
@@ -296,10 +308,22 @@ function renderCards(list, mount){
     node.querySelector('.chips').innerHTML = chips.map(c=>`<span class="chip">${c}</span>`).join('');
     node.querySelector('.specs').innerHTML = specs.map(s=>`<li>${s}</li>`).join('');
 
-    node.querySelector('.price').textContent = x.priceUsd ? `$${x.priceUsd.toFixed(2)}` : (x.msrp ? `MSRP $${x.msrp.toFixed(2)}` : '');
-    const buy = node.querySelector('.btn.small');
-    buy.textContent = (x.commerce?.retailers?.[0] || 'Buy');
-    if (x.commerce?.buyLink) buy.href = x.commerce.buyLink; else buy.removeAttribute('href');
+    const priceNum = Number(x.priceUsd);
+    const msrpNum = Number(x.msrp);
+    node.querySelector('.price').textContent =
+      Number.isFinite(priceNum) ? `$${priceNum.toFixed(2)}`
+      : (Number.isFinite(msrpNum) ? `MSRP $${msrpNum.toFixed(2)}` : '');
+
+    const buy = node.querySelector('a.btn.small');
+    const firstRetailer = x.commerce?.retailers?.[0];
+    buy.textContent = firstRetailer || 'Buy';
+    if (x.commerce?.buyLink) {
+      buy.href = x.commerce.buyLink;
+      buy.target = '_blank';
+      buy.rel = 'noopener';
+    } else {
+      buy.removeAttribute('href');
+    }
 
     const cmp = node.querySelector('.compare-btn');
     cmp.addEventListener('click', ()=> toggleCompare(x));
@@ -315,7 +339,7 @@ function renderActiveChips(){
     if (!set || !set.size) continue;
     for (const val of set){
       const label = Facets[facet]?.label || facet;
-      chips.push(`<button class="chip" data-remove="${facet}:{val}">${label}: ${val} ×</button>`);
+      chips.push(`<button class="chip" data-remove="${facet}:${val}">${label}: ${val} ×</button>`);
     }
   }
   elements.activeChips.innerHTML = chips.join('');
@@ -323,7 +347,7 @@ function renderActiveChips(){
 }
 
 function render(){
-  // facet counts use current filters removed (for counts of remaining items)
+  // facet counts (unfiltered for breadth)
   state.facetCounts = computeFacetCounts(state.data);
   renderQuick();
   renderFacet('brand','facet-brand');
@@ -338,6 +362,7 @@ function render(){
   renderFacet('priceBucket','facet-priceBucket');
 
   elements.matchCount.textContent = `${state.filtered.length} matches`;
+  elements.kitsStatus && (elements.kitsStatus.textContent = `${state.filtered.length} kits loaded`);
   renderActiveChips();
   renderCards(state.filtered, elements.results);
   renderRecs();
@@ -346,8 +371,8 @@ function render(){
 
 function renderRecs(){
   const mount = elements.recoGrid;
-  if (!state.quiz || !elements.toggleRecos.checked){
-    mount.innerHTML = '';
+  if (!state.quiz || (elements.toggleRecos && !elements.toggleRecos.checked)){
+    if (mount) mount.innerHTML = '';
     $('#recommendations').style.display = 'none';
     return;
   }
@@ -368,7 +393,7 @@ function renderCompare(){
   const arr = [...state.compare];
   if (!arr.length){ elements.compareDrawer.hidden = true; return; }
   const items = arr.map(slug => state.data.find(d=>d.slug===slug)).filter(Boolean);
-  elements.compareItems.innerHTML = items.map(x=>`<div class="item">${x.brand} ${x.model} · Wi‑Fi ${x.wifiGen} · ${x.wanTier} · ${x.coverageSqft?.toLocaleString()} sq ft</div>`).join('');
+  elements.compareItems.innerHTML = items.map(x=>`<div class="item">${x.brand} ${x.model} · Wi-Fi ${x.wifiGen} · ${x.wanTier} · ${x.coverageSqft?Number(x.coverageSqft).toLocaleString():''} sq ft</div>`).join('');
   elements.compareDrawer.hidden = false;
 }
 
@@ -410,14 +435,16 @@ function handleSort(){
 
 function openDrawer(open){
   elements.drawer.setAttribute('aria-hidden', String(!open));
+  document.documentElement.style.overflow = open ? 'hidden' : '';
   if (open){
     // clone form into drawer
     elements.drawerMount.innerHTML = '';
     const clone = elements.filtersForm.cloneNode(true);
     clone.addEventListener('change', handleFacetChange);
     elements.drawerMount.appendChild(clone);
-  } else {
-    // no-op
+    // focus first control
+    const first = elements.drawerMount.querySelector('input,select,button');
+    first && first.focus();
   }
 }
 
@@ -434,6 +461,7 @@ function resetAll(){
   state.sort = 'relevance';
   state.compare.clear();
   state.quiz = null;
+  if (elements.sortSelect) elements.sortSelect.value = 'relevance';
   applyFilters();
 }
 
@@ -446,7 +474,7 @@ function applyQuizResult(q){
     let s = 0;
     s += (it.coverageBucket===q.coverage ? 1 : 0) * w.cov;
     s += (String(it.deviceLoad)===String(q.deviceLoad) ? 1 : 0) * w.dev;
-    s += (it.primaryUse?.includes(q.primaryUse) ? 1 : 0) * w.use;
+    s += (Array.isArray(it.primaryUse) ? it.primaryUse.includes(q.primaryUse) : String(it.primaryUse)===String(q.primaryUse)) * w.use;
     s += (q.meshNeed ? (it.meshReady?1:0): 0) * w.mesh;
     s += (q.wanPref ? (it.wanTier===q.wanPref?1:0) : 0) * w.wan;
     // price fit is soft: prefer within 1 bucket if provided
@@ -454,7 +482,7 @@ function applyQuizResult(q){
     it._score = Math.round(s*100);
   }
   state.sort = 'relevance';
-  elements.sortSelect.value = 'relevance';
+  if (elements.sortSelect) elements.sortSelect.value = 'relevance';
   state.filtered = sortItems(state.data);
   render();
 }
@@ -464,37 +492,46 @@ window.__kits = { applyQuizResult, state };
 
 // --- Init ---
 async function init(){
-  const res = await fetch('kits.json', {cache:'no-store'});
-  const raw = await res.json();
-  state.data = raw.map(derive);
+  try {
+    const jsonUrl = (window.RH_CONFIG && window.RH_CONFIG.jsonUrl) ? window.RH_CONFIG.jsonUrl : 'kits.json';
+    const res = await fetch(jsonUrl, {cache:'no-store'});
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    state.data = raw.map(derive);
+    // init state from URL
+    const urlConf = getConfig();
+    state.sort = urlConf.sort;
+    state.active = urlConf.active;
+    if (elements.sortSelect) elements.sortSelect.value = state.sort;
 
-  // init state from URL
-  const conf = (function(){ try{ return JSON.parse(localStorage.getItem('kits.conf')||'null') } catch{ return null } })() || null;
-  const urlConf = getConfig();
-  state.sort = urlConf.sort;
-  state.active = urlConf.active;
+    // compute initial filtered
+    state.facetCounts = computeFacetCounts(state.data);
 
-  // compute initial filtered
-  state.facetCounts = computeFacetCounts(state.data);
+    elements.filtersForm.addEventListener('change', handleFacetChange);
+    elements.quickChips.addEventListener('click', handleQuickClick);
+    elements.activeChips.addEventListener('click', handleActiveChip);
+    elements.sortSelect.addEventListener('change', handleSort);
+    elements.copyLink.addEventListener('click', copyLink);
+    elements.resetAll.addEventListener('click', resetAll);
+    elements.filtersFab.addEventListener('click', ()=> openDrawer(true));
+    elements.drawer.addEventListener('click', (e)=>{
+      if (e.target.closest('[data-close-drawer]')) openDrawer(false);
+    });
+    elements.applyDrawer.addEventListener('click', ()=>{ openDrawer(false); applyFilters(); });
 
-  elements.filtersForm.addEventListener('change', handleFacetChange);
-  elements.quickChips.addEventListener('click', handleQuickClick);
-  elements.activeChips.addEventListener('click', handleActiveChip);
-  elements.sortSelect.addEventListener('change', handleSort);
-  elements.copyLink.addEventListener('click', copyLink);
-  elements.resetAll.addEventListener('click', resetAll);
-  elements.filtersFab.addEventListener('click', ()=> openDrawer(true));
-  elements.drawer.addEventListener('click', (e)=>{
-    if (e.target.closest('[data-close-drawer]')) openDrawer(false);
-  });
-  elements.applyDrawer.addEventListener('click', ()=>{ openDrawer(false); applyFilters(); });
+    elements.clearCompare.addEventListener('click', ()=>{ state.compare.clear(); renderCompare(); });
+    elements.toggleRecos.addEventListener('change', renderRecs);
 
-  elements.clearCompare.addEventListener('click', ()=>{ state.compare.clear(); renderCompare(); });
-  elements.toggleRecos.addEventListener('change', renderRecs);
-
-  // initial render
-  state.filtered = sortItems(state.data);
-  applyFilters();
+    // initial render
+    state.filtered = sortItems(state.data);
+    applyFilters();
+  } catch (e) {
+    console.error(e);
+    if (elements.kitsError){
+      elements.kitsError.classList.remove('hide');
+      elements.kitsError.textContent = `Couldn’t load kits.json: ${e.message}`;
+    }
+  }
 }
 
 init();
