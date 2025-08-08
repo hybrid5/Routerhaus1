@@ -593,6 +593,8 @@ html[data-theme="dark"] .modal-actions{
   }
   .page-header{
     margin-block: 18px 12px;       /* taller header row */
+    justify-content: center;  /* centers both brand and buttons together */
+    text-align: center;       /* ensures text alignment inside */
   }
   .header-actions{
     gap: 10px;                     /* space between buttons */
