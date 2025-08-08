@@ -7,7 +7,7 @@
   <meta name="description" content="Filter and compare the best router kits for apartments, homes, and offices." />
   <meta name="color-scheme" content="light dark" />
 
-  <!-- Preload JSON (same-origin: no crossorigin) -->
+  <!-- Preload JSON -->
   <link rel="preload" href="kits.json" as="fetch" type="application/json" />
 
   <!-- Styles -->
@@ -26,13 +26,12 @@
         <small id="matchCount" aria-live="polite"></small>
       </div>
 
-      <!-- Optional expand/collapse helpers -->
       <div class="facet-toolbar">
         <button type="button" id="expandAll" class="btn small">Expand all</button>
         <button type="button" id="collapseAll" class="btn small">Collapse all</button>
       </div>
 
-      <!-- FORM & FACETS (IDs expected by kits.js) -->
+      <!-- FORM & FACETS -->
       <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
         <!-- Quick picks -->
         <section class="facet" data-facet="quick">
@@ -90,7 +89,6 @@
             </span>
           </summary>
           <div class="options two-cols" id="facet-wanTier"></div>
-          <!-- (Optional placeholders kept for future) -->
           <div class="options two-cols" id="facet-lanCount"></div>
           <div class="options two-cols" id="facet-multiGigLan"></div>
           <div class="options two-cols" id="facet-usb"></div>
@@ -124,6 +122,13 @@
           </summary>
           <div class="options two-cols" id="facet-priceBucket"></div>
         </details>
+
+        <!-- Compare Panel (desktop) -->
+        <section id="comparePanel" class="facet" data-facet="compare">
+          <h3>Compare</h3>
+          <div id="compareItemsPanel" class="compare-items"></div>
+          <button id="clearCompare" class="btn small ghost" type="button">Clear</button>
+        </section>
       </form>
     </aside>
 
@@ -136,7 +141,6 @@
           <button class="icon-btn" data-close-drawer aria-label="Close filters">&times;</button>
         </div>
         <div class="drawer-body">
-          <!-- kits.js clones #filtersForm here -->
           <div id="drawerFormMount"></div>
         </div>
         <div class="drawer-footer">
@@ -178,6 +182,7 @@
           <input type="checkbox" id="toggleRecos" checked />
           <span>Show recommendations</span>
         </label>
+        <button id="openFiltersHeader" class="btn glass" type="button">Filters</button>
       </div>
 
       <!-- Recos -->
@@ -186,27 +191,31 @@
         <div id="recoGrid" class="product-grid"></div>
       </section>
 
+      <!-- Pagination Top -->
+      <nav id="paginationTop" class="pagination"></nav>
+
       <!-- Results -->
       <section class="results">
-        <!-- Loading + error surfaces used by kits.js (optional but helpful) -->
         <div id="kitsStatus" class="sr-only" role="status" aria-live="polite">Loading kits…</div>
         <div id="kitsError" class="hide" role="alert"></div>
-
         <div id="kitResults" class="product-grid"></div>
       </section>
+
+      <!-- Pagination Bottom -->
+      <nav id="paginationBottom" class="pagination"></nav>
     </section>
   </main>
 
-  <!-- Compare -->
+  <!-- Compare bar (mobile only) -->
   <aside id="compareDrawer" class="compare glass" aria-live="polite" hidden>
     <div class="compare-header">
       <strong>Compare</strong>
-      <button id="clearCompare" class="btn small ghost" type="button">Clear</button>
+      <button id="clearCompareMobile" class="btn small ghost" type="button">Clear</button>
     </div>
     <div id="compareItems" class="compare-items"></div>
   </aside>
 
-  <!-- Quiz modal (native dialog) -->
+  <!-- Quiz modal -->
   <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
     <div class="modal-content">
       <header class="modal-header">
@@ -275,15 +284,13 @@
   <!-- Footer partial mounts here -->
   <div id="footer-placeholder"></div>
 
-  <!-- Optional config for kits.js (lets you relocate files without code edits) -->
   <script>
     window.RH_CONFIG = {
-      jsonUrl: 'kits.json',           // change if you move the JSON
+      jsonUrl: 'kits.json',
       enableRecos: true
     };
   </script>
 
-  <!-- Scripts (order matters: partials first, then page modules) -->
   <script src="scripts.js" defer></script>
   <script type="module" src="assets/js/kits.js"></script>
   <script type="module" src="assets/js/quiz-modal.js"></script>
