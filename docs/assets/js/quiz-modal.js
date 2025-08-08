@@ -1,111 +1,58 @@
-"use strict";
+/* assets/js/quiz-modal.js
+ * RouterHaus Kits — Quiz modal + mapping (connected to filters)
+ */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-console.log('quiz-modal.js loaded');
+const dlg = document.getElementById('quizModal');
+const openBtn = document.getElementById('openQuiz');
+const closeBtns = $$('.modal-close', dlg);
+const form = $('#quizForm', dlg);
 
-document.addEventListener('DOMContentLoaded', () => {
-  const openBtn = document.getElementById('startQuizBtn');
-  console.log('openBtn:', openBtn);
-  const modal = document.getElementById('quizModal');
-  console.log('modal:', modal);
-  const form = document.getElementById('quizForm');
-  console.log('form:', form);
-  const closeBtns = modal ? modal.querySelectorAll('.quiz-close') : [];
-  console.log('closeBtns:', closeBtns);
+// Helpers
+function lockScroll(lock){ document.documentElement.style.overflow = lock ? 'hidden' : ''; }
+function openModal(){
+  if (!dlg) return;
+  dlg.showModal();
+  dlg.classList.add('is-open');
+  lockScroll(true);
+  const first = dlg.querySelector('select, button, [href], input');
+  first && first.focus();
+}
+function closeModal(){
+  if (!dlg) return;
+  dlg.classList.remove('is-open');
+  setTimeout(()=>{ dlg.close(); lockScroll(false); }, 120);
+}
 
-  let focusables = [];
-  let firstFocus, lastFocus;
+openBtn?.addEventListener('click', openModal);
+closeBtns.forEach(b=> b.addEventListener('click', closeModal));
 
-  const envMap = {
-    'Apartment/Small': 'Apartment',
-    '2–3 Bedroom': 'House',
-    'Large/Multi-floor': 'House'
-  };
+// Click outside panel closes
+dlg?.addEventListener('click', (e)=>{
+  const rect = dlg.getBoundingClientRect();
+  const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+  if (!inside) closeModal();
+});
+dlg?.addEventListener('cancel', (e)=>{ e.preventDefault(); closeModal(); });
+dlg?.addEventListener('close', ()=> lockScroll(false));
 
-  function ensureFilter(id, labelText, options) {
-    let select = document.getElementById(id);
-    if (!select) {
-      const aside = document.getElementById('kitFilterSection');
-      if (!aside) return null;
-      const clearBtn = document.getElementById('clearFilters');
+form?.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const coverage = $('#qCoverage', dlg).value;
+  const deviceLoad = $('#qDevices', dlg).value;
+  const primaryUse = $('#qUse', dlg).value;
+  if (!coverage || !deviceLoad || !primaryUse) return;
 
-      const label = document.createElement('label');
-      label.setAttribute('for', id);
-      label.textContent = labelText;
+  // Basic mapping: large homes benefit from mesh
+  const meshNeed = (coverage === 'Large/Multi-floor');
 
-      select = document.createElement('select');
-      select.id = id;
-      select.innerHTML = '<option value="">Any</option>' +
-        options.map(o => `<option value="${o}">${o}</option>`).join('');
+  const result = { coverage, deviceLoad, primaryUse, meshNeed };
 
-      aside.insertBefore(label, clearBtn);
-      aside.insertBefore(select, clearBtn);
-
-      const key = id.replace('Filter', '');
-      if (window.elements && elements[key] === null) {
-        elements[key] = select;
-        select.addEventListener('change', () => {
-          if (typeof saveFilters === 'function') saveFilters();
-          if (typeof applyFilters === 'function') applyFilters();
-        });
-      }
-    }
-    return select;
+  // Push into Kits logic (sets facets + recommendations + renders)
+  if (window.__kits?.applyQuizResult) {
+    window.__kits.applyQuizResult(result, { openFilters: false, scrollToResults: true });
   }
 
-  function trapFocus(e) {
-    if (e.key === 'Escape') {
-      closeModal();
-    } else if (e.key === 'Tab' && focusables.length) {
-      if (e.shiftKey && document.activeElement === firstFocus) {
-        e.preventDefault();
-        lastFocus.focus();
-      } else if (!e.shiftKey && document.activeElement === lastFocus) {
-        e.preventDefault();
-        firstFocus.focus();
-      }
-    }
-  }
-
-  function openModal() {
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    focusables = modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    firstFocus = focusables[0];
-    lastFocus = focusables[focusables.length - 1];
-    firstFocus.focus();
-    document.addEventListener('keydown', trapFocus);
-  }
-
-  function closeModal() {
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
-    document.removeEventListener('keydown', trapFocus);
-    if (openBtn) openBtn.focus();
-  }
-
-  if (openBtn && modal && form) {
-    openBtn.addEventListener('click', openModal);
-    closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
-    modal.addEventListener('click', e => {
-      if (e.target === modal) closeModal();
-    });
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const home = form.quizHomeSize.value;
-      const devices = form.quizDeviceLoad.value;
-      const usage = form.quizPrimaryUse.value;
-
-      const envSelect = document.getElementById('envFilter');
-      if (envSelect) envSelect.value = envMap[home] || home;
-
-      ensureFilter('deviceFilter', 'Device Load', ['1–5', '6–15', '16+']).value = devices;
-      ensureFilter('usageFilter', 'Primary Use', ['Family Streaming', 'Gaming', 'Work-From-Home', 'Smart-Home', 'All-Purpose']).value = usage;
-
-      if (typeof applyFilters === 'function') applyFilters();
-      closeModal();
-    });
-  }
+  closeModal();
 });

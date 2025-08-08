@@ -1,189 +1,526 @@
-/* RouterHaus kits page styles */
+/* ================================
+   RouterHaus Kits — COMPLETE styles
+   Polished glass, crisp contrast,
+   accessible focus, and refined motion
+   ================================ */
 
-.product-grid {
-  padding: 5rem 1.5rem;
-  text-align: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.product-grid h2 {
-  font-size: 2.2rem;
-  margin-bottom: 2.3rem;
-}
-.product-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-  gap: 1rem;
-  justify-content: center;
-  justify-items: center;
-}
-.product {
-  padding: 2.2rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: transform var(--transition);
-}
-.product:hover {
-  transform: translateY(-8px);
-}
+/* ---------- THEME TOKENS ---------- */
+:root{
+  /* Light */
+  --bg: #f7f9fc;
+  --bg-elev: #ffffff;
+  --text-1: #0b1020;
+  --text-2: #3b4360;
+  --muted: #6c7391;
 
-.chip {
-  display: inline-block;
-  padding: 0.25rem 0.55rem;
-  font-size: 0.75rem;
-  border-radius: var(--radius);
-  background: var(--primary);
-  color: var(--text-on-accent);
-  margin-right: 0.35rem;
-}
+  --primary: #6ea8fe;           /* brand blue */
+  --accent: #8e7dff;            /* subtle purple */
+  --success: #30d899;
+  --warning: #ffb347;
+  --danger: #ff7a7a;
 
-.glass {
-  background: var(--card);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  border: var(--card-border);
-}
-html[data-theme='dark'] .glass {
-  background: var(--card);
-  border: 1px solid rgba(255,255,255,.08);
+  --card: rgba(255,255,255,.78);
+  --card-strong: rgba(255,255,255,.92);
+  --surface: rgba(255,255,255,.55);
+
+  --border: rgba(12,20,33,.14);
+  --border-strong: rgba(12,20,33,.22);
+  --shadow: 0 18px 48px rgba(16,24,40,.16);
+  --shadow-sm: 0 8px 24px rgba(16,24,40,.10);
+
+  --radius: 16px;
+  --radius-lg: 18px;
+  --gap: 12px;
+
+  --glass-blur: 16px;
+  --glass-sat: 160%;
+  --glass-tint: rgba(255,255,255,.45);
+
+  --transition: .18s cubic-bezier(.22,.61,.36,1);
+  --focus: 0 0 0 3px color-mix(in oklab, var(--primary) 32%, transparent);
+
+  color-scheme: light dark;
+  accent-color: var(--primary);
 }
 
-.kit-filters {
-  padding: 1rem;
-  margin: 0 auto 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
-}
-.kit-filters select,
-.kit-filters input,
-.kit-filters button {
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius);
+/* Dark theme overrides */
+html[data-theme="dark"]{
+  --bg: #0b1018;
+  --bg-elev: #121826;
+  --text-1: #e9eef8;
+  --text-2: #b8c0d8;
+  --muted: #8f98b5;
+
+  --card: rgba(18,22,34,.58);
+  --card-strong: rgba(20,26,40,.82);
+  --surface: rgba(26,32,48,.52);
+
+  --border: rgba(255,255,255,.14);
+  --border-strong: rgba(255,255,255,.22);
+  --shadow: 0 24px 64px rgba(0,0,0,.55);
+  --shadow-sm: 0 12px 36px rgba(0,0,0,.35);
+
+  --glass-tint: rgba(10,14,22,.45);
 }
 
-.kit-grid {
-  padding: 2rem 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+/* Respect OS if you remove explicit data-theme */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme]){
+    --bg: #0b1018;
+    --bg-elev: #121826;
+    --text-1: #e9eef8;
+    --text-2: #b8c0d8;
+    --muted: #8f98b5;
 
-/* filter input styles */
-.filters select,
-.filters input {
-  width: 100%;
-  border: 1px solid var(--accordion-border);
-  background: var(--surface);
-  color: var(--text-primary);
-}
-html[data-theme='dark'] .filters select,
-html[data-theme='dark'] .filters input {
-  background: var(--surface);
-  border-color: rgba(255,255,255,.15);
-  color: var(--text-primary);
-}
+    --card: rgba(18,22,34,.58);
+    --card-strong: rgba(20,26,40,.82);
+    --surface: rgba(26,32,48,.52);
 
-.filters button {
-  width: 100%;
-  border: 1px solid var(--accordion-border);
-  background: var(--surface);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: var(--transition);
-}
-.filters button:hover {
-  filter: brightness(1.05);
-}
-html[data-theme='dark'] .filters button {
-  background: var(--surface);
-  border-color: rgba(255,255,255,.15);
-  color: var(--text-primary);
-}
+    --border: rgba(255,255,255,.14);
+    --border-strong: rgba(255,255,255,.22);
+    --shadow: 0 24px 64px rgba(0,0,0,.55);
+    --shadow-sm: 0 12px 36px rgba(0,0,0,.35);
 
-@media (min-width: 768px) {
-  .kit-filters {
-    flex-direction: column;
-    width: 240px;
-    align-items: stretch;
+    --glass-tint: rgba(10,14,22,.45);
   }
 }
 
-.accordion {
-  max-width: 800px;
-  margin: 0 auto 4rem;
-  padding: 0 1rem;
-}
-.accordion-item {
-  border-top: 1px solid var(--accordion-border);
-  padding: 1rem 0;
-  cursor: pointer;
-}
-.accordion-item h4 {
-  font-size: 1.1rem;
+/* ---------- GLOBAL ---------- */
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+body{
   margin: 0;
-  color: var(--text-primary);
-}
-.accordion-item span {
-  float: right;
-  font-size: 1.3rem;
-  color: var(--primary);
-  transition: var(--transition);
-}
-.accordion-item.open span {
-  transform: rotate(45deg);
-}
-.accordion-item p {
-  display: none;
-  margin: .6rem 0 0;
-  color: var(--text-muted);
-}
-.accordion-item.open p {
-  display: block;
+  background: radial-gradient(1200px 800px at 70% -10%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 60%) , var(--bg);
+  color: var(--text-1);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Quiz modal overlay */
-#quizModal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,.6);
-  z-index: 1200;
+/* ---------- GLASS SYSTEM ---------- */
+.glass{
+  background: color-mix(in oklab, var(--card) 70%, var(--glass-tint));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
-#quizModal.active { display: flex; }
-#quizModal .modal-content {
+.glass.soft{
+  background: color-mix(in oklab, var(--card-strong) 75%, var(--glass-tint));
+}
+
+/* ---------- LAYOUT ---------- */
+.container{ max-width: 1200px; margin-inline: auto; padding: 16px; }
+
+/* Wider container on very large screens */
+@media (min-width: 1440px){
+  .container{ max-width: 1560px; }
+}
+
+.kits-layout{
+  display: grid;
+  grid-template-columns: 320px minmax(0,1fr);
+  gap: 16px;
+}
+.kits-layout > *{ min-width: 0; }
+.content{ min-width: 0; }
+
+/* ---------- HEADER ---------- */
+.page-header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-block: 12px 8px;
+}
+.page-header .brand{ font-size: 1.6rem; font-weight: 800; letter-spacing:.2px; }
+.page-header .brand .subtle{ opacity:.7; font-weight:600; margin-left:.25rem; color: var(--text-2); }
+.header-actions{ display:flex; gap:8px; }
+
+/* ---------- BUTTONS ---------- */
+.btn{
+  border-radius: var(--radius-lg);
+  padding:.55rem .95rem;
+  border:1px solid var(--border);
   background: var(--card);
-  color: var(--text-primary);
-  padding: 2rem;
-  border-radius: var(--radius);
-  position: relative;
-  width: 90%;
-  max-width: 500px;
-}
-#quizModal .modal-close {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--text-primary);
+  color: var(--text-1);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition), filter var(--transition);
   cursor: pointer;
 }
-#quizModal label {
-  display: block;
-  margin-top: 1rem;
+.btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow); filter: brightness(1.03); }
+.btn:active{ transform: translateY(0); box-shadow: var(--shadow-sm); }
+.btn.primary{ background: var(--primary); color:#0b1020; border-color: color-mix(in oklab, var(--primary) 35%, #0000); }
+.btn.ghost{ background: transparent; border-color: var(--border-strong); color: var(--text-1); }
+.btn.glass{ background: var(--surface); }
+.btn.small{ padding:.35rem .6rem; font-size:.85rem; }
+
+.badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width: 1.25rem; padding:0 .45rem;
+  height: 1.25rem; font-size:.72rem; font-weight:700;
+  border-radius: 999px; background: var(--accent); color: #000; box-shadow: inset 0 -1px 0 rgba(0,0,0,.12);
 }
-#quizModal select {
-  width: 100%;
-  margin-top: .25rem;
-  padding: .5rem;
+
+/* ---------- SIDEBAR (DESKTOP) ---------- */
+.filters-rail{
+  position: sticky; top: 12px;
+  height: calc(100dvh - 24px);
+  overflow: auto; padding: 12px;
+  border-radius: var(--radius-lg);
 }
-#quizModal .modal-actions {
-  margin-top: 1.5rem;
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
+.filters-header{ display:flex; align-items: baseline; justify-content: space-between; }
+.filters-header small{ color: var(--muted); }
+.filters-form{ display:block; }
+.divider{ height:1px; background: var(--border); margin: 10px 0; opacity:.35; }
+
+/* Quick chips */
+.chips{ display:flex; flex-wrap: wrap; gap: 6px; }
+.chip{
+  border-radius: 999px; padding:.3rem .6rem;
+  background: var(--surface);
+  border:1px solid var(--border);
+  font-size:.85rem; line-height:1; color:var(--text-1);
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
+.chip:hover{ background: color-mix(in oklab, var(--accent) 24%, var(--surface)); transform: translateY(-1px); }
+.chip.active{ box-shadow: 0 0 0 2px var(--accent) inset; }
+.active-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom: 8px; }
+.active-chips .chip{ cursor: pointer; }
+
+/* ---------- FACETS as DROPDOWNS ---------- */
+.facet{
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  overflow: clip;
+}
+.facet + .facet{ margin-top: 10px; }
+.facet[hidden]{ display:none !important; }
+
+details.facet[open]{ background: color-mix(in oklab, var(--card) 70%, transparent); }
+
+.facet summary{
+  list-style: none; cursor: pointer; user-select: none;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding: 10px 12px; font-weight: 700; color: var(--text-1);
+}
+.facet summary::-webkit-details-marker{ display:none; }
+.facet .facet-meta{ display:inline-flex; align-items:center; gap:8px; }
+.facet .badge.count{ background: color-mix(in oklab, var(--accent) 40%, transparent); color: var(--text-1); visibility: hidden; }
+
+.facet .chev{ transition: transform var(--transition); }
+details.facet[open] .chev{ transform: rotate(180deg); }
+
+.facet .options{
+  padding: 10px 12px;
+  display:grid; grid-template-columns: 1fr; gap:6px;
+}
+.facet .options.two-cols{ grid-template-columns: 1fr 1fr; }
+
+.facet .options label{
+  display:flex; align-items:center; gap:8px;
+  padding:.38rem .55rem;
+  border:1px solid var(--border);
+  border-radius: 10px; background: transparent;
+  transition: background var(--transition), border-color var(--transition);
+}
+.facet .options label:hover{ background: color-mix(in oklab, var(--surface) 80%, transparent); }
+.facet input[type="checkbox"]{ width: 16px; height: 16px; accent-color: var(--primary); }
+
+/* ---------- TOOLBAR ---------- */
+.toolbar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-bottom:8px; padding:8px 12px;
+  border-radius: var(--radius-lg);
+  border:1px solid var(--border);
+  flex-wrap: wrap; /* allow clean wrapping with sort + recos + filters */
+}
+.toolbar.glass{ background: color-mix(in oklab, var(--card) 70%, var(--glass-tint)); }
+.sort{ display:flex; align-items:center; gap:8px; flex-wrap: wrap; }
+.sort select{
+  padding:.45rem .6rem; border-radius: 10px;
+  background: var(--surface);
+  border:1px solid var(--border); color: var(--text-1);
+}
+
+/* Mobile header Filters button (hidden by default; shown ≤980px) */
+#openFiltersHeader{
+  display:none;
+}
+@media (max-width: 980px){
+  #openFiltersHeader{
+    display:inline-flex; align-items:center; gap:6px;
+    border-radius: 12px; padding:.5rem .8rem;
+    background: var(--surface); border:1px solid var(--border);
+  }
+}
+
+/* ---------- GRID & CARDS ---------- */
+.product-grid{
+  display:grid;
+  /* >=3 across on desktop with auto-fit */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap:12px;
+}
+@media (max-width: 1200px){ .product-grid{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } }
+@media (max-width: 640px){ .product-grid{ grid-template-columns: 1fr; } }
+
+.product{
+  padding: 12px; border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--card) 75%, var(--glass-tint));
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  display:flex; flex-direction:column; gap:8px; min-width:0;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.product:hover{ transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--border-strong); }
+
+.product .product-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.product .title{ font-size: 1rem; font-weight: 800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:.2px; }
+
+.product .product-media{
+  width:100%; aspect-ratio: 16/10; min-height:160px;
+  border-radius: 12px; overflow:hidden;
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--border);
+}
+.product .product-media img{ width:100%; height:100%; object-fit: cover; display:block; }
+
+.product .chips.line{ display:flex; flex-wrap:wrap; gap:6px; }
+.product .specs{ margin: 6px 0 8px; padding-left: 18px; color: var(--text-2); }
+.product .specs li{ margin:2px 0; }
+
+.product .priceRow{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.priceRow .price{ font-weight: 900; letter-spacing:.2px; }
+
+/* Compare bar (mobile fallback) */
+.compare{
+  position: fixed; bottom: 12px; left: 12px; right: 12px;
+  display:flex; align-items:center; gap:8px; padding: 8px 10px;
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--card-strong) 75%, var(--glass-tint));
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 110;
+}
+.compare-items{ display:flex; gap:8px; flex-wrap:wrap; }
+.compare .item{
+  padding:.35rem .5rem; border-radius:999px;
+  background: var(--surface); border:1px solid var(--border); font-size:.85rem;
+}
+
+/* Keep space for compare */
+.results{ padding-bottom: 84px; }
+
+/* ---------- RECOMMENDATIONS ---------- */
+.recommendations{ margin-block: 8px 16px; }
+.recommendations:empty{ display:none; }
+
+/* ---------- PAGINATION ---------- */
+.pagination{
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  margin-top: 8px; flex-wrap: wrap;
+}
+.pagination .page{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width: 36px; height: 36px; padding: 0 10px;
+  border-radius: 12px; border:1px solid var(--border);
+  background: var(--surface); color: var(--text-1);
+  font-weight: 700; cursor: pointer;
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+}
+.pagination .page:hover{ transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.pagination .page.active{
+  background: var(--primary); color:#0b1020;
+  border-color: color-mix(in oklab, var(--primary) 45%, #0000);
+}
+.pagination .prev, .pagination .next{
+  padding: 0 .75rem; min-width: 44px;
+}
+.pagination .disabled{
+  opacity:.5; pointer-events:none;
+}
+
+/* ---------- MOBILE FILTERS (FAB + DRAWER) ---------- */
+.fab{
+  position: fixed; inset: auto 16px 16px auto;
+  z-index: 140; border-radius: 999px;
+  padding:.6rem .95rem; border:1px solid var(--border);
+  background: var(--surface); color: var(--text-1);
+  box-shadow: var(--shadow-sm);
+}
+.drawer{ position: fixed; inset: 0; display:none; z-index: 150; }
+.drawer[aria-hidden="false"]{ display:block; }
+
+.drawer::before{
+  content:""; position:absolute; inset:0;
+  background: rgba(8,10,16,.55);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+}
+
+.drawer .drawer-panel{
+  position:absolute; inset: auto 0 0 0;
+  border-top-left-radius: 20px; border-top-right-radius: 20px;
+  padding: 12px;
+  background: color-mix(in oklab, var(--card-strong) 80%, var(--glass-tint));
+  color: var(--text-1);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 151;
+}
+html[data-theme="dark"] .drawer .drawer-panel{ background: color-mix(in oklab, var(--card-strong) 78%, var(--glass-tint)); }
+
+.drawer-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding: 4px 4px 8px; }
+.drawer-body{ max-height: 68dvh; overflow:auto; padding: 6px; }
+.drawer-footer{ display:flex; gap:8px; justify-content:flex-end; padding: 8px 4px 4px; }
+.icon-btn{
+  border-radius: 10px; border:1px solid var(--border);
+  background: var(--surface); padding:.35rem .55rem; color:inherit;
+  transition: background var(--transition);
+}
+.icon-btn:hover{ background: color-mix(in oklab, var(--surface) 90%, transparent); }
+
+/* Only show FAB/drawer below breakpoint */
+@media (min-width: 981px){
+  .fab, #filtersDrawer{ display:none !important; }
+  /* Hide bottom fixed compare bar on desktop */
+  .compare{ display:none !important; }
+  /* Results don’t need bottom padding on desktop since compare bar is hidden */
+  .results{ padding-bottom: 0; }
+}
+
+/* Collapse sidebar on mobile */
+@media (max-width: 980px){
+  .kits-layout{ grid-template-columns: 1fr; }
+  .filters-rail{ display:none; }
+
+  /* When header filter button is present, hide old FAB */
+  .fab{ display:none !important; }
+}
+
+/* ---------- SIDEBAR COMPARE PANEL (desktop) ---------- */
+#comparePanel{
+  margin-top: 10px;
+}
+#comparePanel .compare-items{
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+#comparePanel .item{
+  padding:.35rem .5rem; border-radius:999px;
+  background: var(--surface); border:1px solid var(--border);
+  font-size:.85rem;
+}
+#clearCompare.btn.small{ margin-top: 6px; }
+
+/* ---------- MODAL (QUIZ) ---------- */
+.modal{
+  width: min(92vw, 560px);
+  border: none; padding: 0;
+  border-radius: 20px;
+  background: color-mix(in oklab, var(--card-strong) 86%, var(--glass-tint));
+  color: var(--text-1);
+  box-shadow: 0 28px 80px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.25);
+  overflow: hidden;
+  transform: translateY(6px) scale(.985);
+  opacity: 0;
+  transition: transform .14s ease, opacity .14s ease;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+}
+html[data-theme="dark"] .modal{
+  background: color-mix(in oklab, var(--card-strong) 84%, var(--glass-tint));
+}
+.modal.is-open{ transform: translateY(0) scale(1); opacity: 1; }
+
+/* Backdrop: strong scrim that truly blocks */
+.modal::backdrop{
+  background:
+    radial-gradient(1200px 800px at 50% 30%, rgba(30,40,80,.45), transparent 70%),
+    rgba(8,10,16,.72);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  animation: modalScrimIn .15s ease;
+}
+@keyframes modalScrimIn{ from{ opacity: 0; } to{ opacity: 1; } }
+
+.modal .modal-content{ display:grid; grid-template-rows:auto 1fr auto; }
+.modal-header{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding: 14px 16px 10px;
+  background: linear-gradient(0deg, rgba(255,255,255,.02), rgba(255,255,255,.06));
+  border-bottom:1px solid var(--border);
+}
+html[data-theme="dark"] .modal-header{
+  background: linear-gradient(0deg, rgba(255,255,255,.02), rgba(255,255,255,.05));
+}
+#quizTitle{ margin:0; font-size:1.15rem; font-weight:900; letter-spacing:.2px; }
+
+.modal-close{
+  border:1px solid var(--border); background: var(--surface); color: inherit;
+  width: 36px; height: 36px; border-radius: 10px;
+  display:grid; place-items:center; cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+.modal-close:hover{ background: color-mix(in oklab, var(--surface) 95%, transparent); }
+.modal-close:active{ transform: scale(.98); }
+
+.quiz-body{ padding: 14px 16px 4px; display:grid; gap: 10px; }
+.quiz-body label{ display:grid; gap: 6px; font-weight: 700; color: var(--text-1); }
+html[data-theme="dark"] .quiz-body label{ color: var(--text-1); }
+
+.quiz-body select{
+  padding:.6rem .65rem; border-radius: 12px;
+  border:1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text-1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.3);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+html[data-theme="dark"] .quiz-body select{
+  background: color-mix(in oklab, var(--surface) 95%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.quiz-body select:focus{
+  outline: none;
+  border-color: color-mix(in oklab, var(--primary) 65%, var(--border));
+  box-shadow: var(--focus);
+}
+
+.modal-actions{
+  display:flex; gap:8px; justify-content:flex-end;
+  padding: 10px 16px 14px;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+}
+html[data-theme="dark"] .modal-actions{
+  background: linear-gradient(0deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+}
+.modal-actions .btn{ border-radius: 12px; padding:.6rem .95rem; }
+
+/* ---------- FOCUS STATES ---------- */
+:where(button, .btn, .chip, .icon-btn, select, input, summary):focus-visible{
+  outline: none;
+  box-shadow: var(--focus);
+  border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+}
+
+/* ---------- SCROLLBARS ---------- */
+.filters-rail::-webkit-scrollbar,
+.drawer-body::-webkit-scrollbar{ width: 10px; }
+.filters-rail::-webkit-scrollbar-thumb,
+.drawer-body::-webkit-scrollbar-thumb{
+  background: rgba(127,127,127,.28);
+  border: 3px solid transparent; border-radius: 999px; background-clip: padding-box;
+}
+
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; animation: none !important; }
+}
+
+/* ---------- UTILS ---------- */
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); border:0;
+}
+.hide{ display:none !important; }
