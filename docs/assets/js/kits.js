@@ -1,9 +1,10 @@
-/* RouterHaus Kits — Next-Gen (static, vanilla JS)
+/* assets/js/kits.js
+ * RouterHaus Kits — Next-Gen (static, vanilla JS)
  * - Reads kits.json (configurable via window.RH_CONFIG.jsonUrl)
  * - Derives: brand, coverageBucket, wanTier, priceBucket, wifiScore
  * - Facets: Brand, Wi-Fi Gen, Mesh, WAN Tier, Coverage, Device Load, Primary Use, Access, Price
  * - URL sync + localStorage
- * - Recommendations computed after quiz
+ * - Quiz wiring now SETS FILTER FACETS so results update immediately
  */
 
 const $ = (sel, root=document) => root.querySelector(sel);
@@ -107,7 +108,7 @@ function derive(item){
   out.wifiGen = wifiNormalize(out.wifiStandard || out.wifiGen || '');
   out.wifiScore = wifiRank(out.wifiGen);
 
-  // mesh ecosystem guess from model (very rough)
+  // mesh ecosystem guess from model (rough)
   if (out.meshReady && !out.meshEco){
     if (brand==='ASUS') out.meshEco = 'AiMesh';
     else if (brand==='NETGEAR') out.meshEco = 'Orbi';
@@ -117,10 +118,8 @@ function derive(item){
     else out.meshEco = 'EasyMesh';
   }
 
-  // accessSupport array ensure
   if (!Array.isArray(out.accessSupport)) out.accessSupport = [];
 
-  // device load normalize (fallback)
   if (!out.deviceLoad) {
     const dl = (out.primaryUse||[]).includes('Gaming') ? '6–15' : '1–5';
     out.deviceLoad = dl;
@@ -271,7 +270,6 @@ function sortItems(items){
       arr.sort((a,b)=> (b.reviews?.score||0) - (a.reviews?.score||0)); break;
     case 'relevance':
     default:
-      // quiz score first if available, else wifi desc then coverage
       arr.sort((a,b)=> (Number(b._score||0) - Number(a._score||0)) || (b.wifiScore - a.wifiScore) || ((Number(a.priceUsd)||9e9) - (Number(b.priceUsd)||9e9)));
   }
   return arr;
@@ -347,7 +345,6 @@ function renderActiveChips(){
 }
 
 function render(){
-  // facet counts (unfiltered for breadth)
   state.facetCounts = computeFacetCounts(state.data);
   renderQuick();
   renderFacet('brand','facet-brand');
@@ -437,12 +434,10 @@ function openDrawer(open){
   elements.drawer.setAttribute('aria-hidden', String(!open));
   document.documentElement.style.overflow = open ? 'hidden' : '';
   if (open){
-    // clone form into drawer
     elements.drawerMount.innerHTML = '';
     const clone = elements.filtersForm.cloneNode(true);
     clone.addEventListener('change', handleFacetChange);
     elements.drawerMount.appendChild(clone);
-    // focus first control
     const first = elements.drawerMount.querySelector('input,select,button');
     first && first.focus();
   }
@@ -465,26 +460,56 @@ function resetAll(){
   applyFilters();
 }
 
-// --- Quiz integration ---
-function applyQuizResult(q){
-  state.quiz = q;
-  // compute score
-  const w = {cov:0.30, dev:0.25, use:0.25, mesh:0.10, wan:0.05, price:0.05};
+/* ---- QUIZ -> FILTERS bridge ---- */
+function setFacetValue(name, value){
+  if (value == null || value === '') return;
+  state.active[name] = new Set([String(value)]);
+}
+function addFacetValue(name, value){
+  if (value == null || value === '') return;
+  state.active[name] ??= new Set();
+  state.active[name].add(String(value));
+}
+
+/**
+ * applyQuizResult(result, opts?)
+ * result: { coverage, deviceLoad, primaryUse, meshNeed }
+ * opts: { openFilters?: boolean, scrollToResults?: boolean }
+ */
+function applyQuizResult(result, opts={}){
+  state.quiz = result;
+
+  // Score each item (for "Recommendations")
+  const w = {cov:0.35, dev:0.25, use:0.25, mesh:0.10, wan:0.03, price:0.02};
   for (const it of state.data){
     let s = 0;
-    s += (it.coverageBucket===q.coverage ? 1 : 0) * w.cov;
-    s += (String(it.deviceLoad)===String(q.deviceLoad) ? 1 : 0) * w.dev;
-    s += (Array.isArray(it.primaryUse) ? it.primaryUse.includes(q.primaryUse) : String(it.primaryUse)===String(q.primaryUse)) * w.use;
-    s += (q.meshNeed ? (it.meshReady?1:0): 0) * w.mesh;
-    s += (q.wanPref ? (it.wanTier===q.wanPref?1:0) : 0) * w.wan;
-    // price fit is soft: prefer within 1 bucket if provided
-    s += (q.pricePref && it.priceBucket===q.pricePref ? 1 : 0) * w.price;
+    s += (it.coverageBucket===result.coverage ? 1 : 0) * w.cov;
+    s += (String(it.deviceLoad)===String(result.deviceLoad) ? 1 : 0) * w.dev;
+    s += (Array.isArray(it.primaryUse) ? it.primaryUse.includes(result.primaryUse) : String(it.primaryUse)===String(result.primaryUse)) * w.use;
+    s += (result.meshNeed ? (it.meshReady?1:0): 0) * w.mesh;
     it._score = Math.round(s*100);
   }
+
+  // *** NEW: set filter facets from quiz ***
+  setFacetValue('coverageBucket', result.coverage);
+  setFacetValue('deviceLoad', result.deviceLoad);
+  // primaryUse facet is multi-capable; add the chosen use
+  addFacetValue('primaryUse', result.primaryUse);
+  // mesh toggle (facet uses "Yes"/"No")
+  if (result.meshNeed) setFacetValue('meshReady', 'Yes');
+  else delete state.active.meshReady;
+
+  // Sort by relevance and show recommendations
   state.sort = 'relevance';
   if (elements.sortSelect) elements.sortSelect.value = 'relevance';
-  state.filtered = sortItems(state.data);
-  render();
+  if (elements.toggleRecos) elements.toggleRecos.checked = true;
+
+  applyFilters();
+
+  if (opts.scrollToResults !== false){
+    document.querySelector('.results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  if (opts.openFilters){ openDrawer(true); }
 }
 
 // Expose for quiz-modal.js
@@ -498,13 +523,12 @@ async function init(){
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const raw = await res.json();
     state.data = raw.map(derive);
-    // init state from URL
+
     const urlConf = getConfig();
     state.sort = urlConf.sort;
     state.active = urlConf.active;
     if (elements.sortSelect) elements.sortSelect.value = state.sort;
 
-    // compute initial filtered
     state.facetCounts = computeFacetCounts(state.data);
 
     elements.filtersForm.addEventListener('change', handleFacetChange);
@@ -522,7 +546,6 @@ async function init(){
     elements.clearCompare.addEventListener('click', ()=>{ state.compare.clear(); renderCompare(); });
     elements.toggleRecos.addEventListener('change', renderRecs);
 
-    // initial render
     state.filtered = sortItems(state.data);
     applyFilters();
   } catch (e) {
