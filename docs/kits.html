@@ -1,24 +1,32 @@
+<!-- ===========================
+     RouterHaus v1 – kits.html
+     =========================== -->
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Explore our top router kits for home and business networks." />
   <title>RouterHaus · Kits</title>
-  <link rel="preload" href="kits.json" as="fetch" crossorigin="anonymous">
-  <link rel="stylesheet" href="main.css">
-  <link rel="stylesheet" href="assets/css/kits.css">
+
+  <!-- Fonts & Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="assets/css/kits.css" />
 </head>
 <body>
-  
-    <div id="header-placeholder"></div>
+  <!-- Header partial mounts here -->
+  <div id="header-placeholder"></div>
 
   <main class="container kits-layout">
-    <!-- Desktop filter rail -->
+    <!-- ===== Desktop filter rail ===== -->
     <aside id="filtersAside" class="filters-rail glass" aria-label="Filters">
       <div class="filters-header">
         <h2>Filters</h2>
         <small id="matchCount" aria-live="polite"></small>
       </div>
+
+      <!-- FORM & FACETS (IDs that kits.js targets) -->
       <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
         <!-- Quick picks -->
         <section class="facet" data-facet="quick">
@@ -34,7 +42,7 @@
         </section>
 
         <section class="facet" data-facet="wifi">
-          <h3>Wi‑Fi</h3>
+          <h3>Wi-Fi</h3>
           <div class="options two-cols" id="facet-wifiGen"></div>
           <div class="options two-cols" id="facet-wifiBands"></div>
         </section>
@@ -68,7 +76,7 @@
       </form>
     </aside>
 
-    <!-- Mobile filter FAB & drawer -->
+    <!-- ===== Mobile filter FAB & drawer ===== -->
     <button id="filtersFab" class="fab">Filters <span id="activeCount" class="badge">0</span></button>
     <div id="filtersDrawer" class="drawer" aria-hidden="true" aria-labelledby="drawerTitle">
       <div class="drawer-panel glass">
@@ -77,7 +85,7 @@
           <button class="icon-btn" data-close-drawer aria-label="Close filters">&times;</button>
         </div>
         <div class="drawer-body">
-          <!-- We'll clone filtersForm into here for mobile -->
+          <!-- kits.js clones #filtersForm here -->
           <div id="drawerFormMount"></div>
         </div>
         <div class="drawer-footer">
@@ -87,7 +95,18 @@
       </div>
     </div>
 
+    <!-- ===== Content ===== -->
     <section class="content">
+      <!-- actions -->
+      <header class="page-header">
+        <h1 class="brand">RouterHaus <span class="subtle">Kits</span></h1>
+        <div class="header-actions">
+          <button id="openQuiz" class="btn primary" type="button">Find my kit</button>
+          <button id="copyLink" class="btn glass" type="button">Copy link</button>
+          <button id="resetAll" class="btn ghost" type="button">Reset</button>
+        </div>
+      </header>
+
       <div id="activeChips" class="active-chips"></div>
 
       <div class="toolbar glass">
@@ -95,7 +114,7 @@
           <span>Sort</span>
           <select id="sortSelect" aria-label="Sort results">
             <option value="relevance">Relevance</option>
-            <option value="wifi-desc">Wi‑Fi Gen</option>
+            <option value="wifi-desc">Wi-Fi Gen</option>
             <option value="price-asc">Price ↑</option>
             <option value="price-desc">Price ↓</option>
             <option value="coverage-desc">Coverage</option>
@@ -120,83 +139,12 @@
     </section>
   </main>
 
-  <aside id="compareDrawer" class="compare glass" aria-live="polite" hidden>
-    <div class="compare-header">
-      <strong>Compare</strong>
-      <button id="clearCompare" class="btn small ghost">Clear</button>
-    </div>
-    <div id="compareItems" class="compare-items"></div>
-  </aside>
+  <!-- Footer partial mounts here -->
+  <div id="footer-placeholder"></div>
 
-  <!-- Quiz modal -->
-  <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
-    <div class="modal-content">
-      <header class="modal-header">
-        <h2 id="quizTitle">Find your best kit</h2>
-        <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
-      </header>
-      <form id="quizForm" class="quiz-body">
-        <label>
-          Home size
-          <select id="qCoverage" required>
-            <option value="">Select...</option>
-            <option value="Apartment/Small">Apartment / Small</option>
-            <option value="2–3 Bedroom">2–3 Bedroom</option>
-            <option value="Large/Multi-floor">Large / Multi‑floor</option>
-          </select>
-        </label>
-        <label>
-          Device load
-          <select id="qDevices" required>
-            <option value="">Select...</option>
-            <option value="1–5">1–5</option>
-            <option value="6–15">6–15</option>
-            <option value="16+">16+</option>
-          </select>
-        </label>
-        <label>
-          Primary use
-          <select id="qUse" required>
-            <option value="">Select...</option>
-            <option>All-Purpose</option>
-            <option>Gaming</option>
-            <option>Work-From-Home</option>
-            <option>Smart-Home</option>
-            <option>Family Streaming</option>
-          </select>
-        </label>
-        <footer class="modal-actions">
-          <button type="button" class="btn ghost modal-close">Cancel</button>
-          <button type="submit" class="btn primary">See recommendations</button>
-        </footer>
-      </form>
-    </div>
-  </dialog>
-
-  <template id="cardTpl">
-    <article class="product glass" data-id="">
-      <div class="product-media">
-        <img loading="lazy" alt="" src="" onerror="this.style.display='none'">
-      </div>
-      <header class="product-header">
-        <h4 class="title"></h4>
-        <div class="chips line"></div>
-      </header>
-      <ul class="specs"></ul>
-      <div class="priceRow">
-        <strong class="price"></strong>
-        <div class="ctaRow">
-          <a class="btn small" target="_blank" rel="noopener">Buy</a>
-          <button class="icon-btn compare-btn" title="Compare">+</button>
-        </div>
-      </div>
-    </article>
-  </template>
-
-    <div id="footer-placeholder"></div>
-  
+  <!-- Scripts: keep order; kits.js expects DOM above -->
   <script src="scripts.js" defer></script>
-  <script type="module" src="assets/js/kits.js"></script>
-  <script type="module" src="assets/js/quiz-modal.js"></script>
+  <script src="assets/js/kits.js" defer></script>
+  <script src="assets/js/quiz-modal.js" defer></script>
 </body>
 </html>
