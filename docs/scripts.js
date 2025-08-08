@@ -112,25 +112,19 @@ function initUI() {
   );
 
   /* Theme toggle */
-  const applyTheme = (mode, save = true) => {
+  const applyTheme = mode => {
     document.documentElement.dataset.theme = mode;
-    if (save) localStorage.setItem('rh-theme', mode);
     if (themeToggle) themeToggle.textContent = mode === 'dark' ? 'Light Mode' : 'Dark Mode';
     showToast(mode === 'dark' ? 'Dark mode on' : 'Light mode on', 'info');
   };
 
-  const saved = localStorage.getItem('rh-theme');
-  if (saved) {
-    applyTheme(saved);
-  } else {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-    applyTheme(prefersDark.matches ? 'dark' : 'light', false);
-    prefersDark.addEventListener('change', e => {
-      if (!localStorage.getItem('rh-theme')) {
-        applyTheme(e.matches ? 'dark' : 'light', false);
-      }
-    });
-  }
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  applyTheme(prefersDark.matches ? 'dark' : 'light');
+
+  prefersDark.addEventListener('change', e => {
+    applyTheme(e.matches ? 'dark' : 'light');
+  });
 
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {

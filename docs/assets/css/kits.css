@@ -284,8 +284,7 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 /* ---------- GRID & CARDS ---------- */
 .product-grid{
   display:grid;
-  /* ≥3 across on desktop with auto-fit */
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* ≥3 across on desktop */
   gap:12px;
 }
 /* Tighten gaps & raise min card width on XL */
@@ -310,12 +309,33 @@ details.facet[open] .chev{ transform: rotate(180deg); }
   transform: translateY(-4px);
   box-shadow: var(--shadow);
   border-color: var(--border-strong);
-  /* Subtle border glow */
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 28%, transparent));
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 28%, transparent)); /* subtle border glow */
 }
 
-.product .product-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.product .title{ font-size: 1rem; font-weight: 800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:.2px; }
+/* Header: stack title + chips so name gets space */
+.product .product-header{
+  display:grid;
+  grid-template-columns: 1fr;
+  align-items:start;
+  row-gap:4px;
+}
+
+/* Title: allow wrapping (2–3 line clamp) instead of single-line ellipsis */
+.product .title{
+  font-size: 1rem; font-weight: 800; letter-spacing:.2px;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;              /* mobile/tablet: 2 lines */
+  line-height: 1.25;
+  word-break: break-word;
+  hyphens: auto;
+  text-overflow: ellipsis;
+}
+@media (min-width: 1024px){
+  .product .title{ -webkit-line-clamp: 3; } /* desktop: 3 lines */
+}
 
 .product .product-media{
   width:100%; aspect-ratio: 16/10; min-height:160px;
@@ -326,8 +346,22 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 }
 .product .product-media img{ width:100%; height:100%; object-fit: cover; display:block; }
 
-.product .chips.line{ display:flex; flex-wrap:wrap; gap:6px; }
-.product .specs{ margin: 6px 0 8px; padding-left: 18px; color: var(--text-2); }
+/* Chips: smaller, tighter; wrap under title */
+.product .chips.line{
+  display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;
+}
+.product .chips.line .chip{
+  padding:.2rem .45rem; font-size:.78rem; line-height:1; white-space:nowrap;
+}
+/* On narrow cards, hide extra chips so the title keeps priority */
+@media (max-width: 360px){ .product .chips.line .chip:nth-child(n+3){ display:none; } }   /* show 2 */
+@media (min-width: 361px) and (max-width: 420px){ .product .chips.line .chip:nth-child(n+4){ display:none; } } /* show 3 */
+
+.product .specs{
+  margin: 4px 0 8px; padding-left: 18px; color: var(--text-2);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; /* cap height */
+  overflow: hidden;
+}
 .product .specs li{ margin:2px 0; }
 
 /* Price & CTA consistency */
