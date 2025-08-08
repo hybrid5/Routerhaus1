@@ -4,7 +4,8 @@
  * - Derives: brand, coverageBucket, wanTier, priceBucket, wifiScore
  * - Facets: Brand, Wi-Fi Gen, Mesh, WAN Tier, Coverage, Device Load, Primary Use, Access, Price
  * - URL sync + localStorage
- * - Quiz wiring now SETS FILTER FACETS so results update immediately
+ * - Quiz wiring sets facets so results update immediately
+ * - Dropdown facet (<details>) persistence + badges
  */
 
 const $ = (sel, root=document) => root.querySelector(sel);
@@ -43,6 +44,8 @@ const elements = {
   toggleRecos: $('#toggleRecos'),
   kitsError: $('#kitsError'),
   kitsStatus: $('#kitsStatus'),
+  expandAll: $('#expandAll'),
+  collapseAll: $('#collapseAll'),
 };
 
 // --- Utilities ---
@@ -205,7 +208,7 @@ function renderFacet(key, mountId){
   if (!mount) return;
   const counts = state.facetCounts[key] || new Map();
   const entries = [...counts.entries()].sort((a,b)=> String(a[0]).localeCompare(String(b[0]), undefined, {numeric:true}));
-  if (!entries.length){ mount.closest('.facet')?.setAttribute('hidden',''); return; }
+  if (!entries.length){ mount.closest('.facet,details.facet')?.setAttribute('hidden',''); return; }
   mount.innerHTML = entries.map(([val, count])=>{
     const id = `f-${key}-${slug(String(val))}`;
     const checked = state.active[key]?.has(String(val)) ? 'checked' : '';
@@ -226,6 +229,31 @@ function renderQuick(){
     }
   }
   elements.quickChips.innerHTML = chips.join('');
+}
+
+// ---- <details> (dropdown) persistence + badges ----
+function loadFacetOpenState(key, fallback=true){
+  const k = `facet.open.${key}`;
+  const v = localStorage.getItem(k);
+  return v == null ? fallback : v === '1';
+}
+function saveFacetOpenState(key, open){
+  localStorage.setItem(`facet.open.${key}`, open ? '1' : '0');
+}
+function wireFacetDetailsPersistence(){
+  document.querySelectorAll('#filtersForm details.facet').forEach(d=>{
+    const key = d.dataset.facet || '';
+    if (!key) return;
+    d.open = loadFacetOpenState(key, true);
+    d.addEventListener('toggle', ()=> saveFacetOpenState(key, d.open));
+  });
+}
+function setFacetBadge(idOrEl, facetKey){
+  const el = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  if (!el) return;
+  const n = state.active[facetKey]?.size || 0;
+  el.textContent = n;
+  el.style.visibility = n ? 'visible' : 'hidden';
 }
 
 // --- Filtering & sorting ---
@@ -344,7 +372,21 @@ function renderActiveChips(){
   elements.activeCount.textContent = chips.length.toString();
 }
 
+function updateFacetBadges(){
+  // If your HTML has badge elements like <span id="badge-brand">…</span>
+  setFacetBadge('badge-brand', 'brand');
+  setFacetBadge('badge-wifiGen', 'wifiGen');
+  setFacetBadge('badge-meshReady', 'meshReady');
+  setFacetBadge('badge-wanTier', 'wanTier');
+  setFacetBadge('badge-coverageBucket', 'coverageBucket');
+  setFacetBadge('badge-deviceLoad', 'deviceLoad');
+  setFacetBadge('badge-primaryUse', 'primaryUse');
+  setFacetBadge('badge-access', 'access');
+  setFacetBadge('badge-priceBucket', 'priceBucket');
+}
+
 function render(){
+  // facet counts for building options
   state.facetCounts = computeFacetCounts(state.data);
   renderQuick();
   renderFacet('brand','facet-brand');
@@ -361,6 +403,7 @@ function render(){
   elements.matchCount.textContent = `${state.filtered.length} matches`;
   elements.kitsStatus && (elements.kitsStatus.textContent = `${state.filtered.length} kits loaded`);
   renderActiveChips();
+  updateFacetBadges();
   renderCards(state.filtered, elements.results);
   renderRecs();
   saveToURL();
@@ -434,11 +477,12 @@ function openDrawer(open){
   elements.drawer.setAttribute('aria-hidden', String(!open));
   document.documentElement.style.overflow = open ? 'hidden' : '';
   if (open){
+    // clone current form (with <details> states)
     elements.drawerMount.innerHTML = '';
     const clone = elements.filtersForm.cloneNode(true);
     clone.addEventListener('change', handleFacetChange);
     elements.drawerMount.appendChild(clone);
-    const first = elements.drawerMount.querySelector('input,select,button');
+    const first = elements.drawerMount.querySelector('input,select,button,summary');
     first && first.focus();
   }
 }
@@ -490,12 +534,10 @@ function applyQuizResult(result, opts={}){
     it._score = Math.round(s*100);
   }
 
-  // *** NEW: set filter facets from quiz ***
+  // Set filter facets from quiz
   setFacetValue('coverageBucket', result.coverage);
   setFacetValue('deviceLoad', result.deviceLoad);
-  // primaryUse facet is multi-capable; add the chosen use
   addFacetValue('primaryUse', result.primaryUse);
-  // mesh toggle (facet uses "Yes"/"No")
   if (result.meshNeed) setFacetValue('meshReady', 'Yes');
   else delete state.active.meshReady;
 
@@ -531,6 +573,10 @@ async function init(){
 
     state.facetCounts = computeFacetCounts(state.data);
 
+    // Persist dropdown open/closed state
+    wireFacetDetailsPersistence();
+
+    // Event bindings
     elements.filtersForm.addEventListener('change', handleFacetChange);
     elements.quickChips.addEventListener('click', handleQuickClick);
     elements.activeChips.addEventListener('click', handleActiveChip);
@@ -544,8 +590,21 @@ async function init(){
     elements.applyDrawer.addEventListener('click', ()=>{ openDrawer(false); applyFilters(); });
 
     elements.clearCompare.addEventListener('click', ()=>{ state.compare.clear(); renderCompare(); });
-    elements.toggleRecos.addEventListener('change', renderRecs);
+    elements.toggleRecos?.addEventListener('change', renderRecs);
 
+    // Expand/Collapse all (optional buttons)
+    elements.expandAll?.addEventListener('click', ()=>{
+      document.querySelectorAll('#filtersForm details.facet').forEach(d=>{
+        d.open = true; saveFacetOpenState(d.dataset.facet||'', true);
+      });
+    });
+    elements.collapseAll?.addEventListener('click', ()=>{
+      document.querySelectorAll('#filtersForm details.facet').forEach(d=>{
+        d.open = false; saveFacetOpenState(d.dataset.facet||'', false);
+      });
+    });
+
+    // initial render
     state.filtered = sortItems(state.data);
     applyFilters();
   } catch (e) {
