@@ -4,7 +4,7 @@
    accessible focus, and refined motion
    ================================ */
 
-/* ---------- THEME TOKENS ---------- */
+/* ---------- THEME TOKENS (aligned to main.css naming) ---------- */
 :root{
   /* Light */
   --bg: #f7f9fc;
@@ -43,7 +43,7 @@
   accent-color: var(--primary);
 }
 
-/* Dark theme overrides */
+/* Dark theme overrides (reduced opacity for contrast) */
 html[data-theme="dark"]{
   --bg: #0b1018;
   --bg-elev: #121826;
@@ -51,16 +51,16 @@ html[data-theme="dark"]{
   --text-2: #b8c0d8;
   --muted: #8f98b5;
 
-  --card: rgba(18,22,34,.58);
-  --card-strong: rgba(20,26,40,.82);
-  --surface: rgba(26,32,48,.52);
+  --card: rgba(18,22,34,.52);
+  --card-strong: rgba(20,26,40,.78);
+  --surface: rgba(26,32,48,.44);
 
   --border: rgba(255,255,255,.14);
   --border-strong: rgba(255,255,255,.22);
   --shadow: 0 24px 64px rgba(0,0,0,.55);
   --shadow-sm: 0 12px 36px rgba(0,0,0,.35);
 
-  --glass-tint: rgba(10,14,22,.45);
+  --glass-tint: rgba(10,14,22,.40);
 }
 
 /* Respect OS if you remove explicit data-theme */
@@ -72,16 +72,16 @@ html[data-theme="dark"]{
     --text-2: #b8c0d8;
     --muted: #8f98b5;
 
-    --card: rgba(18,22,34,.58);
-    --card-strong: rgba(20,26,40,.82);
-    --surface: rgba(26,32,48,.52);
+    --card: rgba(18,22,34,.52);
+    --card-strong: rgba(20,26,40,.78);
+    --surface: rgba(26,32,48,.44);
 
     --border: rgba(255,255,255,.14);
     --border-strong: rgba(255,255,255,.22);
     --shadow: 0 24px 64px rgba(0,0,0,.55);
     --shadow-sm: 0 12px 36px rgba(0,0,0,.35);
 
-    --glass-tint: rgba(10,14,22,.45);
+    --glass-tint: rgba(10,14,22,.40);
   }
 }
 
@@ -90,7 +90,9 @@ html[data-theme="dark"]{
 html, body{ height: 100%; }
 body{
   margin: 0;
-  background: radial-gradient(1200px 800px at 70% -10%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 60%) , var(--bg);
+  background:
+    radial-gradient(1200px 800px at 70% -10%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 60%),
+    var(--bg);
   color: var(--text-1);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
   -webkit-font-smoothing: antialiased;
@@ -151,6 +153,16 @@ body{
 .btn.ghost{ background: transparent; border-color: var(--border-strong); color: var(--text-1); }
 .btn.glass{ background: var(--surface); }
 .btn.small{ padding:.35rem .6rem; font-size:.85rem; }
+.btn.tiny{ padding:.25rem .45rem; font-size:.78rem; }
+
+/* Icon button */
+.icon-btn{
+  border-radius: 10px; border:1px solid var(--border);
+  background: var(--surface); padding:.35rem .55rem; color:inherit;
+  transition: background var(--transition), transform var(--transition);
+}
+.icon-btn:hover{ background: color-mix(in oklab, var(--surface) 90%, transparent); }
+.icon-btn:active{ transform: scale(.98); }
 
 .badge{
   display:inline-flex; align-items:center; justify-content:center;
@@ -209,6 +221,20 @@ details.facet[open]{ background: color-mix(in oklab, var(--card) 70%, transparen
 .facet .chev{ transition: transform var(--transition); }
 details.facet[open] .chev{ transform: rotate(180deg); }
 
+.facet .facet-controls{
+  display:flex; justify-content:flex-end; gap:6px;
+  padding: 0 12px 4px;
+}
+.facet .facet-clear,
+.facet .facet__clear{
+  border-radius: 10px; font-size:.78rem;
+  padding:.25rem .5rem; border:1px solid var(--border);
+  background: transparent; color: var(--text-1); cursor:pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+.facet .facet-clear:hover,
+.facet .facet__clear:hover{ background: color-mix(in oklab, var(--surface) 90%, transparent); }
+
 .facet .options{
   padding: 10px 12px;
   display:grid; grid-template-columns: 1fr; gap:6px;
@@ -231,11 +257,13 @@ details.facet[open] .chev{ transform: rotate(180deg); }
   margin-bottom:8px; padding:8px 12px;
   border-radius: var(--radius-lg);
   border:1px solid var(--border);
-  flex-wrap: wrap; /* allow clean wrapping with sort + recos + filters */
+  flex-wrap: wrap; /* clean wrapping with sort + recos + filters */
 }
 .toolbar.glass{ background: color-mix(in oklab, var(--card) 70%, var(--glass-tint)); }
-.sort{ display:flex; align-items:center; gap:8px; flex-wrap: wrap; }
-.sort select{
+
+.sort, .pagesize{ display:flex; align-items:center; gap:8px; flex-wrap: wrap; }
+.sort select,
+.pagesize select{
   padding:.45rem .6rem; border-radius: 10px;
   background: var(--surface);
   border:1px solid var(--border); color: var(--text-1);
@@ -256,9 +284,16 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 /* ---------- GRID & CARDS ---------- */
 .product-grid{
   display:grid;
-  /* >=3 across on desktop with auto-fit */
+  /* ≥3 across on desktop with auto-fit */
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap:12px;
+}
+/* Tighten gaps & raise min card width on XL */
+@media (min-width: 1440px){
+  .product-grid{
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap:10px;
+  }
 }
 @media (max-width: 1200px){ .product-grid{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } }
 @media (max-width: 640px){ .product-grid{ grid-template-columns: 1fr; } }
@@ -269,9 +304,15 @@ details.facet[open] .chev{ transform: rotate(180deg); }
   border:1px solid var(--border);
   box-shadow: var(--shadow-sm);
   display:flex; flex-direction:column; gap:8px; min-width:0;
-  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), filter var(--transition);
 }
-.product:hover{ transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--border-strong); }
+.product:hover{
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: var(--border-strong);
+  /* Subtle border glow */
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 28%, transparent));
+}
 
 .product .product-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .product .title{ font-size: 1rem; font-weight: 800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:.2px; }
@@ -289,10 +330,13 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 .product .specs{ margin: 6px 0 8px; padding-left: 18px; color: var(--text-2); }
 .product .specs li{ margin:2px 0; }
 
+/* Price & CTA consistency */
 .product .priceRow{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .priceRow .price{ font-weight: 900; letter-spacing:.2px; }
+.priceRow .ctaRow{ display:flex; gap:6px; align-items:center; }
+.priceRow .ctaRow .btn.small{ min-width: 74px; text-align:center; }
 
-/* Compare bar (mobile fallback) */
+/* Compare bar (mobile fallback / drawer) */
 .compare{
   position: fixed; bottom: 12px; left: 12px; right: 12px;
   display:flex; align-items:center; gap:8px; padding: 8px 10px;
@@ -301,15 +345,24 @@ details.facet[open] .chev{ transform: rotate(180deg); }
   border:1px solid var(--border);
   box-shadow: var(--shadow);
   z-index: 110;
+  max-width: 840px; margin-inline: auto;
 }
 .compare-items{ display:flex; gap:8px; flex-wrap:wrap; }
 .compare .item{
   padding:.35rem .5rem; border-radius:999px;
   background: var(--surface); border:1px solid var(--border); font-size:.85rem;
+  max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 /* Keep space for compare */
 .results{ padding-bottom: 84px; }
+
+/* Sticky compare trigger */
+.compare-sticky{
+  position: fixed; right: 16px; bottom: 84px; z-index: 120;
+  border-radius: 999px; padding:.6rem .9rem; border:1px solid var(--border);
+  background: var(--primary); color:#0b1020; box-shadow: var(--shadow-sm);
+}
 
 /* ---------- RECOMMENDATIONS ---------- */
 .recommendations{ margin-block: 8px 16px; }
@@ -326,10 +379,11 @@ details.facet[open] .chev{ transform: rotate(180deg); }
   border-radius: 12px; border:1px solid var(--border);
   background: var(--surface); color: var(--text-1);
   font-weight: 700; cursor: pointer;
-  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition), border-color var(--transition);
 }
 .pagination .page:hover{ transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-.pagination .page.active{
+.pagination .page.active,
+.pagination .page[aria-current="page"]{
   background: var(--primary); color:#0b1020;
   border-color: color-mix(in oklab, var(--primary) 45%, #0000);
 }
@@ -338,6 +392,22 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 }
 .pagination .disabled{
   opacity:.5; pointer-events:none;
+}
+.pagination .page:focus-visible{
+  outline: none; box-shadow: var(--focus);
+}
+
+/* ---------- SKELETONS ---------- */
+.skeletons .skeleton{ position: relative; overflow: hidden; }
+.shimmer{
+  position: relative; overflow: hidden;
+  background: linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.12), rgba(255,255,255,.05));
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+@keyframes shimmer{
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 /* ---------- MOBILE FILTERS (FAB + DRAWER) ---------- */
@@ -350,6 +420,9 @@ details.facet[open] .chev{ transform: rotate(180deg); }
 }
 .drawer{ position: fixed; inset: 0; display:none; z-index: 150; }
 .drawer[aria-hidden="false"]{ display:block; }
+
+/* Scroll-lock when drawer open */
+html.scroll-lock, html.scroll-lock body{ overflow: hidden; }
 
 .drawer::before{
   content:""; position:absolute; inset:0;
@@ -373,12 +446,6 @@ html[data-theme="dark"] .drawer .drawer-panel{ background: color-mix(in oklab, v
 .drawer-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding: 4px 4px 8px; }
 .drawer-body{ max-height: 68dvh; overflow:auto; padding: 6px; }
 .drawer-footer{ display:flex; gap:8px; justify-content:flex-end; padding: 8px 4px 4px; }
-.icon-btn{
-  border-radius: 10px; border:1px solid var(--border);
-  background: var(--surface); padding:.35rem .55rem; color:inherit;
-  transition: background var(--transition);
-}
-.icon-btn:hover{ background: color-mix(in oklab, var(--surface) 90%, transparent); }
 
 /* Only show FAB/drawer below breakpoint */
 @media (min-width: 981px){
@@ -399,16 +466,12 @@ html[data-theme="dark"] .drawer .drawer-panel{ background: color-mix(in oklab, v
 }
 
 /* ---------- SIDEBAR COMPARE PANEL (desktop) ---------- */
-#comparePanel{
-  margin-top: 10px;
-}
-#comparePanel .compare-items{
-  display:flex; gap:8px; flex-wrap:wrap;
-}
+#comparePanel{ margin-top: 10px; }
+#comparePanel .compare-items{ display:flex; gap:8px; flex-wrap:wrap; }
 #comparePanel .item{
   padding:.35rem .5rem; border-radius:999px;
   background: var(--surface); border:1px solid var(--border);
-  font-size:.85rem;
+  font-size:.85rem; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 #clearCompare.btn.small{ margin-top: 6px; }
 
@@ -427,9 +490,7 @@ html[data-theme="dark"] .drawer .drawer-panel{ background: color-mix(in oklab, v
   backdrop-filter: blur(10px) saturate(140%);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
 }
-html[data-theme="dark"] .modal{
-  background: color-mix(in oklab, var(--card-strong) 84%, var(--glass-tint));
-}
+html[data-theme="dark"] .modal{ background: color-mix(in oklab, var(--card-strong) 84%, var(--glass-tint)); }
 .modal.is-open{ transform: translateY(0) scale(1); opacity: 1; }
 
 /* Backdrop: strong scrim that truly blocks */
@@ -498,7 +559,7 @@ html[data-theme="dark"] .modal-actions{
 .modal-actions .btn{ border-radius: 12px; padding:.6rem .95rem; }
 
 /* ---------- FOCUS STATES ---------- */
-:where(button, .btn, .chip, .icon-btn, select, input, summary):focus-visible{
+:where(button, .btn, .chip, .icon-btn, select, input, summary, .page):focus-visible{
   outline: none;
   box-shadow: var(--focus);
   border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
