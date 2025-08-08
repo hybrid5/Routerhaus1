@@ -112,32 +112,33 @@ function initUI() {
   );
 
   /* Theme toggle */
-const applyTheme = (mode, save = true) => {
-  document.documentElement.dataset.theme = mode;
-  if (save) localStorage.setItem('rh-theme', mode);
-  themeToggle.textContent = mode === 'dark' ? 'Light Mode' : 'Dark Mode';
-  showToast(mode === 'dark' ? 'Dark mode on' : 'Light mode on', 'info');
-};
+  const applyTheme = (mode, save = true) => {
+    document.documentElement.dataset.theme = mode;
+    if (save) localStorage.setItem('rh-theme', mode);
+    if (themeToggle) themeToggle.textContent = mode === 'dark' ? 'Light Mode' : 'Dark Mode';
+    showToast(mode === 'dark' ? 'Dark mode on' : 'Light mode on', 'info');
+  };
 
-const saved = localStorage.getItem('rh-theme');
+  const saved = localStorage.getItem('rh-theme');
+  if (saved) {
+    applyTheme(saved);
+  } else {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    applyTheme(prefersDark.matches ? 'dark' : 'light', false);
+    prefersDark.addEventListener('change', e => {
+      if (!localStorage.getItem('rh-theme')) {
+        applyTheme(e.matches ? 'dark' : 'light', false);
+      }
+    });
+  }
 
-if (saved) {
-  applyTheme(saved);
-} else {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-  applyTheme(prefersDark.matches ? 'dark' : 'light', false);
-
-  // Listen for OS theme changes if no user override
-  prefersDark.addEventListener('change', e => {
-    applyTheme(e.matches ? 'dark' : 'light', false);
-  });
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const newMode = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(newMode);
+    });
+  }
 }
-
-themeToggle.addEventListener('click', () => {
-  const newMode = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  applyTheme(newMode);
-});
-
 
 /* ---------- DOM Ready ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
