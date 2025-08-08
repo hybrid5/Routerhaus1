@@ -464,7 +464,7 @@ window.__kits = { applyQuizResult, state };
 
 // --- Init ---
 async function init(){
-  const res = await fetch('routers.normalized.json', {cache:'no-store'});
+  const res = await fetch('kits.json', {cache:'no-store'});
   const raw = await res.json();
   state.data = raw.map(derive);
 
