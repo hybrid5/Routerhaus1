@@ -285,15 +285,19 @@
   </aside>
 
   <!-- Quiz modal -->
-  <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
-    <div class="modal-content">
-      <header class="modal-header">
-        <h2 id="quizTitle">Find your best kit</h2>
-        <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
-      </header>
-      <form id="quizForm" class="quiz-body">
+<dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
+  <div class="modal-content">
+    <header class="modal-header">
+      <h2 id="quizTitle">Find your best kit</h2>
+      <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
+    </header>
+
+    <form id="quizForm" class="quiz-body">
+      <!-- ENVIRONMENT -->
+      <fieldset class="q-group">
+        <legend>Home size</legend>
         <label>
-          Home size
+          <span class="sr-only">Home size</span>
           <select id="qCoverage" required>
             <option value="">Select...</option>
             <option value="Apartment/Small">Apartment / Small</option>
@@ -301,17 +305,28 @@
             <option value="Large/Multi-floor">Large / Multi-floor</option>
           </select>
         </label>
+        <p id="meshHint" class="hint" aria-live="polite"></p>
+      </fieldset>
+
+      <!-- LOAD -->
+      <fieldset class="q-group">
+        <legend>Device load</legend>
         <label>
-          Device load
+          <span class="sr-only">Device load</span>
           <select id="qDevices" required>
             <option value="">Select...</option>
             <option value="1–5">1–5</option>
             <option value="6–15">6–15</option>
-            <option value="16+">16+</option>
+            <option value="15+">15+</option>
           </select>
         </label>
+      </fieldset>
+
+      <!-- USE -->
+      <fieldset class="q-group">
+        <legend>Primary use</legend>
         <label>
-          Primary use
+          <span class="sr-only">Primary use</span>
           <select id="qUse" required>
             <option value="">Select...</option>
             <option>All-Purpose</option>
@@ -321,12 +336,75 @@
             <option>Family Streaming</option>
           </select>
         </label>
-        <footer class="modal-actions">
-          <button type="submit" class="btn primary">See recommendations</button>
-        </footer>
-      </form>
-    </div>
-  </dialog>
+      </fieldset>
+
+      <!-- ACCESS -->
+      <fieldset class="q-group">
+        <legend>Internet access</legend>
+        <label>
+          <span class="sr-only">Access type</span>
+          <select id="qAccess">
+            <option value="">No preference</option>
+            <option value="Cable">Cable</option>
+            <option value="Fiber">Fiber</option>
+            <option value="FixedWireless5G">Fixed Wireless 5G</option>
+            <option value="Satellite">Satellite</option>
+            <option value="DSL">DSL</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <!-- SPEED -->
+      <fieldset class="q-group">
+        <legend>Plan speed</legend>
+        <div class="speed-grid" role="group" aria-label="Plan speed">
+          <label><input type="radio" name="qSpeed" value="200"> 200 Mbps</label>
+          <label><input type="radio" name="qSpeed" value="250"> 250 Mbps</label>
+          <label><input type="radio" name="qSpeed" value="500"> 500 Mbps</label>
+          <label><input type="radio" name="qSpeed" value="1000"> 1 Gbps</label>
+          <label><input type="radio" name="qSpeed" value="2500"> 2.5 Gbps</label>
+          <label><input type="radio" name="qSpeed" value="5000"> 5 Gbps</label>
+          <label><input type="radio" name="qSpeed" value="10000"> 10 Gbps</label>
+          <label><input type="radio" name="qSpeed" value=""> I’m not sure</label>
+        </div>
+      </fieldset>
+
+      <!-- MESH PREFERENCE -->
+      <fieldset class="q-group">
+        <legend>Mesh preference</legend>
+        <label class="mesh-row">
+          <input type="checkbox" id="qMeshAuto" checked>
+          <span>Auto decide for me (recommended)</span>
+        </label>
+        <div class="mesh-row">
+          <label><input type="radio" name="qMesh" value="" checked> No preference</label>
+          <label><input type="radio" name="qMesh" value="yes"> Require mesh</label>
+          <label><input type="radio" name="qMesh" value="no"> Standalone only</label>
+        </div>
+      </fieldset>
+
+      <!-- BUDGET (optional) -->
+      <fieldset class="q-group">
+        <legend>Budget</legend>
+        <label>
+          <span class="sr-only">Budget</span>
+          <select id="qPrice">
+            <option value="">No preference</option>
+            <option value="$">$ – Budget</option>
+            <option value="$$">$$ – Mid</option>
+            <option value="$$$">$$$ – Upper mid</option>
+            <option value="$$$$">$$$$ – Premium</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <footer class="modal-actions">
+        <button type="button" class="btn" id="quizCancel">Cancel</button>
+        <button type="submit" class="btn primary">See recommendations</button>
+      </footer>
+    </form>
+  </div>
+</dialog>
 
   <!-- Card template -->
   <template id="cardTpl">
