@@ -6,21 +6,17 @@
   <title>RouterHaus · Kits</title>
   <meta name="description" content="Filter and compare the best router kits for apartments, homes, and offices." />
   <meta name="color-scheme" content="light dark" />
-
-  <!-- Preload JSON -->
   <link rel="preload" href="kits.json" as="fetch" type="application/json" />
 
-  <!-- Theme Toggle -->
+  <!-- Theme (sync to system; no FOUC) -->
   <script>
-(function () {
-  const KEY = 'rh-theme';
-  const root = document.documentElement;
-  const media = window.matchMedia('(prefers-color-scheme: dark)');
-  const apply = () => root.setAttribute('data-theme', media.matches ? 'dark' : 'light');
-  apply();
-  media.addEventListener('change', apply);
-})();
-</script>
+    (() => {
+      const root = document.documentElement;
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const apply = () => root.setAttribute('data-theme', media.matches ? 'dark' : 'light');
+      apply(); media.addEventListener('change', apply);
+    })();
+  </script>
 
   <!-- Styles -->
   <link rel="stylesheet" href="main.css" />
@@ -31,7 +27,7 @@
   <div id="header-placeholder" data-partial="header.html"></div>
 
   <main class="container kits-layout">
-    <!-- ===== Desktop filter rail ===== -->
+    <!-- ===== Desktop filter rail (all facets split for 1:1 with kits.js) ===== -->
     <aside id="filtersAside" class="filters-rail glass" aria-label="Filters">
       <div class="filters-header">
         <h2>Filters</h2>
@@ -44,7 +40,6 @@
         <button type="button" id="clearAllFacets" class="btn small ghost">Clear all</button>
       </div>
 
-      <!-- FORM & FACETS -->
       <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
         <!-- Quick picks -->
         <section class="facet" data-facet="quick">
@@ -67,12 +62,12 @@
             </span>
           </summary>
           <div class="facet-controls">
-            <button type="button" class="btn tiny facet-clear" data-clear="brand" aria-label="Clear Brand">Clear</button>
+            <button type="button" class="btn tiny facet-clear" data-clear="brand">Clear</button>
           </div>
           <div class="options" id="facet-brand"></div>
         </details>
 
-        <!-- Wi-Fi -->
+        <!-- Wi-Fi Gen -->
         <details class="facet" data-facet="wifi" open>
           <summary>
             <span>Wi-Fi</span>
@@ -82,9 +77,22 @@
             </span>
           </summary>
           <div class="facet-controls">
-            <button type="button" class="btn tiny facet-clear" data-clear="wifi" aria-label="Clear Wi-Fi">Clear</button>
+            <button type="button" class="btn tiny facet-clear" data-clear="wifi">Clear</button>
           </div>
           <div class="options two-cols" id="facet-wifiGen"></div>
+        </details>
+
+        <!-- Bands (own facet so drawer sync + persistence work) -->
+        <details class="facet" data-facet="bands">
+          <summary>
+            <span>Bands</span>
+            <span class="facet-meta">
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="bands">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-wifiBands"></div>
         </details>
 
@@ -98,52 +106,130 @@
             </span>
           </summary>
           <div class="facet-controls">
-            <button type="button" class="btn tiny facet-clear" data-clear="mesh" aria-label="Clear Mesh">Clear</button>
+            <button type="button" class="btn tiny facet-clear" data-clear="mesh">Clear</button>
           </div>
           <div class="options" id="facet-meshReady"></div>
           <div class="options" id="facet-meshEco"></div>
         </details>
 
-        <!-- Ports -->
-        <details class="facet" data-facet="ports">
+        <!-- WAN Tier -->
+        <details class="facet" data-facet="wan">
           <summary>
-            <span>Ports</span>
+            <span>WAN Tier</span>
             <span class="facet-meta">
               <span class="badge count" id="badge-wanTier">0</span>
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
           <div class="facet-controls">
-            <button type="button" class="btn tiny facet-clear" data-clear="ports" aria-label="Clear Ports">Clear</button>
+            <button type="button" class="btn tiny facet-clear" data-clear="wan">Clear</button>
           </div>
           <div class="options two-cols" id="facet-wanTier"></div>
+        </details>
+
+        <!-- LAN count -->
+        <details class="facet" data-facet="lanCount">
+          <summary>
+            <span>LAN ports</span>
+            <span class="facet-meta">
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="lanCount">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-lanCount"></div>
+        </details>
+
+        <!-- Multi-Gig LAN -->
+        <details class="facet" data-facet="multiGigLan">
+          <summary>
+            <span>Multi-Gig LAN</span>
+            <span class="facet-meta">
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="multiGigLan">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-multiGigLan"></div>
+        </details>
+
+        <!-- USB -->
+        <details class="facet" data-facet="usb">
+          <summary>
+            <span>USB</span>
+            <span class="facet-meta">
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="usb">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-usb"></div>
         </details>
 
-        <!-- Use & Fit -->
-        <details class="facet" data-facet="fit" open>
+        <!-- Coverage -->
+        <details class="facet" data-facet="coverage" open>
           <summary>
-            <span>Use &amp; Fit</span>
+            <span>Coverage</span>
             <span class="facet-meta">
               <span class="badge count" id="badge-coverageBucket">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="coverage">Clear</button>
+          </div>
+          <div class="options two-cols" id="facet-coverageBucket"></div>
+        </details>
+
+        <!-- Device load -->
+        <details class="facet" data-facet="device" open>
+          <summary>
+            <span>Device load</span>
+            <span class="facet-meta">
               <span class="badge count" id="badge-deviceLoad">0</span>
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="device">Clear</button>
+          </div>
+          <div class="options two-cols" id="facet-deviceLoad"></div>
+        </details>
+
+        <!-- Primary use -->
+        <details class="facet" data-facet="use" open>
+          <summary>
+            <span>Primary use</span>
+            <span class="facet-meta">
               <span class="badge count" id="badge-primaryUse">0</span>
               <span class="chev" aria-hidden>▾</span>
             </span>
           </summary>
           <div class="facet-controls">
-            <button type="button" class="btn tiny facet-clear" data-clear="fit" aria-label="Clear Use &amp; Fit">Clear</button>
+            <button type="button" class="btn tiny facet-clear" data-clear="use">Clear</button>
           </div>
-          <div class="options two-cols" id="facet-coverageBucket"></div>
-          <div class="options two-cols" id="facet-deviceLoad"></div>
           <div class="options" id="facet-primaryUse"></div>
+        </details>
+
+        <!-- Access -->
+        <details class="facet" data-facet="access">
+          <summary>
+            <span>Access</span>
+            <span class="facet-meta">
+              <span class="chev" aria-hidden>▾</span>
+            </span>
+          </summary>
+          <div class="facet-controls">
+            <button type="button" class="btn tiny facet-clear" data-clear="access">Clear</button>
+          </div>
           <div class="options two-cols" id="facet-access"></div>
         </details>
 
         <!-- Price -->
-        <details class="facet" data-facet="commerce">
+        <details class="facet" data-facet="price">
           <summary>
             <span>Price</span>
             <span class="facet-meta">
@@ -152,7 +238,7 @@
             </span>
           </summary>
           <div class="facet-controls">
-            <button type="button" class="btn tiny facet-clear" data-clear="commerce" aria-label="Clear Price">Clear</button>
+            <button type="button" class="btn tiny facet-clear" data-clear="price">Clear</button>
           </div>
           <div class="options two-cols" id="facet-priceBucket"></div>
         </details>
@@ -234,7 +320,7 @@
         <button id="openFiltersHeader" class="btn glass" type="button">Filters</button>
       </div>
 
-      <!-- Recommendations (auto-collapse when no matches / toggle off) -->
+      <!-- Recommendations -->
       <section id="recommendations" class="recommendations" aria-live="polite">
         <div class="section-head">
           <h2>Recommended for you</h2>
@@ -284,127 +370,128 @@
     <div id="compareItems" class="compare-items"></div>
   </aside>
 
-  <!-- Quiz modal -->
-<dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
-  <div class="modal-content">
-    <header class="modal-header">
-      <h2 id="quizTitle">Find your best kit</h2>
-      <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
-    </header>
+  <!-- Quiz modal (aligned to quiz-modal.js expectations) -->
+  <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="quizTitle">Find your best kit</h2>
+        <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
+      </header>
 
-    <form id="quizForm" class="quiz-body">
-      <!-- ENVIRONMENT -->
-      <fieldset class="q-group">
-        <legend>Home size</legend>
-        <label>
-          <span class="sr-only">Home size</span>
-          <select id="qCoverage" required>
-            <option value="">Select...</option>
-            <option value="Apartment/Small">Apartment / Small</option>
-            <option value="2–3 Bedroom">2–3 Bedroom</option>
-            <option value="Large/Multi-floor">Large / Multi-floor</option>
-          </select>
-        </label>
-        <p id="meshHint" class="hint" aria-live="polite"></p>
-      </fieldset>
+      <form id="quizForm" class="quiz-body">
+        <!-- ENVIRONMENT -->
+        <fieldset class="q-group">
+          <legend>Home size</legend>
+          <label>
+            <span class="sr-only">Home size</span>
+            <select id="qCoverage" required>
+              <option value="">Select...</option>
+              <option value="Apartment/Small">Apartment / Small</option>
+              <option value="2–3 Bedroom">2–3 Bedroom</option>
+              <option value="Large/Multi-floor">Large / Multi-floor</option>
+            </select>
+          </label>
+          <p id="meshHint" class="hint" aria-live="polite"></p>
+        </fieldset>
 
-      <!-- LOAD -->
-      <fieldset class="q-group">
-        <legend>Device load</legend>
-        <label>
-          <span class="sr-only">Device load</span>
-          <select id="qDevices" required>
-            <option value="">Select...</option>
-            <option value="1–5">1–5</option>
-            <option value="6–15">6–15</option>
-            <option value="15+">15+</option>
-          </select>
-        </label>
-      </fieldset>
+        <!-- LOAD -->
+        <fieldset class="q-group">
+          <legend>Device load</legend>
+          <label>
+            <span class="sr-only">Device load</span>
+            <select id="qDevices" required>
+              <option value="">Select...</option>
+              <option value="1–5">1–5</option>
+              <option value="6–15">6–15</option>
+              <option value="16–30">16–30</option>
+              <option value="31–60">31–60</option>
+              <option value="61–100">61–100</option>
+              <option value="100+">100+</option>
+            </select>
+          </label>
+        </fieldset>
 
-      <!-- USE -->
-      <fieldset class="q-group">
-        <legend>Primary use</legend>
-        <label>
-          <span class="sr-only">Primary use</span>
-          <select id="qUse" required>
-            <option value="">Select...</option>
-            <option>All-Purpose</option>
-            <option>Gaming</option>
-            <option>Work-From-Home</option>
-            <option>Smart-Home</option>
-            <option>Family Streaming</option>
-          </select>
-        </label>
-      </fieldset>
+        <!-- USE -->
+        <fieldset class="q-group">
+          <legend>Primary use</legend>
+          <label>
+            <span class="sr-only">Primary use</span>
+            <select id="qUse" required>
+              <option value="">Select...</option>
+              <option>All-Purpose</option>
+              <option>Gaming</option>
+              <option>Work-From-Home</option>
+              <option>Smart-Home</option>
+              <option>Family Streaming</option>
+              <option>Prosumer</option>
+            </select>
+          </label>
+        </fieldset>
 
-      <!-- ACCESS -->
-      <fieldset class="q-group">
-        <legend>Internet access</legend>
-        <label>
-          <span class="sr-only">Access type</span>
-          <select id="qAccess">
-            <option value="">No preference</option>
-            <option value="Cable">Cable</option>
-            <option value="Fiber">Fiber</option>
-            <option value="FixedWireless5G">Fixed Wireless 5G</option>
-            <option value="Satellite">Satellite</option>
-            <option value="DSL">DSL</option>
-          </select>
-        </label>
-      </fieldset>
+        <!-- ACCESS -->
+        <fieldset class="q-group">
+          <legend>Internet access</legend>
+          <label>
+            <span class="sr-only">Access type</span>
+            <select id="qAccess">
+              <option value="">No preference</option>
+              <option value="Cable">Cable</option>
+              <option value="Fiber">Fiber</option>
+              <option value="FixedWireless5G">Fixed Wireless 5G</option>
+              <option value="Satellite">Satellite</option>
+              <option value="DSL">DSL</option>
+            </select>
+          </label>
+        </fieldset>
 
-      <!-- SPEED -->
-      <fieldset class="q-group">
-        <legend>Plan speed</legend>
-        <div class="speed-grid" role="group" aria-label="Plan speed">
-          <label><input type="radio" name="qSpeed" value="200"> 200 Mbps</label>
-          <label><input type="radio" name="qSpeed" value="250"> 250 Mbps</label>
-          <label><input type="radio" name="qSpeed" value="500"> 500 Mbps</label>
-          <label><input type="radio" name="qSpeed" value="1000"> 1 Gbps</label>
-          <label><input type="radio" name="qSpeed" value="2500"> 2.5 Gbps</label>
-          <label><input type="radio" name="qSpeed" value="5000"> 5 Gbps</label>
-          <label><input type="radio" name="qSpeed" value="10000"> 10 Gbps</label>
-          <label><input type="radio" name="qSpeed" value=""> I’m not sure</label>
-        </div>
-      </fieldset>
+        <!-- SPEED (quiz-modal.js reads qSpeedLabel values: '', '≤1G','2.5G','5G','10G') -->
+        <fieldset class="q-group">
+          <legend>Plan speed (WAN tier)</legend>
+          <div class="speed-grid" role="group" aria-label="Plan speed">
+            <label><input type="radio" name="qSpeedLabel" value="≤1G"> ≤1 Gbps</label>
+            <label><input type="radio" name="qSpeedLabel" value="2.5G"> 2.5 Gbps</label>
+            <label><input type="radio" name="qSpeedLabel" value="5G"> 5 Gbps</label>
+            <label><input type="radio" name="qSpeedLabel" value="10G"> 10 Gbps</label>
+            <label><input type="radio" name="qSpeedLabel" value=""> I’m not sure</label>
+          </div>
+        </fieldset>
 
-      <!-- MESH PREFERENCE -->
-      <fieldset class="q-group">
-        <legend>Mesh preference</legend>
-        <label class="mesh-row">
-          <input type="checkbox" id="qMeshAuto" checked>
-          <span>Auto decide for me (recommended)</span>
-        </label>
-        <div class="mesh-row">
-          <label><input type="radio" name="qMesh" value="" checked> No preference</label>
-          <label><input type="radio" name="qMesh" value="yes"> Require mesh</label>
-          <label><input type="radio" name="qMesh" value="no"> Standalone only</label>
-        </div>
-      </fieldset>
+        <!-- MESH PREFERENCE -->
+        <fieldset class="q-group">
+          <legend>Mesh preference</legend>
+          <label class="mesh-row">
+            <input type="checkbox" id="qMeshAuto" checked>
+            <span>Auto decide for me (recommended)</span>
+          </label>
+          <div class="mesh-row">
+            <label class="radio-pill"><input type="radio" name="qMesh" value="" checked> No preference</label>
+            <label class="radio-pill"><input type="radio" name="qMesh" value="yes"> Require mesh</label>
+            <label class="radio-pill"><input type="radio" name="qMesh" value="no"> Standalone only</label>
+          </div>
+        </fieldset>
 
-      <!-- BUDGET (optional) -->
-      <fieldset class="q-group">
-        <legend>Budget</legend>
-        <label>
-          <span class="sr-only">Budget</span>
-          <select id="qPrice">
-            <option value="">No preference</option>
-            <option value="$">$ – Budget</option>
-            <option value="$$">$$ – Mid</option>
-            <option value="$$$">$$$ – Upper mid</option>
-            <option value="$$$$">$$$$ – Premium</option>
-          </select>
-        </label>
-      </fieldset>
+        <!-- BUDGET (optional) -->
+        <fieldset class="q-group">
+          <legend>Budget</legend>
+          <label>
+            <span class="sr-only">Budget</span>
+            <select id="qPrice">
+              <option value="">No preference</option>
+              <option value="<150">$ – Budget</option>
+              <option value="150–299">$$ – Mid</option>
+              <option value="300–599">$$$ – Upper mid</option>
+              <option value="600+">$$$$ – Premium</option>
+            </select>
+          </label>
+        </fieldset>
 
-      <footer class="modal-actions">
-        <button type="button" class="btn" id="quizCancel">Cancel</button>
-        <button type="submit" class="btn primary">See recommendations</button>
-      </footer>
-    </form>
-  </div>
-</dialog>
+        <footer class="modal-actions">
+          <button type="button" class="btn" id="quizCancel">Cancel</button>
+          <button type="submit" class="btn primary">See recommendations</button>
+        </footer>
+      </form>
+    </div>
+  </dialog>
 
   <!-- Card template -->
   <template id="cardTpl">
@@ -460,7 +547,7 @@
     };
   </script>
 
-  <!-- App scripts (kits.js wires all behaviors referenced above) -->
+  <!-- App scripts -->
   <script src="scripts.js" defer></script>
   <script type="module" src="assets/js/kits.js"></script>
   <script type="module" src="assets/js/quiz-modal.js"></script>
