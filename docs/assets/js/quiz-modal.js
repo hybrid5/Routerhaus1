@@ -1,68 +1,68 @@
 /* assets/js/quiz-modal.js
- * Quiz modal logic:
- * - Open/close (Esc/overlay/close btn), focus trap, restore focus to opener
- * - Prefill from previous selections
- * - Submit -> window.RH_APPLY_QUIZ({coverage, devices, use}) and scroll handled by kits.js
- * - "Edit answers" event reopens with previous selections
+ * Reimagined Quiz:
+ * - Environment-first: coverage, devices, primary use
+ * - Plus: ISP speed tier, access type, mesh preference/autopilot, budget
+ * - Prefill last answers (localStorage), robust focus trap, overlay close, a11y
+ * - Submits to window.RH_APPLY_QUIZ(answers) — extras are included for future facet-prefill
  */
-
 (() => {
-  // Elements
   const dlg = document.getElementById('quizModal');
-  const openBtn = document.getElementById('openQuiz');
-  const editBtn = document.getElementById('editQuiz');
-  const form = document.getElementById('quizForm');
-  const selCoverage = document.getElementById('qCoverage');
-  const selDevices  = document.getElementById('qDevices');
-  const selUse      = document.getElementById('qUse');
-  const closeBtns = Array.from(dlg.querySelectorAll('.modal-close, .quiz-close'));
-  let lastOpener = null;
-  let lastAnswers = null; // {coverage, devices, use}
+  if (!dlg) return; // no-op if modal not present
 
-  // --- Open / Close ---
+  // Triggers / form
+  const openBtn   = document.getElementById('openQuiz');
+  const editBtn   = document.getElementById('editQuiz');
+  const form      = document.getElementById('quizForm');
+
+  // Core selects
+  const selCoverage = document.getElementById('qCoverage');   // Apartment/Small | 2–3 Bedroom | Large/Multi-floor
+  const selDevices  = document.getElementById('qDevices');    // 1–5 | 6–15 | 16–30 | 31–60 | 61–100 | 100+
+  const selUse      = document.getElementById('qUse');        // All-Purpose | Gaming | WFH | Family Streaming | Smart-Home | Prosumer
+
+  // Optional extras
+  const selAccess = document.getElementById('qAccess');       // Cable | Fiber | FixedWireless5G | Satellite | DSL
+  const priceSel  = document.getElementById('qPrice');        // <150 | 150–299 | 300–599 | 600+
+  const meshAuto  = document.getElementById('qMeshAuto');     // checkbox (default on)
+  const meshHint  = document.getElementById('meshHint');      // text node for helper hint
+  const cancelBtn = document.getElementById('quizCancel');    // button
+
+  let lastOpener = null;
+  const LS_KEY = 'rh.quiz.answers';
+
+  // ---------- Open / Close ----------
   function openModal(from = document.activeElement) {
     lastOpener = from || document.activeElement || null;
     prefillForm();
     dlg.showModal();
     dlg.classList.add('is-open');
-    // Focus first field
-    setTimeout(() => (firstFocusable(dlg)?.focus()), 0);
+    queueMicrotask(() => firstFocusable(dlg)?.focus());
     attachTrap();
+    updateMeshHint();
   }
-
   function closeModal() {
     detachTrap();
     dlg.classList.remove('is-open');
-    // allow CSS transition if any
     setTimeout(() => { if (dlg.open) dlg.close(); restoreFocus(); }, 0);
   }
+  function restoreFocus() { try { lastOpener?.focus(); } catch {} }
 
-  function restoreFocus() {
-    if (lastOpener && document.contains(lastOpener)) {
-      try { lastOpener.focus(); } catch {}
-    }
-  }
-
-  // Click outside (overlay)
+  // Overlay click to close
   dlg.addEventListener('click', (e) => {
     const r = dlg.getBoundingClientRect();
-    const inDialog = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-    if (!inDialog) closeModal();
+    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    if (!inside) closeModal();
   });
 
-  // Native cancel (Esc)
-  dlg.addEventListener('cancel', (e) => {
-    e.preventDefault();
-    closeModal();
-  });
+  // Native Esc
+  dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); });
 
-  closeBtns.forEach(b => b.addEventListener('click', closeModal));
+  // Buttons / triggers
   openBtn?.addEventListener('click', () => openModal(openBtn));
+  editBtn?.addEventListener('click', (e) => { e.preventDefault(); openModal(editBtn); });
+  cancelBtn?.addEventListener('click', closeModal);
+  dlg.querySelectorAll('.modal-close,.quiz-close').forEach(b => b.addEventListener('click', closeModal));
 
-  // External "edit" trigger from kits.js
-  document.addEventListener('quiz:edit', () => openModal(editBtn || openBtn));
-
-  // --- Focus Trap ---
+  // ---------- Focus Trap ----------
   let trapHandler = null;
   function attachTrap() {
     trapHandler = (e) => {
@@ -70,73 +70,129 @@
       if (e.key !== 'Tab') return;
       const items = focusables(dlg);
       if (!items.length) return;
-      const current = document.activeElement;
-      const idx = items.indexOf(current);
-      let nextIdx = idx;
-      if (e.shiftKey) nextIdx = idx <= 0 ? items.length - 1 : idx - 1;
-      else nextIdx = idx === items.length - 1 ? 0 : idx + 1;
-      if (idx === -1 || (e.shiftKey && current === items[0]) || (!e.shiftKey && current === items[items.length - 1])) {
-        e.preventDefault();
-        items[nextIdx].focus();
+      const idx = items.indexOf(document.activeElement);
+      const last = items.length - 1;
+      if (e.shiftKey) {
+        if (idx <= 0) { e.preventDefault(); items[last].focus(); }
+      } else {
+        if (idx === last) { e.preventDefault(); items[0].focus(); }
       }
     };
     document.addEventListener('keydown', trapHandler, true);
   }
-  function detachTrap() {
-    if (trapHandler) document.removeEventListener('keydown', trapHandler, true);
-    trapHandler = null;
-  }
+  function detachTrap() { if (trapHandler) document.removeEventListener('keydown', trapHandler, true); trapHandler = null; }
   function focusables(root) {
-    return Array.from(root.querySelectorAll([
-      'a[href]',
-      'button:not([disabled])',
-      'select:not([disabled])',
-      'input:not([disabled]):not([type=hidden])',
-      'textarea:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])'
-    ].join(','))).filter(el => el.offsetParent !== null || el === document.activeElement);
+    return Array.from(root.querySelectorAll('a[href],button:not([disabled]),select:not([disabled]),input:not([disabled]):not([type=hidden]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+      .filter(el => el.offsetParent !== null || el === document.activeElement);
   }
-  function firstFocusable(root) {
-    return focusables(root)[0] || root;
-  }
+  function firstFocusable(root) { return focusables(root)[0] || root; }
 
-  // --- Prefill ---
+  // ---------- Prefill ----------
+  function getStored() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { return null; }
+  }
+  function setStored(a) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(a)); } catch {}
+  }
   function prefillForm() {
-    if (!lastAnswers) return;
-    if (selCoverage) selCoverage.value = lastAnswers.coverage || '';
-    if (selDevices)  selDevices.value  = lastAnswers.devices  || '';
-    if (selUse)      selUse.value      = String(lastAnswers.use || '');
-  }
+    const a = getStored() || {};
+    if (selCoverage) selCoverage.value = a.coverage || '';
+    if (selDevices)  selDevices.value  = a.devices  || '';
+    if (selUse)      selUse.value      = a.use      || '';
+    if (selAccess)   selAccess.value   = a.access   || '';
+    if (priceSel)    priceSel.value    = a.price    || '';
 
-  // --- Submit -> apply filters & scroll (kits.js listens) ---
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const answers = {
-      coverage: selCoverage?.value || '',
-      devices:  selDevices?.value || '',
-      use:      selUse?.value || ''
-    };
-
-    // Basic validation: focus first empty
-    const missing = Object.entries(answers).find(([,v]) => !v);
-    if (missing) {
-      const key = missing[0];
-      ({ coverage: selCoverage, devices: selDevices, use: selUse }[key]).focus();
-      return;
+    // Speed radios (qSpeedLabel: '', '≤1G','2.5G','5G','10G')
+    const qSpeed = form?.elements?.qSpeedLabel;
+    if (qSpeed) {
+      const target = String(a.wanTierLabel || '');
+      [...qSpeed].forEach(r => r.checked = (r.value === target));
+      if (!target) [...qSpeed].find(r => r.value === '')?.setAttribute('checked','');
     }
 
-    lastAnswers = answers;
+    // Mesh: autopilot + explicit override
+    if (meshAuto) meshAuto.checked = a.meshAuto !== false; // default true
+    const meshRadios = form?.elements?.qMesh;
+    if (meshRadios) {
+      const meshVal = a.mesh || '';
+      [...meshRadios].forEach(r => r.checked = (r.value === meshVal));
+    }
+  }
+
+  // ---------- Mesh hint / autopilot ----------
+  function updateMeshHint() {
+    const cov = selCoverage?.value || '';
+    const auto = !!meshAuto?.checked;
+    if (!meshHint) return;
+    if (cov === 'Large/Multi-floor') {
+      meshHint.textContent = auto
+        ? 'Large / multi-floor detected — we’ll prefer mesh systems for even coverage.'
+        : 'Tip: mesh greatly improves multi-floor coverage.';
+    } else {
+      meshHint.textContent = '';
+    }
+  }
+  selCoverage?.addEventListener('change', updateMeshHint);
+  meshAuto?.addEventListener('change', updateMeshHint);
+
+  // ---------- Submit -> kits.js ----------
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // Read core fields
+    const coverage = selCoverage?.value || '';
+    const devices  = selDevices?.value  || '';
+    const use      = selUse?.value      || '';
+
+    // Validate required trio
+    const missing = !coverage ? selCoverage : !devices ? selDevices : !use ? selUse : null;
+    if (missing) { missing.focus(); return; }
+
+    // Optional fields
+    const access = selAccess?.value || '';
+    const price  = priceSel?.value  || '';
+
+    const wanTierLabel = readSpeedLabel(form?.elements?.qSpeedLabel); // '', '≤1G','2.5G','5G','10G'
+    let mesh = readMeshChoice();                                       // 'yes' | 'no' | ''
+    const meshAutoVal = !!meshAuto?.checked;
+
+    // Autopilot: if user didn't pick mesh explicitly, decide from environment
+    if (!mesh && meshAutoVal) {
+      if (coverage === 'Large/Multi-floor') mesh = 'yes';
+    }
+
+    const answers = {
+      coverage,
+      devices,
+      use,
+      access,           // for future facet prefill
+      wanTierLabel,     // for future facet prefill (matches UI labels)
+      mesh,             // 'yes' | 'no' | ''
+      meshAuto: meshAutoVal,
+      price             // price bucket label
+    };
+
+    setStored(answers);
+
     if (typeof window.RH_APPLY_QUIZ === 'function') {
       window.RH_APPLY_QUIZ(answers);
     }
     closeModal();
   });
 
-  // Make sure edit button reopens with previous selection if user already submitted once
-  if (editBtn) {
-    editBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal(editBtn);
-    });
+  function readSpeedLabel(radios) {
+    if (!radios) return '';
+    const r = [...radios].find(x => x.checked);
+    const v = r ? String(r.value || '') : '';
+    // normalize to allowed set
+    return v === '10G' || v === '5G' || v === '2.5G' || v === '≤1G' ? v : '';
   }
+  function readMeshChoice() {
+    const r = form?.querySelector('input[name="qMesh"]:checked');
+    const v = r ? r.value : '';
+    return v === 'yes' || v === 'no' ? v : '';
+  }
+
+  // External reopen (from kits.js)
+  document.addEventListener('quiz:edit', () => openModal(editBtn || openBtn));
 })();
