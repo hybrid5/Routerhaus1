@@ -1,35 +1,41 @@
 /* assets/js/quiz-modal.js
  * Reimagined Quiz:
- * - Environment-first + ISP speed + access type + mesh autopilot + optional budget
- * - Prefill last answers, robust focus trap, overlay close, a11y
- * - Submits to window.RH_APPLY_QUIZ(answers)
+ * - Environment-first: coverage, devices, primary use
+ * - Plus: ISP speed tier, access type, mesh preference/autopilot, budget
+ * - Prefill last answers (localStorage), robust focus trap, overlay close, a11y
+ * - Submits to window.RH_APPLY_QUIZ(answers) — extras are included for future facet-prefill
  */
 (() => {
-  // Elements
   const dlg = document.getElementById('quizModal');
-  const openBtn = document.getElementById('openQuiz');
-  const editBtn = document.getElementById('editQuiz');
-  const form = document.getElementById('quizForm');
+  if (!dlg) return; // no-op if modal not present
 
-  const selCoverage = document.getElementById('qCoverage');
-  const selDevices  = document.getElementById('qDevices');
-  const selUse      = document.getElementById('qUse');
-  const selAccess   = document.getElementById('qAccess');
-  const priceSel    = document.getElementById('qPrice');
-  const meshAuto    = document.getElementById('qMeshAuto');
-  const meshHint    = document.getElementById('meshHint');
-  const cancelBtn   = document.getElementById('quizCancel');
+  // Triggers / form
+  const openBtn   = document.getElementById('openQuiz');
+  const editBtn   = document.getElementById('editQuiz');
+  const form      = document.getElementById('quizForm');
+
+  // Core selects
+  const selCoverage = document.getElementById('qCoverage');   // Apartment/Small | 2–3 Bedroom | Large/Multi-floor
+  const selDevices  = document.getElementById('qDevices');    // 1–5 | 6–15 | 16–30 | 31–60 | 61–100 | 100+
+  const selUse      = document.getElementById('qUse');        // All-Purpose | Gaming | WFH | Family Streaming | Smart-Home | Prosumer
+
+  // Optional extras
+  const selAccess = document.getElementById('qAccess');       // Cable | Fiber | FixedWireless5G | Satellite | DSL
+  const priceSel  = document.getElementById('qPrice');        // <150 | 150–299 | 300–599 | 600+
+  const meshAuto  = document.getElementById('qMeshAuto');     // checkbox (default on)
+  const meshHint  = document.getElementById('meshHint');      // text node for helper hint
+  const cancelBtn = document.getElementById('quizCancel');    // button
 
   let lastOpener = null;
-  let lastAnswers = null; // persisted in-memory for this page session
+  const LS_KEY = 'rh.quiz.answers';
 
-  // --- Open / Close ---
+  // ---------- Open / Close ----------
   function openModal(from = document.activeElement) {
     lastOpener = from || document.activeElement || null;
     prefillForm();
     dlg.showModal();
     dlg.classList.add('is-open');
-    queueMicrotask(() => (firstFocusable(dlg)?.focus()));
+    queueMicrotask(() => firstFocusable(dlg)?.focus());
     attachTrap();
     updateMeshHint();
   }
@@ -40,23 +46,23 @@
   }
   function restoreFocus() { try { lastOpener?.focus(); } catch {} }
 
-  // Click outside (overlay)
+  // Overlay click to close
   dlg.addEventListener('click', (e) => {
     const r = dlg.getBoundingClientRect();
     const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
     if (!inside) closeModal();
   });
 
-  // Esc
+  // Native Esc
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); });
 
-  // Buttons
+  // Buttons / triggers
   openBtn?.addEventListener('click', () => openModal(openBtn));
-  document.addEventListener('quiz:edit', () => openModal(editBtn || openBtn));
+  editBtn?.addEventListener('click', (e) => { e.preventDefault(); openModal(editBtn); });
   cancelBtn?.addEventListener('click', closeModal);
   dlg.querySelectorAll('.modal-close,.quiz-close').forEach(b => b.addEventListener('click', closeModal));
 
-  // --- Focus Trap ---
+  // ---------- Focus Trap ----------
   let trapHandler = null;
   function attachTrap() {
     trapHandler = (e) => {
@@ -65,11 +71,11 @@
       const items = focusables(dlg);
       if (!items.length) return;
       const idx = items.indexOf(document.activeElement);
-      let next = idx;
-      next = e.shiftKey ? (idx <= 0 ? items.length - 1 : idx - 1) : (idx === items.length - 1 ? 0 : idx + 1);
-      if (idx === -1 || (e.shiftKey && document.activeElement === items[0]) || (!e.shiftKey && document.activeElement === items.at(-1))) {
-        e.preventDefault();
-        items[next].focus();
+      const last = items.length - 1;
+      if (e.shiftKey) {
+        if (idx <= 0) { e.preventDefault(); items[last].focus(); }
+      } else {
+        if (idx === last) { e.preventDefault(); items[0].focus(); }
       }
     };
     document.addEventListener('keydown', trapHandler, true);
@@ -81,35 +87,47 @@
   }
   function firstFocusable(root) { return focusables(root)[0] || root; }
 
-  // --- Prefill ---
+  // ---------- Prefill ----------
+  function getStored() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { return null; }
+  }
+  function setStored(a) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(a)); } catch {}
+  }
   function prefillForm() {
-    const a = lastAnswers || {};
+    const a = getStored() || {};
     if (selCoverage) selCoverage.value = a.coverage || '';
     if (selDevices)  selDevices.value  = a.devices  || '';
     if (selUse)      selUse.value      = a.use      || '';
     if (selAccess)   selAccess.value   = a.access   || '';
     if (priceSel)    priceSel.value    = a.price    || '';
-    // speed radios
-    const qSpeed = form?.elements?.qSpeed;
+
+    // Speed radios (qSpeedLabel: '', '≤1G','2.5G','5G','10G')
+    const qSpeed = form?.elements?.qSpeedLabel;
     if (qSpeed) {
-      const v = String(a.wanTier || '');
-      [...qSpeed].forEach(r => r.checked = (r.value === v));
-      if (!v) { // "I'm not sure" radio
-        [...qSpeed].find(r => r.value === '')?.setAttribute('checked','');
-      }
+      const target = String(a.wanTierLabel || '');
+      [...qSpeed].forEach(r => r.checked = (r.value === target));
+      if (!target) [...qSpeed].find(r => r.value === '')?.setAttribute('checked','');
     }
+
+    // Mesh: autopilot + explicit override
     if (meshAuto) meshAuto.checked = a.meshAuto !== false; // default true
-    // mesh explicit
-    const meshRadios = form.querySelectorAll('input[name="qMesh"]');
-    [...meshRadios].forEach(r => r.checked = (r.value === (a.mesh || '')));
+    const meshRadios = form?.elements?.qMesh;
+    if (meshRadios) {
+      const meshVal = a.mesh || '';
+      [...meshRadios].forEach(r => r.checked = (r.value === meshVal));
+    }
   }
 
-  // --- Mesh hint / auto behavior ---
+  // ---------- Mesh hint / autopilot ----------
   function updateMeshHint() {
-    const cov = selCoverage?.value;
+    const cov = selCoverage?.value || '';
     const auto = !!meshAuto?.checked;
+    if (!meshHint) return;
     if (cov === 'Large/Multi-floor') {
-      meshHint.textContent = auto ? 'Large / multi-floor detected — we’ll prefer mesh systems for even coverage.' : 'Tip: mesh greatly improves multi-floor coverage.';
+      meshHint.textContent = auto
+        ? 'Large / multi-floor detected — we’ll prefer mesh systems for even coverage.'
+        : 'Tip: mesh greatly improves multi-floor coverage.';
     } else {
       meshHint.textContent = '';
     }
@@ -117,52 +135,64 @@
   selCoverage?.addEventListener('change', updateMeshHint);
   meshAuto?.addEventListener('change', updateMeshHint);
 
-  // --- Submit -> kits.js
+  // ---------- Submit -> kits.js ----------
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const wanTier = readSpeed(form?.elements?.qSpeed);
-    const meshChoice = readMeshChoice();
+    // Read core fields
+    const coverage = selCoverage?.value || '';
+    const devices  = selDevices?.value  || '';
+    const use      = selUse?.value      || '';
 
-    const answers = {
-      coverage: selCoverage?.value || '',
-      devices:  selDevices?.value  || '',
-      use:      selUse?.value      || '',
-      access:   selAccess?.value   || '',
-      wanTier,                         // '', 200, 250, 500, 1000, 2500, 5000, 10000 (number or '')
-      mesh:     meshChoice,            // 'yes' | 'no' | '' (no pref)
-      meshAuto: !!meshAuto?.checked,   // true = allow auto-suggestion
-      price:    priceSel?.value || ''  // '$' | '$$' | '$$$' | '$$$$' | ''
-    };
+    // Validate required trio
+    const missing = !coverage ? selCoverage : !devices ? selDevices : !use ? selUse : null;
+    if (missing) { missing.focus(); return; }
 
-    // Validate required trio first
-    const missingKey = ['coverage','devices','use'].find(k => !answers[k]);
-    if (missingKey) {
-      ({ coverage: selCoverage, devices: selDevices, use: selUse }[missingKey]).focus();
-      return;
+    // Optional fields
+    const access = selAccess?.value || '';
+    const price  = priceSel?.value  || '';
+
+    const wanTierLabel = readSpeedLabel(form?.elements?.qSpeedLabel); // '', '≤1G','2.5G','5G','10G'
+    let mesh = readMeshChoice();                                       // 'yes' | 'no' | ''
+    const meshAutoVal = !!meshAuto?.checked;
+
+    // Autopilot: if user didn't pick mesh explicitly, decide from environment
+    if (!mesh && meshAutoVal) {
+      if (coverage === 'Large/Multi-floor') mesh = 'yes';
     }
 
-    lastAnswers = answers;
+    const answers = {
+      coverage,
+      devices,
+      use,
+      access,           // for future facet prefill
+      wanTierLabel,     // for future facet prefill (matches UI labels)
+      mesh,             // 'yes' | 'no' | ''
+      meshAuto: meshAutoVal,
+      price             // price bucket label
+    };
+
+    setStored(answers);
+
     if (typeof window.RH_APPLY_QUIZ === 'function') {
       window.RH_APPLY_QUIZ(answers);
     }
     closeModal();
   });
 
-  function readSpeed(radios) {
+  function readSpeedLabel(radios) {
     if (!radios) return '';
     const r = [...radios].find(x => x.checked);
-    if (!r) return '';
-    const v = r.value.trim();
-    return v === '' ? '' : Number(v);
+    const v = r ? String(r.value || '') : '';
+    // normalize to allowed set
+    return v === '10G' || v === '5G' || v === '2.5G' || v === '≤1G' ? v : '';
   }
   function readMeshChoice() {
-    const r = form.querySelector('input[name="qMesh"]:checked');
-    return r ? r.value : '';
+    const r = form?.querySelector('input[name="qMesh"]:checked');
+    const v = r ? r.value : '';
+    return v === 'yes' || v === 'no' ? v : '';
   }
 
-  // Keep Edit button behavior
-  if (editBtn) {
-    editBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(editBtn); });
-  }
+  // External reopen (from kits.js)
+  document.addEventListener('quiz:edit', () => openModal(editBtn || openBtn));
 })();
