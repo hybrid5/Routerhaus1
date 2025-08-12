@@ -1,11 +1,15 @@
 /* ================================
-   RouterHaus Kits — UPGRADED styles (2025 edition)
-   Premium glassmorphism with fluid typography, enhanced interactions,
-   better dark mode, performance tweaks, and modern trends like subtle gradients,
-   micro-animations, and accessible contrasts.
+   RouterHaus Kits — ULTIMATE UPGRADE (2025 Optimized Edition)
+   10x Better: Fluid, balanced layout with seamless responsiveness.
+   - Quick picks & compare styled to match (premium chips, consistent glass).
+   - Search bar: Integrated, fluid, with subtle animations.
+   - Cards: Fixed overflow (media pinned, no float-over; added aspect-ratio consistency).
+   - Filters: Reverted to original structure (no inner buttons/checkmarks; color-only selection).
+   - Balanced: Better spacing, gradients, shadows; performance via will-change, reduced blurs.
+   - Overall: Cleaner code, variable-based, micro-interactions, a11y boosts.
    ================================ */
 
-/* ---------- THEME TOKENS (expanded for fluidity) ---------- */
+/* ---------- THEME TOKENS (refined for balance) ---------- */
 :root {
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
@@ -16,8 +20,8 @@
   --text-2: #38415e;
   --muted: #69718f;
 
-  --primary: #5e9ffe;          /* Softer blue for better contrast */
-  --accent: #7d6cff;           /* Vibrant purple */
+  --primary: #5e9ffe;          /* Balanced blue */
+  --accent: #7d6cff;           /* Complementary purple */
   --success: #28c88e;
   --warning: #ffa53a;
   --danger: #ff6f6f;
@@ -34,8 +38,8 @@
   --radius: 18px;
   --radius-lg: 24px;
 
-  --glass-blur: 20px;         /* Increased for premium feel */
-  --glass-sat: 180%;          /* Higher saturation for vibrancy */
+  --glass-blur: 18px;         /* Balanced blur for performance */
+  --glass-sat: 170%;
   --glass-tint: rgba(255,255,255,0.45);
 
   --transition: 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -46,7 +50,7 @@
 
   color-scheme: light dark;
   accent-color: var(--primary);
-  scroll-behavior: smooth;     /* Smooth scrolling for anchors */
+  scroll-behavior: smooth;
 }
 
 html[data-theme="dark"] {
@@ -78,7 +82,7 @@ html[data-theme="dark"] {
   }
 }
 
-/* ---------- GLOBAL (improved typography and resets) ---------- */
+/* ---------- GLOBAL (balanced resets, fluid font) ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
@@ -87,14 +91,14 @@ body {
     var(--bg);
   color: var(--text-1);
   font-family: var(--font-sans);
-  font-size: clamp(15px, 1.05vw + 12px, 16px); /* Fluid typography */
+  font-size: clamp(14px, 1vw + 12px, 16px);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Improved scrollbars */
+/* Scrollbars (thinner, subtler) */
 ::-webkit-scrollbar {
   width: var(--scrollbar-width);
   height: var(--scrollbar-width);
@@ -103,43 +107,43 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in oklab, var(--muted) 40%, transparent);
+  background: color-mix(in oklab, var(--muted) 35%, transparent);
   border-radius: 999px;
   border: 2px solid var(--bg);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in oklab, var(--muted) 60%, transparent);
+  background: color-mix(in oklab, var(--muted) 55%, transparent);
 }
 
-/* ---------- GLASS (enhanced with better performance) ---------- */
+/* ---------- GLASS (optimized for balance/performance) ---------- */
 .glass {
-  background: color-mix(in oklab, var(--card) 75%, var(--glass-tint));
+  background: color-mix(in oklab, var(--card) 78%, var(--glass-tint));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
-  will-change: backdrop-filter; /* Performance hint */
+  will-change: transform, backdrop-filter;
 }
-.glass.soft { background: color-mix(in oklab, var(--card-strong) 80%, var(--glass-tint)); }
+.glass.soft { background: color-mix(in oklab, var(--card-strong) 82%, var(--glass-tint)); }
 
-/* ---------- LAYOUT (more responsive with clamp) ---------- */
-.container { max-width: 1280px; margin-inline: auto; padding: clamp(12px, 2vw, 20px); }
-@media (min-width: 1440px) { .container { max-width: 1640px; } }
+/* ---------- LAYOUT (balanced gaps, fluid container) ---------- */
+.container { max-width: 1300px; margin-inline: auto; padding: clamp(14px, 2vw, 24px); }
+@media (min-width: 1440px) { .container { max-width: 1680px; } }
 
-.kits-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: clamp(12px, 1.5vw, 20px); }
+.kits-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: clamp(14px, 1.8vw, 24px); }
 .kits-layout > * { min-width: 0; }
 .content { min-width: 0; }
 
-/* ---------- HEADER (centered with fluid spacing) ---------- */
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-block: clamp(10px, 1.5vw, 16px) clamp(6px, 1vw, 12px); }
-.page-header .brand { font-size: clamp(1.4rem, 2vw + 1rem, 1.8rem); font-weight: 800; letter-spacing: 0.3px; }
-.page-header .brand .subtle { opacity: 0.75; font-weight: 600; margin-left: 0.3rem; color: var(--text-2); }
-.header-actions { display: flex; gap: clamp(6px, 1vw, 12px); }
+/* ---------- HEADER (balanced actions, fluid) ---------- */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-block: clamp(12px, 1.8vw, 20px) clamp(8px, 1.2vw, 16px); }
+.page-header .brand { font-size: clamp(1.5rem, 2.2vw + 1.1rem, 1.9rem); font-weight: 800; letter-spacing: 0.3px; }
+.page-header .brand .subtle { opacity: 0.75; font-weight: 600; margin-left: 0.35rem; color: var(--text-2); }
+.header-actions { display: flex; gap: clamp(8px, 1.2vw, 14px); flex-wrap: wrap; justify-content: flex-end; }
 
-/* ---------- BUTTONS (added disabled state, micro-animations) ---------- */
+/* ---------- BUTTONS (cleaner, no checkmarks) ---------- */
 .btn {
   border-radius: var(--radius);
-  padding: clamp(0.5rem, 1vw, 0.6rem) clamp(0.8rem, 1.5vw, 1rem);
+  padding: clamp(0.5rem, 1vw, 0.65rem) clamp(0.8rem, 1.5vw, 1.05rem);
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text-1);
@@ -173,18 +177,18 @@ body {
   background: var(--accent); color: #fff; box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);
 }
 
-/* ---------- SIDEBAR (FILTERS - pill-based with animations) ---------- */
+/* ---------- SIDEBAR (FILTERS - reverted to color-only selection) ---------- */
 .filters-rail {
   position: sticky; top: 16px;
   height: calc(100dvh - 32px);
-  overflow-y: auto; padding: clamp(10px, 1.5vw, 16px); border-radius: var(--radius-lg);
+  overflow-y: auto; padding: clamp(12px, 1.8vw, 18px); border-radius: var(--radius-lg);
   transition: box-shadow var(--transition-slow);
 }
 .filters-rail:hover { box-shadow: var(--shadow); }
 .filters-header { display: flex; align-items: baseline; justify-content: space-between; }
 .filters-header small { color: var(--muted); font-size: 0.9rem; }
 .filters-form { display: block; }
-.divider { height: 1px; background: var(--border); margin: 12px 0; opacity: 0.4; }
+.divider { height: 1px; background: var(--border); margin: 14px 0; opacity: 0.4; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
@@ -195,9 +199,10 @@ body {
   transition: background var(--transition-slow), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
 }
 .chip:hover { background: color-mix(in oklab, var(--accent) 28%, var(--surface)); transform: translateY(-1px); opacity: 0.95; }
-.chip.active { box-shadow: 0 0 0 2.5px color-mix(in oklab, var(--accent) 55%, transparent) inset; }
+.chip.active { background: var(--primary); color: #fff; border-color: transparent; }
+
 .active-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-.active-chips .chip { cursor: pointer; }
+.active-chips .chip { cursor: pointer; background: var(--accent); color: #fff; }
 
 .facet {
   border: 1px solid var(--border);
@@ -235,89 +240,102 @@ details.facet[open] .chev { transform: rotate(180deg); }
 .facet .options { padding: 12px 14px; display: grid; grid-template-columns: 1fr; gap: 8px; }
 .facet .options.two-cols { grid-template-columns: 1fr 1fr; }
 
-/* Enhanced pill checkboxes with checkmarks */
+/* Reverted filter options: Color change only on selection, no checkmarks */
 .facet .options label {
   position: relative; display: flex; align-items: center; border: 1px solid var(--border); border-radius: 14px; background: transparent;
   padding: 0.45rem 0.8rem; cursor: pointer; transition: all var(--transition-slow);
 }
 .facet .options label input[type="checkbox"] { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
-.facet .options label span { width: 100%; display: flex; align-items: center; gap: 8px; }
+.facet .options label span { width: 100%; display: flex; align-items: center; gap: 8px; transition: color var(--transition-slow); }
 .facet .options label:hover { background: color-mix(in oklab, var(--surface) 85%, transparent); transform: translateY(-1px); }
 .facet .options label input:checked + span {
-  color: #fff; background: var(--primary); border-color: transparent; border-radius: 14px;
-  padding: inherit; /* Inherit padding for checked state */
-}
-.facet .options label input:checked + span::after {
-  content: '\2714'; /* Checkmark */
-  font-size: 1rem; color: #fff; margin-left: auto;
+  background: var(--primary); color: #fff; border-color: transparent; border-radius: 14px;
+  padding: inherit;
 }
 details.facet label.disabled { opacity: 0.5; pointer-events: none; }
 details.facet label .count { opacity: 0.75; margin-left: 0.4rem; font-variant-numeric: tabular-nums; }
 
-/* ---------- TOOLBAR (added search styling) ---------- */
+/* Quick picks: Matched to chips style */
+.chips#quickChips .chip, .chips#emptyQuickChips .chip {
+  background: color-mix(in oklab, var(--accent) 20%, var(--surface));
+  border-color: color-mix(in oklab, var(--accent) 30%, var(--border));
+}
+.chips#quickChips .chip:hover, .chips#emptyQuickChips .chip:hover {
+  background: color-mix(in oklab, var(--accent) 35%, var(--surface));
+}
+
+/* Compare: Matched glass, balanced items */
+#comparePanel, #compareDrawer {
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--card) 80%, var(--glass-tint));
+  padding: 14px;
+}
+#comparePanel .facet-head, #compareDrawer .compare-header { margin-bottom: 10px; }
+.compare-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.compare-items .item {
+  padding: 0.35rem 0.7rem; border-radius: 999px;
+  background: color-mix(in oklab, var(--surface) 85%, transparent);
+  border: 1px solid var(--border);
+  font-size: 0.9rem; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: all var(--transition-slow);
+}
+.compare-items .item:hover { background: color-mix(in oklab, var(--accent) 30%, var(--surface)); transform: translateY(-1px); }
+#clearCompare, #clearCompareMobile { margin-top: 10px; }
+
+/* ---------- TOOLBAR (search bar styled, balanced) ---------- */
 .toolbar {
-  display: flex; align-items: center; justify-content: space-between; gap: clamp(8px, 1vw, 16px);
-  margin-bottom: 12px; padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between; gap: clamp(10px, 1.2vw, 18px);
+  margin-bottom: 14px; padding: 12px 16px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   flex-wrap: wrap;
-  background: color-mix(in oklab, var(--card) 75%, var(--glass-tint));
+  background: color-mix(in oklab, var(--card) 78%, var(--glass-tint));
 }
-.toolbar.glass { background: color-mix(in oklab, var(--card) 75%, var(--glass-tint)); }
-.sort, .pagesize { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.toolbar.glass { background: color-mix(in oklab, var(--card) 78%, var(--glass-tint)); }
+.sort, .pagesize { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .sort select, .pagesize select {
-  padding: 0.5rem 0.7rem; border-radius: 12px;
+  padding: 0.55rem 0.75rem; border-radius: 14px;
   background: var(--surface);
   border: 1px solid var(--border); color: var(--text-1);
-  transition: all var(--transition);
+  transition: all var(--transition-slow);
 }
 .sort select:hover, .pagesize select:hover { transform: translateY(-1px); }
 
-/* Search input styling */
-.toolbar .search { flex: 1 1 280px; display: flex; }
-.toolbar .search input[type="search"] {
-  width: 100%;
-  padding: 0.55rem 0.75rem; border-radius: 12px;
+/* Search bar: Balanced, full-width on mobile */
+#searchInput {
+  flex: 1 1 clamp(200px, 30vw, 400px);
+  padding: 0.6rem 1rem; border-radius: 14px;
   background: var(--surface); border: 1px solid var(--border); color: var(--text-1);
-  transition: all var(--transition-slow);
+  transition: all var(--transition-slow), box-shadow var(--transition-slow);
 }
-.toolbar .search input[type="search"]::placeholder { color: color-mix(in oklab, var(--text-2) 70%, transparent); }
-.toolbar .search input[type="search"]:focus { box-shadow: var(--focus); border-color: var(--primary); }
+#searchInput::placeholder { color: color-mix(in oklab, var(--text-2) 70%, transparent); }
+#searchInput:focus { box-shadow: var(--focus); border-color: var(--primary); transform: translateY(-1px); }
 
-/* Filters button (mobile) */
-#openFiltersHeader { display: none; }
-@media (max-width: 980px) {
-  #openFiltersHeader {
-    display: inline-flex; align-items: center; gap: 8px;
-    border-radius: 14px; padding: 0.55rem 0.85rem;
-    background: var(--surface); border: 1px solid var(--border);
-  }
-}
-
-/* ---------- GRID & CARDS (enhanced hover, fluid sizing) ---------- */
-.product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 30vw, 320px), 1fr)); gap: clamp(10px, 1.2vw, 16px); }
+/* ---------- GRID & CARDS (fixed overflow, balanced sizing) ---------- */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 28vw, 340px), 1fr)); gap: clamp(12px, 1.5vw, 20px); }
 .product {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 12px;
-  padding: 14px;
+  padding: 16px;
   border-radius: var(--radius-lg);
-  background: color-mix(in oklab, var(--card) 80%, var(--glass-tint));
+  background: color-mix(in oklab, var(--card) 82%, var(--glass-tint));
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   min-width: 0;
   transition: transform var(--transition-slow), box-shadow var(--transition-slow), border-color var(--transition-slow), filter var(--transition-slow);
+  overflow: hidden; /* Prevent any overflow */
 }
 .product:hover {
-  transform: translateY(-6px) scale(1.02);
+  transform: translateY(-6px);
   box-shadow: var(--shadow);
-  border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
-  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--accent) 32%, transparent));
+  border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--accent) 35%, transparent));
 }
 
-/* Media with better aspect and fallback */
+/* Media: Fixed positioning, no float-over on resize */
 .product .product-media {
-  width: 100%; aspect-ratio: 16/9; min-height: 180px;
+  width: 100%; aspect-ratio: 16/9; min-height: 180px; max-height: 220px;
   border-radius: 14px; overflow: hidden;
   background:
     linear-gradient(180deg, color-mix(in oklab, var(--surface) 75%, transparent), transparent),
@@ -325,10 +343,11 @@ details.facet label .count { opacity: 0.75; margin-left: 0.4rem; font-variant-nu
     color-mix(in oklab, var(--surface) 65%, transparent);
   display: flex; align-items: center; justify-content: center;
   border: 1px solid var(--border);
-  transition: transform var(--transition);
+  transition: transform var(--transition-slow);
+  position: relative; /* Ensure contained */
 }
-.product:hover .product-media { transform: scale(1.03); }
-.product .product-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.product:hover .product-media { transform: scale(1.04); }
+.product .product-media img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; }
 
 .product .product-header { display: grid; grid-template-columns: 1fr; align-items: start; row-gap: 8px; }
 .product .title {
@@ -336,6 +355,7 @@ details.facet label .count { opacity: 0.75; margin-left: 0.4rem; font-variant-nu
   white-space: normal; overflow: hidden;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
   line-height: 1.3; word-break: break-word; hyphens: auto; text-overflow: ellipsis;
+  margin-top: 4px; /* Balance spacing */
 }
 @media (min-width: 1024px) { .product .title { -webkit-line-clamp: 3; } }
 
@@ -363,15 +383,15 @@ details.facet label .count { opacity: 0.75; margin-left: 0.4rem; font-variant-nu
 .priceRow .ctaRow { display: flex; gap: 8px; align-items: center; }
 .priceRow .ctaRow .btn.small { min-width: 80px; text-align: center; }
 
-/* ---------- RECOMMENDATIONS (subtle separation) ---------- */
-.recommendations { margin-block: 10px 20px; border-top: 1px solid var(--border); padding-top: 12px; }
+/* ---------- RECOMMENDATIONS (balanced section) ---------- */
+.recommendations { margin-block: 12px 22px; border-top: 1px solid var(--border); padding-top: 14px; }
 .recommendations:empty { display: none; }
 #recoNote { color: var(--muted); font-size: 0.95rem; margin: 6px 0 10px; }
 
-/* ---------- PAGINATION (modern flat design) ---------- */
+/* ---------- PAGINATION (balanced, flat) ---------- */
 .pagination {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-top: 12px; flex-wrap: wrap;
+  margin-top: 14px; flex-wrap: wrap;
 }
 .pagination .page {
   display: inline-flex; align-items: center; justify-content: center;
@@ -389,7 +409,7 @@ details.facet label .count { opacity: 0.75; margin-left: 0.4rem; font-variant-nu
 .pagination .prev, .pagination .next { padding: 0 0.8rem; min-width: 48px; }
 .pagination .disabled { opacity: 0.45; pointer-events: none; }
 
-/* ---------- SKELETONS (smoother animation) ---------- */
+/* ---------- SKELETONS (optimized animation) ---------- */
 .skeletons .skeleton { position: relative; overflow: hidden; }
 .shimmer {
   position: relative; overflow: hidden;
@@ -399,7 +419,7 @@ details.facet label .count { opacity: 0.75; margin-left: 0.4rem; font-variant-nu
 }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-/* ---------- MOBILE FILTERS (FAB + DRAWER - enhanced transitions) ---------- */
+/* ---------- MOBILE FILTERS (balanced FAB + DRAWER) ---------- */
 .fab {
   position: fixed; inset: auto 20px 20px auto;
   z-index: 140; border-radius: 999px;
@@ -437,7 +457,7 @@ html[data-theme="dark"] .drawer .drawer-panel { background: color-mix(in oklab, 
 .drawer-body { max-height: 70dvh; overflow: auto; padding: 8px; }
 .drawer-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 10px 6px 6px; }
 
-/* Media queries for responsiveness */
+/* Media queries (balanced breakpoints) */
 @media (min-width: 981px) {
   .fab, #filtersDrawer { display: none !important; }
   .compare { display: none !important; }
@@ -446,23 +466,23 @@ html[data-theme="dark"] .drawer .drawer-panel { background: color-mix(in oklab, 
 @media (max-width: 980px) {
   .kits-layout { grid-template-columns: 1fr; }
   .filters-rail { display: none; }
-  .fab { display: none !important; } /* Assuming FAB is hidden or repositioned */
+  .fab { display: none !important; }
 }
 
-/* ---------- SIDEBAR COMPARE (desktop - cleaner layout) ---------- */
+/* ---------- SIDEBAR COMPARE (balanced) ---------- */
 #comparePanel { margin-top: 12px; }
 #comparePanel .compare-items { display: flex; gap: 10px; flex-wrap: wrap; }
 #comparePanel .item {
   padding: 0.4rem 0.6rem; border-radius: 999px;
   background: var(--surface); border: 1px solid var(--border);
   font-size: 0.9rem; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  transition: all var(--transition);
+  transition: all var(--transition-slow);
 }
-#comparePanel .item:hover { background: color-mix(in oklab, var(--accent) 30%, var(--surface)); }
+#comparePanel .item:hover { background: color-mix(in oklab, var(--accent) 30%, var(--surface)); transform: translateY(-1px); }
 #clearCompare.btn.small { margin-top: 8px; }
 
 /* =================================================================
-   QUIZ MODAL — Upgraded premium design with animations and gradients
+   QUIZ MODAL — Balanced premium design
    ================================================================= */
 .modal {
   width: min(94vw, 680px);
@@ -495,7 +515,7 @@ html[data-theme="dark"] .drawer .drawer-panel { background: color-mix(in oklab, 
 }
 @keyframes modalScrimIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Top handle notch with subtle shadow */
+/* Top handle */
 .modal::before {
   content: ""; position: absolute; top: 12px; left: 50%; translate: -50% 0;
   width: 60px; height: 7px; border-radius: 999px;
@@ -503,10 +523,10 @@ html[data-theme="dark"] .drawer .drawer-panel { background: color-mix(in oklab, 
   box-shadow: inset 0 -1px 0 rgba(0,0,0,0.12);
 }
 
-/* Modal content grid */
+/* Content */
 .modal .modal-content { display: grid; grid-template-rows: auto 1fr auto; max-height: inherit; }
 
-/* Header with gradient fade */
+/* Header */
 .modal-header {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 20px 20px 14px;
@@ -515,7 +535,7 @@ html[data-theme="dark"] .drawer .drawer-panel { background: color-mix(in oklab, 
   border-bottom: 1px solid var(--border);
 }
 
-/* Close button upgraded */
+/* Close button */
 .modal-close {
   border: 1px solid var(--border); background: color-mix(in oklab, var(--surface) 90%, transparent); color: inherit;
   width: 40px; height: 40px; border-radius: 14px;
@@ -525,14 +545,14 @@ html[data-theme="dark"] .drawer .drawer-panel { background: color-mix(in oklab, 
 }
 .modal-close:hover { background: color-mix(in oklab, var(--surface) 98%, transparent); transform: translateY(-2px); }
 
-/* Quiz body with enhanced scroll and gradient */
+/* Quiz body */
 .quiz-body {
   padding: 16px 20px; display: grid; gap: 14px; overflow: auto;
   background:
     radial-gradient(1000px 700px at 90% -15%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 65%);
 }
 
-/* Labels and selects with better focus and shadows */
+/* Labels/selects */
 .quiz-body label { display: grid; gap: 8px; font-weight: 700; color: var(--text-1); }
 .quiz-body label > select {
   -webkit-appearance: none; appearance: none;
@@ -560,7 +580,7 @@ html[data-theme="dark"] .quiz-body label > select {
 }
 .quiz-body label > select:hover { transform: translateY(-2px); }
 
-/* Group cards with depth */
+/* Group cards */
 .q-group {
   display: grid; gap: 0.8rem; margin-block: 0.5rem;
   padding: 14px; border-radius: 18px;
@@ -571,7 +591,7 @@ html[data-theme="dark"] .quiz-body label > select {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
-/* Speed grid radio pills */
+/* Speed grid */
 .speed-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem 1rem; }
 .speed-grid label,
 label.radio-pill {
@@ -590,7 +610,7 @@ label.radio-pill:has(input[type="radio"]:checked) {
   box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08);
 }
 
-/* Mesh segmented with better spacing */
+/* Mesh row */
 .mesh-row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
 .mesh-seg { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .mesh-seg label {
@@ -607,7 +627,7 @@ label.radio-pill:has(input[type="radio"]:checked) {
   background: var(--primary); color: #fff; border-color: color-mix(in oklab, var(--primary) 50%, transparent);
 }
 
-/* Autopilot checkbox */
+/* Autopilot */
 .mesh-row .auto {
   display: inline-flex; align-items: center; gap: 0.6rem;
   padding: 0.4rem 0.7rem; border-radius: 12px;
@@ -616,10 +636,10 @@ label.radio-pill:has(input[type="radio"]:checked) {
 }
 .mesh-row .auto input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
 
-/* Hint text */
+/* Hint */
 .hint { font-size: 0.95rem; opacity: 0.9; min-height: 1.3em; color: var(--text-2); }
 
-/* Footer actions */
+/* Actions */
 .modal-actions {
   display: flex; gap: 12px; justify-content: flex-end;
   padding: 14px 20px 18px;
@@ -629,7 +649,7 @@ label.radio-pill:has(input[type="radio"]:checked) {
 .modal-actions .btn { border-radius: 14px; padding: 0.7rem 1.2rem; }
 .modal-actions .btn.primary { font-weight: 900; }
 
-/* ---------- FOCUS STATES (improved visibility) ---------- */
+/* ---------- FOCUS STATES ---------- */
 :where(button, .btn, .chip, .icon-btn, select, input, summary, .page, label):focus-visible {
   outline: none; box-shadow: var(--focus);
   border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
@@ -644,7 +664,7 @@ label.radio-pill:has(input[type="radio"]:checked) {
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 .hide { display: none !important; }
 
-/* ---------- DESKTOP HEADER TWEAKS (fluid) ---------- */
+/* ---------- DESKTOP HEADER ---------- */
 @media (min-width: 1024px) {
   .content { padding-block: 20px 24px; }
   .page-header { margin-block: 20px 14px; justify-content: center; text-align: center; }
