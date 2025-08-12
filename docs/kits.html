@@ -21,6 +21,7 @@
   <!-- Styles -->
   <link rel="stylesheet" href="main.css" />
   <link rel="stylesheet" href="assets/css/kits.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <!-- For icons -->
 </head>
 <body>
   <!-- Header partial mounts BEFORE main to avoid CLS -->
@@ -44,7 +45,7 @@
         <!-- Quick picks -->
         <section class="facet" data-facet="quick">
           <div class="facet-head">
-            <h3>Quick picks</h3>
+            <h3>Quick Picks <i class="fas fa-lightbulb" title="Easy starting points for common needs"></i></h3>
             <button type="button" class="btn tiny facet-clear" data-clear="quick">Clear</button>
           </div>
           <div class="chips" id="quickChips"></div>
@@ -55,7 +56,7 @@
         <!-- Brand -->
         <details class="facet" data-facet="brand" open>
           <summary>
-            <span>Brand</span>
+            <span>Brand <i class="fas fa-tags" title="Choose your favorite router maker, like Google or Netgear"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-brand">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -70,7 +71,7 @@
         <!-- Wi-Fi Gen -->
         <details class="facet" data-facet="wifi" open>
           <summary>
-            <span>Wi-Fi</span>
+            <span>Wi-Fi Speed & Tech <i class="fas fa-wifi" title="Newer versions are faster and handle more devices"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-wifiGen">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -85,7 +86,7 @@
         <!-- Bands (own facet so drawer sync + persistence work) -->
         <details class="facet" data-facet="bands">
           <summary>
-            <span>Bands</span>
+            <span>Wi-Fi Bands <i class="fas fa-signal" title="More bands mean better coverage for different devices (e.g., 2.4GHz for smart home gadgets)"></i></span>
             <span class="facet-meta">
               <span class="chev" aria-hidden>▾</span>
             </span>
@@ -99,7 +100,7 @@
         <!-- Mesh -->
         <details class="facet" data-facet="mesh" open>
           <summary>
-            <span>Mesh</span>
+            <span>Whole-Home Coverage (Mesh) <i class="fas fa-home" title="Mesh spreads Wi-Fi evenly, great for big houses—no dead spots!"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-meshReady">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -115,7 +116,7 @@
         <!-- WAN Tier -->
         <details class="facet" data-facet="wan">
           <summary>
-            <span>WAN Tier</span>
+            <span>Internet Speed Support <i class="fas fa-tachometer-alt" title="Matches your internet plan (e.g., basic for streaming, high for gaming)"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-wanTier">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -130,7 +131,7 @@
         <!-- LAN count -->
         <details class="facet" data-facet="lanCount">
           <summary>
-            <span>LAN ports</span>
+            <span>Wired Ports (LAN) <i class="fas fa-plug" title="For connecting devices with cables, like desktops or printers"></i></span>
             <span class="facet-meta">
               <span class="chev" aria-hidden>▾</span>
             </span>
@@ -144,7 +145,7 @@
         <!-- Multi-Gig LAN -->
         <details class="facet" data-facet="multiGigLan">
           <summary>
-            <span>Multi-Gig LAN</span>
+            <span>Super-Fast Wired Ports <i class="fas fa-bolt" title="For high-speed wired connections, like to a NAS or gaming PC"></i></span>
             <span class="facet-meta">
               <span class="chev" aria-hidden>▾</span>
             </span>
@@ -158,7 +159,7 @@
         <!-- USB -->
         <details class="facet" data-facet="usb">
           <summary>
-            <span>USB</span>
+            <span>USB Ports <i class="fas fa-usb" title="For plugging in external drives or printers"></i></span>
             <span class="facet-meta">
               <span class="chev" aria-hidden>▾</span>
             </span>
@@ -172,7 +173,7 @@
         <!-- Coverage -->
         <details class="facet" data-facet="coverage" open>
           <summary>
-            <span>Coverage</span>
+            <span>Home Size Coverage <i class="fas fa-ruler-combined" title="How much area the router covers without weak signals"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-coverageBucket">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -187,7 +188,7 @@
         <!-- Device load -->
         <details class="facet" data-facet="device" open>
           <summary>
-            <span>Device load</span>
+            <span>Number of Devices on Wi-Fi <i class="fas fa-mobile-alt" title="How many gadgets connect? E.g., phones, laptops, smart TVs, thermostats, lights"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-deviceLoad">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -202,7 +203,7 @@
         <!-- Primary use -->
         <details class="facet" data-facet="use" open>
           <summary>
-            <span>Primary use</span>
+            <span>Main Use <i class="fas fa-tasks" title="What do you use Wi-Fi for most? E.g., streaming movies or working from home"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-primaryUse">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -217,7 +218,7 @@
         <!-- Access -->
         <details class="facet" data-facet="access">
           <summary>
-            <span>Access</span>
+            <span>Internet Type <i class="fas fa-globe" title="How you get internet: cable, fiber, etc."></i></span>
             <span class="facet-meta">
               <span class="chev" aria-hidden>▾</span>
             </span>
@@ -231,7 +232,7 @@
         <!-- Price -->
         <details class="facet" data-facet="price">
           <summary>
-            <span>Price</span>
+            <span>Price Range <i class="fas fa-dollar-sign" title="Find options that fit your budget"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-priceBucket">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -278,8 +279,9 @@
     <section class="content" aria-live="polite">
       <header class="page-header">
         <div class="header-actions">
-          <button id="openQuiz" class="btn primary" type="button">Find my kit</button>
-          <button id="editQuiz" class="btn ghost" type="button" hidden>Edit answers</button>
+          <button id="openQuiz" class="btn primary" type="button">Help Me Find a Kit <i class="fas fa-question-circle"></i></button>
+          <button id="editQuiz" class="btn ghost" type="button" hidden>Edit My Answers</button>
+          <input type="text" id="searchInput" placeholder="Search by brand or model..." aria-label="Search routers"> <!-- New: Quick search -->
           <button id="copyLink" class="btn glass" type="button">Copy link</button>
           <button id="resetAll" class="btn ghost" type="button">Reset</button>
         </div>
@@ -374,91 +376,96 @@
   <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
     <div class="modal-content">
       <header class="modal-header">
-        <h2 id="quizTitle">Find your best kit</h2>
+        <h2 id="quizTitle">Let's Find Your Perfect Router Kit</h2> <!-- Friendlier title -->
         <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
       </header>
 
       <form id="quizForm" class="quiz-body">
+        <div class="quiz-progress">Step <span id="quizStep">1</span>/7</div> <!-- New: Progress indicator -->
+
         <!-- ENVIRONMENT -->
         <fieldset class="q-group">
-          <legend>Home size</legend>
+          <legend>What's your home like? <i class="fas fa-info-circle" title="This helps pick coverage that fits your space"></i></legend>
           <label>
             <span class="sr-only">Home size</span>
             <select id="qCoverage" required>
               <option value="">Select...</option>
-              <option value="Apartment/Small">Apartment / Small</option>
-              <option value="2–3 Bedroom">2–3 Bedroom</option>
-              <option value="Large/Multi-floor">Large / Multi-floor</option>
+              <option value="Apartment/Small">Apartment or Small Home (studio, 1-bed, under 1,800 sq ft)</option>
+              <option value="2–3 Bedroom">Medium Home (2-3 bedrooms, up to 3,200 sq ft)</option>
+              <option value="Large/Multi-floor">Large or Multi-Floor Home (over 3,200 sq ft, big families)</option>
+              <option value="">I'm not sure – suggest based on other answers</option>
             </select>
           </label>
-          <p id="meshHint" class="hint" aria-live="polite"></p>
+          <p id="meshHint" class="hint" aria-live="polite">For larger homes, we recommend mesh for no dead spots.</p>
         </fieldset>
 
         <!-- LOAD -->
         <fieldset class="q-group">
-          <legend>Device load</legend>
+          <legend>How many devices connect to your Wi-Fi? <i class="fas fa-info-circle" title="Count phones, laptops, TVs, smart lights, thermostats, etc."></i></legend>
           <label>
-            <span class="sr-only">Device load</span>
+            <span class="sr-only">Number of devices</span>
             <select id="qDevices" required>
               <option value="">Select...</option>
-              <option value="1–5">1–5</option>
-              <option value="6–15">6–15</option>
-              <option value="16–30">16–30</option>
-              <option value="31–60">31–60</option>
-              <option value="61–100">61–100</option>
-              <option value="100+">100+</option>
+              <option value="1–5">1-5 (just basics, like a phone and laptop)</option>
+              <option value="6–15">6-15 (family with phones, TVs, and a few smart devices)</option>
+              <option value="16–30">16-30 (busy home with streaming and gaming)</option>
+              <option value="31–60">31-60 (smart home with lights, cameras, etc.)</option>
+              <option value="61–100">61-100 (lots of gadgets, like in an office)</option>
+              <option value="100+">100+ (heavy use, pros or big households)</option>
+              <option value="">I'm not sure – average for most homes</option>
             </select>
           </label>
         </fieldset>
 
         <!-- USE -->
         <fieldset class="q-group">
-          <legend>Primary use</legend>
+          <legend>What do you use Wi-Fi for most? <i class="fas fa-info-circle" title="This matches features to your needs"></i></legend>
           <label>
-            <span class="sr-only">Primary use</span>
+            <span class="sr-only">Main use</span>
             <select id="qUse" required>
               <option value="">Select...</option>
-              <option>All-Purpose</option>
-              <option>Gaming</option>
-              <option>Work-From-Home</option>
-              <option>Smart-Home</option>
-              <option>Family Streaming</option>
-              <option>Prosumer</option>
+              <option value="All-Purpose">Everyday Use (browsing, email, social media)</option>
+              <option value="Gaming">Gaming (online games, low lag needed)</option>
+              <option value="Work-From-Home">Work from Home (video calls, file sharing)</option>
+              <option value="Smart-Home">Smart Home (lights, thermostats, cameras)</option>
+              <option value="Family Streaming">Family Streaming (Netflix, YouTube on multiple TVs)</option>
+              <option value="Prosumer">Advanced/Pro (high-speed downloads, servers)</option>
+              <option value="">I'm not sure – mix of everything</option>
             </select>
           </label>
         </fieldset>
 
         <!-- ACCESS -->
         <fieldset class="q-group">
-          <legend>Internet access</legend>
+          <legend>What type of internet do you have? <i class="fas fa-info-circle" title="Check your bill or ask your provider (e.g., Comcast cable)"></i></legend>
           <label>
             <span class="sr-only">Access type</span>
             <select id="qAccess">
-              <option value="">No preference</option>
-              <option value="Cable">Cable</option>
-              <option value="Fiber">Fiber</option>
-              <option value="FixedWireless5G">Fixed Wireless 5G</option>
-              <option value="Satellite">Satellite</option>
-              <option value="DSL">DSL</option>
+              <option value="">No preference / I'm not sure</option>
+              <option value="Cable">Cable (most common, like Xfinity)</option>
+              <option value="Fiber">Fiber (super fast, like Google Fiber)</option>
+              <option value="FixedWireless5G">5G Wireless (home internet via cell towers)</option>
+              <option value="Satellite">Satellite (rural areas, like Starlink)</option>
+              <option value="DSL">DSL (older phone line internet)</option>
             </select>
           </label>
         </fieldset>
 
         <!-- SPEED (quiz-modal.js reads qSpeedLabel values: '', '≤1G','2.5G','5G','10G') -->
         <fieldset class="q-group">
-          <legend>Plan speed (WAN tier)</legend>
+          <legend>Your Internet Plan Speed <i class="fas fa-info-circle" title="Check your bill; higher speeds need better routers"></i></legend>
           <div class="speed-grid" role="group" aria-label="Plan speed">
-            <label><input type="radio" name="qSpeedLabel" value="≤1G"> ≤1 Gbps</label>
-            <label><input type="radio" name="qSpeedLabel" value="2.5G"> 2.5 Gbps</label>
-            <label><input type="radio" name="qSpeedLabel" value="5G"> 5 Gbps</label>
-            <label><input type="radio" name="qSpeedLabel" value="10G"> 10 Gbps</label>
-            <label><input type="radio" name="qSpeedLabel" value=""> I’m not sure</label>
+            <label><input type="radio" name="qSpeedLabel" value="≤1G"> Basic (up to 1 Gbps – good for streaming)</label>
+            <label><input type="radio" name="qSpeedLabel" value="2.5G"> Medium (2.5 Gbps – for gaming/work)</label>
+            <label><input type="radio" name="qSpeedLabel" value="5G"> High (5 Gbps – fast downloads)</label>
+            <label><input type="radio" name="qSpeedLabel" value="10G"> Ultra (10 Gbps – pro use)</label>
+            <label><input type="radio" name="qSpeedLabel" value=""> I'm not sure – suggest based on other answers</label>
           </div>
         </fieldset>
 
         <!-- MESH PREFERENCE -->
         <fieldset class="q-group">
-          <legend>Mesh preference</legend>
+          <legend>Do you want whole-home coverage? <i class="fas fa-info-circle" title="Mesh is like Wi-Fi extenders built-in"></i></legend>
           <label class="mesh-row">
             <input type="checkbox" id="qMeshAuto" checked>
             <span>Auto decide for me (recommended)</span>
@@ -472,22 +479,22 @@
 
         <!-- BUDGET (optional) -->
         <fieldset class="q-group">
-          <legend>Budget</legend>
+          <legend>What's your budget? <i class="fas fa-info-circle" title="We can find great options at any price"></i></legend>
           <label>
             <span class="sr-only">Budget</span>
             <select id="qPrice">
-              <option value="">No preference</option>
-              <option value="<150">$ – Budget</option>
-              <option value="150–299">$$ – Mid</option>
-              <option value="300–599">$$$ – Upper mid</option>
-              <option value="600+">$$$$ – Premium</option>
+              <option value="">No preference / Show all</option>
+              <option value="<150">$ (Under $150 – budget basics)</option>
+              <option value="150–299">$$ ($150-299 – good value)</option>
+              <option value="300–599">$$$ ($300-599 – premium features)</option>
+              <option value="600+">$$$$ ($600+ – top-of-the-line)</option>
             </select>
           </label>
         </fieldset>
 
         <footer class="modal-actions">
           <button type="button" class="btn" id="quizCancel">Cancel</button>
-          <button type="submit" class="btn primary">See recommendations</button>
+          <button type="submit" class="btn primary">Show My Recommendations</button>
         </footer>
       </form>
     </div>
