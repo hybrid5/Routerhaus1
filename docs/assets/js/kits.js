@@ -159,11 +159,11 @@
     // mesh, coverage
     o.meshReady = !!o.meshReady;
     o.coverageSqft = num(o.coverageSqft);
-    o.coverageBucket = o.coverageBucket || coverageToBucket(o.coverageSqft);
+    o.coverageBucket = o.coverageBucket || coverageToBucket(o.coverageSqft) + ' (examples added in UI)';
 
     // WAN tier (prefer label if provided)
     o.maxWanSpeedMbps = num(o.maxWanSpeedMbps);
-    o.wanTierLabel = o.wanTierLabel || wanLabelFromMbps(o.maxWanSpeedMbps);
+    o.wanTierLabel = o.wanTierLabel || wanLabelFromMbps(o.maxWanSpeedMbps) + ' (for your plan)';
     // keep numeric wanTier for legacy sort/chips if needed
     o.wanTier = o.wanTier ?? wanNumericFromLabel(o.wanTierLabel);
 
@@ -175,7 +175,7 @@
 
     // device capacity/load (prefer provided buckets)
     o.deviceCapacity = num(o.deviceCapacity);
-    if (!o.deviceLoad) o.deviceLoad = capacityToLoad(o.deviceCapacity);
+    if (!o.deviceLoad) o.deviceLoad = capacityToLoad(o.deviceCapacity) + ' devices';
 
     // uses (multi-label aware)
     // primaryUses (array) optional; primaryUse (string) for chips/back-compat
@@ -406,6 +406,13 @@
     order(opts.mesh, ['Mesh-ready','Standalone']);
     order(opts.wan, ['10G','5G','2.5G','≤1G']);
     order(opts.price, ['<150','150–299','300–599','600+']);
+
+    // Enhance labels for user-friendliness
+    opts.device = new Set([...opts.device].map(v => `${v} (e.g., ${v === '1–5' ? 'phone + laptop' : 'family with TVs and smart devices'})`));
+    opts.wan = new Set([...opts.wan].map(v => `${v} ${v === '≤1G' ? '(basic streaming)' : '(high-speed gaming/work)'}`));
+    opts.coverage = new Set([...opts.coverage].map(v => `${v} ${v === 'Apartment/Small' ? '(studio/1-bed)' : '(big house)'}`));
+    opts.price = new Set([...opts.price].map(v => `${v} ${v === '<150' ? '(budget)' : '(premium)'}`));
+
     return opts;
 
     function order(set, arr) {
@@ -816,6 +823,16 @@
       });
     }
     el.openFiltersHeader?.addEventListener('click', openDrawer);
+
+    // Wire search input
+    const searchInput = byId('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        state.filtered = state.data.filter(o => o.model.toLowerCase().includes(term) || o.brand.toLowerCase().includes(term));
+        onStateChanged({});
+      });
+    }
   }
 
   // ---------- Drawer (mobile filters) ----------
@@ -905,12 +922,12 @@
       return c;
     };
     const picks = [
-      ['Wi-Fi 7', () => state.facets.wifi.add('7')],
-      ['Mesh only', () => { state.facets.mesh.clear(); state.facets.mesh.add('Mesh-ready'); }],
-      ['2.5G+ WAN', () => { ['2.5G','5G','10G'].forEach(v => state.facets.wan.add(v)); }],
-      ['Budget', () => { state.facets.price.clear(); state.facets.price.add('<150'); }],
-      ['Gaming', () => state.facets.use.add('Gaming')],
-      ['WFH', () => state.facets.use.add('Work-From-Home')],
+      ['Best for Families', () => { state.facets.use.add('Family Streaming'); state.facets.device.add('16–30'); }],
+      ['Budget-Friendly', () => state.facets.price.add('<150')],
+      ['Gaming Ready', () => { state.facets.use.add('Gaming'); state.facets.wan.add('2.5G'); }],
+      ['Whole-Home Wi-Fi', () => state.facets.mesh.add('Mesh-ready')],
+      ['Fast Internet', () => state.facets.wifi.add('7')],
+      ['Work from Home', () => state.facets.use.add('Work-From-Home')],
     ];
     el.quickChips.innerHTML = '';
     el.emptyQuickChips.innerHTML = '';
@@ -960,6 +977,21 @@
     el.editQuiz?.removeAttribute('hidden');
   };
   el.editQuiz?.addEventListener('click', () => document.dispatchEvent(new CustomEvent('quiz:edit')));
+
+  // New: Quiz progress
+  document.addEventListener('quiz:open', () => {
+    const steps = $$('.q-group', byId('quizForm')).length;
+    const stepEl = byId('quizStep');
+    // Simple progress: Update on change (or use tabs for multi-step if complex)
+    $$('select, input', byId('quizForm')).forEach(el => el.addEventListener('change', () => {
+      let current = 1;
+      $$('.q-group').forEach((g, i) => { if (g.querySelector('select, input:checked').value) current = i + 2; });
+      stepEl.textContent = Math.min(current, steps);
+    }));
+  });
+
+  // Updated emptyState: Add quiz button
+  el.emptyState.innerHTML += `<button class="btn primary" onclick="byId('openQuiz').click()">Try Our Quiz for Suggestions</button>`;
 
   // ---------- Lifecycle ----------
   async function init() {
