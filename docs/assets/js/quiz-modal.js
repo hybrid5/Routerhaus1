@@ -26,6 +26,9 @@
   const meshHint  = document.getElementById('meshHint');      // text node for helper hint
   const cancelBtn = document.getElementById('quizCancel');    // button
 
+  // New: Progress element
+  const stepEl = document.getElementById('quizStep');
+
   let lastOpener = null;
   const LS_KEY = 'rh.quiz.answers';
 
@@ -38,6 +41,7 @@
     queueMicrotask(() => firstFocusable(dlg)?.focus());
     attachTrap();
     updateMeshHint();
+    updateProgress(); // New: Update progress on open
   }
   function closeModal() {
     detachTrap();
@@ -62,7 +66,7 @@
   cancelBtn?.addEventListener('click', closeModal);
   dlg.querySelectorAll('.modal-close,.quiz-close').forEach(b => b.addEventListener('click', closeModal));
 
-  // ---------- Focus Trap ----------
+  // ---------- Focus Trap (enhanced for better a11y) ----------
   let trapHandler = null;
   function attachTrap() {
     trapHandler = (e) => {
@@ -73,9 +77,9 @@
       const idx = items.indexOf(document.activeElement);
       const last = items.length - 1;
       if (e.shiftKey) {
-        if (idx <= 0) { e.preventDefault(); items[last].focus(); }
+        if (idx <= 0 || idx === -1) { e.preventDefault(); items[last].focus(); }
       } else {
-        if (idx === last) { e.preventDefault(); items[0].focus(); }
+        if (idx === last || idx === -1) { e.preventDefault(); items[0].focus(); }
       }
     };
     document.addEventListener('keydown', trapHandler, true);
@@ -135,7 +139,25 @@
   selCoverage?.addEventListener('change', updateMeshHint);
   meshAuto?.addEventListener('change', updateMeshHint);
 
-  // ---------- Submit -> kits.js ----------
+  // New: Dynamic progress update
+  function updateProgress() {
+    if (!stepEl) return;
+    const groups = $$('.q-group', form);
+    const steps = groups.length;
+    let current = 0;
+    groups.forEach(g => {
+      const inputs = g.querySelectorAll('select, input:checked');
+      if (inputs.length > 0 && Array.from(inputs).some(inp => inp.value)) current++;
+    });
+    stepEl.textContent = current;
+    // Optionally: stepEl.textContent = `${current}/${steps}`;
+  }
+
+  // Event listeners for progress
+  form?.addEventListener('input', updateProgress);
+  form?.addEventListener('change', updateProgress);
+
+  // ---------- Submit -> kits.js (with improved validation) ----------
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -144,9 +166,11 @@
     const devices  = selDevices?.value  || '';
     const use      = selUse?.value      || '';
 
-    // Validate required trio
-    const missing = !coverage ? selCoverage : !devices ? selDevices : !use ? selUse : null;
-    if (missing) { missing.focus(); return; }
+    // Validate required trio with visual feedback
+    [selCoverage, selDevices, selUse].forEach(el => el?.classList.remove('error'));
+    if (!coverage) { selCoverage?.classList.add('error'); selCoverage?.focus(); return; }
+    if (!devices) { selDevices?.classList.add('error'); selDevices?.focus(); return; }
+    if (!use) { selUse?.classList.add('error'); selUse?.focus(); return; }
 
     // Optional fields
     const access = selAccess?.value || '';
@@ -195,4 +219,14 @@
 
   // External reopen (from kits.js)
   document.addEventListener('quiz:edit', () => openModal(editBtn || openBtn));
+
+  // A11y enhancements: Add aria-describedby to fieldset legends if hints present
+  $$('.q-group').forEach(group => {
+    const legend = group.querySelector('legend');
+    const hint = group.querySelector('.hint');
+    if (legend && hint) {
+      hint.id = hint.id || `hint-${group.id || Math.random().toString(36).slice(2)}`;
+      legend.setAttribute('aria-describedby', hint.id);
+    }
+  });
 })();
