@@ -8,9 +8,10 @@
  *
  * Enhancements:
  * - Command bar condensation on scroll
- * - Powerful search (tokenized; brand/model/uses/tech terms)
- * - Search hotkeys: "/" or "Ctrl/Cmd+K" to focus, "Esc" to clear
+ * - Powerful search (tokenized; brand/model/uses/tech terms; normalized no-punct)
+ * - Search hotkeys: "/" or "Ctrl/Cmd+K" to focus, "Enter" to apply now, "Esc" to clear
  * - Optional clear button when input sits inside .search wrapper
+ * - Works with header.html (open/edit quiz in header)
  */
 
 (() => {
@@ -18,9 +19,7 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const byId = (id) => document.getElementById(id);
-  const debounce = (fn, d = 200) => {
-    let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, a), d); };
-  };
+  const debounce = (fn, d = 200) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, a), d); }; };
   const qs = new URLSearchParams(location.search);
   const LS = {
     get: (k, d = null) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
@@ -30,6 +29,7 @@
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const fmtMoney = (v) => (v == null || Number(v) === 0 ? '' : `$${Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 })}`);
   const uniq = (arr) => Array.from(new Set(arr.filter(Boolean)));
+  const nopunct = (s) => String(s || '').toLowerCase().replace(/[\W_]+/g, ''); // normalize for fuzzy inclusion
 
   // ---------- State ----------
   const state = {
@@ -42,12 +42,12 @@
     page: Math.max(1, Number(qs.get('page')) || 1),
     pageSize: Number(qs.get('ps')) || 12,
     compare: new Set(),
-    quiz: null,                 // { coverage, devices, use }
+    quiz: null,                 // { coverage, devices, use, ... }
     showRecos: (qs.get('recos') ?? '1') !== '0',
     search: qs.get('q')?.trim().toLowerCase() || '',
   };
 
-  // ---------- Elements ----------
+  // ---------- Elements (note: some live in header.html and mount later) ----------
   const el = {
     headerMount: byId('header-placeholder'),
     footerMount: byId('footer-placeholder'),
@@ -92,8 +92,7 @@
 
     openFiltersHeader: byId('openFiltersHeader'),
 
-    openQuiz: byId('openQuiz'),
-    editQuiz: byId('editQuiz'),
+    // Note: openQuiz/editQuiz live in header.html; don't cache now, query when needed
     copyLink: byId('copyLink'),
     resetAll: byId('resetAll'),
 
@@ -234,10 +233,7 @@
     return o;
   }
 
-  const num = (v) => {
-    const n = Number(v);
-    return Number.isFinite(n) && n >= 0 ? n : 0;
-  };
+  const num = (v) => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? n : 0; };
   const guessBrand = (m) => (m || '').split(' ')[0] || 'Unknown';
   const normWifi = (w) => {
     const s = String(w).toUpperCase().replace(/\s+/g, '');
@@ -517,19 +513,24 @@
     const term = state.search;
 
     const out = state.data.filter(o => {
-      // Text search (brand/model/uses/tech); tokenized AND
+      // Text search (brand/model/uses/tech); tokenized AND; normalized too
       if (term) {
-        const hay = [
+        const hayRaw = [
           o.brand, o.model,
-          'wifi', o.wifiStandard,  // allow "wifi 7" / "wifi7"
+          'wifi', `wifi-${o.wifiStandard}`, `wifi ${o.wifiStandard}`, `wifi${o.wifiStandard}`,
+          o.wifiStandard,
           o.wanTierLabel,
+          o.meshReady ? 'mesh mesh-ready' : 'standalone non-mesh',
           ...(o.primaryUses || []),
           ...(o.applicablePrimaryUses || []),
           ...(o.useTags || []),
         ].join(' ').toLowerCase();
+
+        const hayComp = nopunct(hayRaw);
         const tokens = term.split(/\s+/).filter(Boolean);
         for (const t of tokens) {
-          if (!hay.includes(t)) return false;
+          const tComp = nopunct(t);
+          if (!(hayRaw.includes(t) || hayComp.includes(tComp))) return false;
         }
       }
 
@@ -911,18 +912,20 @@
     wireCommandBarCondense();
   }
 
-  // Search bar UX: focus hotkeys, clear button, debounced filtering
+  // Search bar UX: focus hotkeys, clear button, debounced filtering, Search button, Enter apply
   function wireSearch() {
-    const input = byId('searchInput');
+    const input = byId('searchInput');   // lives in header.html
+    const btn   = byId('searchBtn');     // lives in header.html
     if (!input) return;
 
     // If wrapped in .search, inject a clear button (optional)
     const wrap = input.closest('.search');
     let clearBtn = null;
-    if (wrap) {
+    if (wrap && !wrap.querySelector('[data-clear]')) {
       clearBtn = document.createElement('button');
       clearBtn.type = 'button';
       clearBtn.className = 'icon-btn';
+      clearBtn.setAttribute('data-clear', '');
       clearBtn.setAttribute('aria-label', 'Clear search');
       clearBtn.textContent = '✕';
       clearBtn.style.marginLeft = '8px';
@@ -934,35 +937,46 @@
         input.value = '';
         state.search = '';
         state.page = 1;
-        onStateChanged({});
+        onStateChanged({ scrollToTop: true });
         input.focus();
       });
     }
 
+    // Initial value from URL
     input.value = state.search;
 
-    const onType = debounce((e) => {
-      state.search = (e.target.value || '').trim().toLowerCase();
+    const applySearch = () => {
+      state.search = (input.value || '').trim().toLowerCase();
       state.page = 1;
-      onStateChanged({});
-    }, 220);
+      onStateChanged({ scrollToTop: true });
+    };
+
+    const onType = debounce(() => applySearch(), 220);
     input.addEventListener('input', onType);
 
-    // Keyboard: "/" or Ctrl/Cmd+K focuses; Enter just applies (already applied); Esc clears
+    // Enter submits immediately (no debounce)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); applySearch(); }
+      if (e.key === 'Escape' && input.value) {
+        e.preventDefault();
+        input.value = '';
+        applySearch();
+      }
+    });
+
+    // Search button click
+    if (btn) btn.addEventListener('click', applySearch);
+
+    // Keyboard: "/" or Ctrl/Cmd+K focuses the input globally
     document.addEventListener('keydown', (e) => {
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      const typingField = tag === 'input' || tag === 'textarea' || tag === 'select' || document.activeElement?.isContentEditable;
       const modK = (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey));
-      if (modK || (e.key === '/' && !/input|textarea|select/i.test(document.activeElement?.tagName || ''))) {
+      if (typingField && !modK) return;
+      if (modK || e.key === '/') {
         e.preventDefault();
         input.focus();
         input.select();
-      }
-    });
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && input.value) {
-        input.value = '';
-        state.search = '';
-        state.page = 1;
-        onStateChanged({});
       }
     });
   }
@@ -1111,7 +1125,7 @@
 
   // ---------- Quiz wiring ----------
   window.RH_APPLY_QUIZ = (answers) => {
-    // answers: { coverage, devices, use }
+    // answers: { coverage, devices, use, ... }
     state.quiz = answers;
     if (answers.coverage) { state.facets.coverage.clear(); state.facets.coverage.add(answers.coverage); }
     if (answers.devices)  { state.facets.device.clear(); state.facets.device.add(answers.devices); }
@@ -1119,37 +1133,40 @@
     state.showRecos = true;
     if (el.toggleRecos) el.toggleRecos.checked = true;
     onStateChanged({ scrollToRecos: true });
-    el.editQuiz?.removeAttribute('hidden');
+
+    // Unhide Edit button in header if present (header mounts asynchronously)
+    const editBtn = byId('editQuiz');
+    if (editBtn) editBtn.removeAttribute('hidden');
   };
-  el.editQuiz?.addEventListener('click', () => document.dispatchEvent(new CustomEvent('quiz:edit')));
+  // Note: quiz-modal.js uses delegated clicks for #editQuiz / #openQuiz, so no listener needed here.
 
-  // Quiz progress (plain JS, no TS casts)
-  document.addEventListener('quiz:open', () => {
-    const form = byId('quizForm');
-    if (!form) return;
-    const steps = $$('.q-group', form).length || 1;
-    const stepEl = byId('quizStep');
-
-    const update = () => {
-      let current = 1;
-      $$('.q-group', form).forEach((g, i) => {
-        const c = g.querySelector('select, input:checked');
-        if (c && c.value) current = i + 2;
-      });
-      if (stepEl) stepEl.textContent = String(Math.min(current, steps));
-    };
-
-    $$('.q-group select, .q-group input', form).forEach(el => el.addEventListener('change', update));
-    update();
-  });
-
-  // Updated emptyState: Add quiz button
-  el.emptyState.innerHTML += `<button class="btn primary" onclick="byId('openQuiz').click()">Try Our Quiz for Suggestions</button>`;
+  // ---------- Empty-state quiz button (delegated by quiz-modal.js) ----------
+  (function ensureEmptyQuizButton() {
+    if (!el.emptyState) return;
+    if (el.emptyState.querySelector('[data-open-quiz]')) return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn primary';
+    b.setAttribute('data-open-quiz', '');
+    b.textContent = 'Try Our Quiz for Suggestions';
+    el.emptyState.appendChild(b);
+  })();
 
   // ---------- Lifecycle ----------
   async function init() {
+    // 1) Mount header/footer so header controls exist before wiring
     await Promise.all([mountPartial(el.headerMount), mountPartial(el.footerMount)]);
 
+    // 2) Handle quiz deep-link AFTER header exists
+    const params = new URLSearchParams(location.search);
+    if (params.get('quiz') === '1') {
+      // Click header's Find a Kit button if present, else dispatch event quiz:open
+      const opener = byId('openQuiz') || $('[data-open-quiz]');
+      if (opener) opener.click();
+      else document.dispatchEvent(new CustomEvent('quiz:open'));
+    }
+
+    // 3) Show skeletons while we load
     renderSkeletons(12);
 
     try {
@@ -1208,12 +1225,6 @@
     if (opts?.scrollToTop) window.scrollTo({ top: 0, behavior: 'smooth' });
     if (opts?.scrollToRecos) el.recommendations?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-
-  // Quiz deep link
-  document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('quiz') === '1') byId('openQuiz')?.click();
-  });
 
   // Start
   document.addEventListener('DOMContentLoaded', init);
