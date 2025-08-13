@@ -1,7 +1,10 @@
 /* assets/js/kits.js
  * RouterHaus Kits — App logic (client-side)
- * Optimized for enriched JSON (primaryUses, wanTierLabel, fitBullets, chipsOverride)
- * Robust data load + URL sync, facets, sorting, pagination, chips, compare, recos, a11y.
+ * Schema-aware for enriched JSON:
+ * - reviewCount, rating
+ * - applicableDeviceLoads, applicableCoverageBuckets, applicableWanTiers, applicablePrimaryUses
+ * - chipsOverride, fitBullets, updatedAt
+ * Robust data load + URL sync, facets, inclusive filtering, sorting, pagination, chips, compare, recos, a11y.
  */
 
 (() => {
@@ -9,6 +12,9 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const byId = (id) => document.getElementById(id);
+  const debounce = (fn, d = 200) => {
+    let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, a), d); };
+  };
   const qs = new URLSearchParams(location.search);
   const LS = {
     get: (k, d = null) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
@@ -17,13 +23,14 @@
   };
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const fmtMoney = (v) => (v == null || Number(v) === 0 ? '' : `$${Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 })}`);
+  const uniq = (arr) => Array.from(new Set(arr.filter(Boolean)));
 
   // ---------- State ----------
   const state = {
     data: [],
     filtered: [],
-    facets: {},                 // facetKey -> Set(selected values)
-    facetDefs: {},              // facetKey -> { id, label, el, badge, getValues(item), map? }
+    facets: {},                 // facetKey -> Set(selected raw values)
+    facetDefs: {},              // facetKey -> { id, label, el, badge, getValues(item), map?, order? }
     openDetails: LS.get('rh.details', {}), // facetKey -> boolean
     sort: qs.get('sort') || 'relevance',
     page: Math.max(1, Number(qs.get('page')) || 1),
@@ -31,6 +38,7 @@
     compare: new Set(),
     quiz: null,                 // { coverage, devices, use }
     showRecos: (qs.get('recos') ?? '1') !== '0',
+    search: qs.get('q')?.trim().toLowerCase() || '',
   };
 
   // ---------- Elements ----------
@@ -70,6 +78,7 @@
     emptyState: byId('emptyState'),
 
     filtersFab: byId('filtersFab'),
+    activeCountBadge: byId('activeCount'),
     filtersDrawer: byId('filtersDrawer'),
     drawerTitle: byId('drawerTitle'),
     drawerFormMount: byId('drawerFormMount'),
@@ -106,7 +115,7 @@
     facet_wifiGen: byId('facet-wifiGen'),
     facet_wifiBands: byId('facet-wifiBands'),
     facet_meshReady: byId('facet-meshReady'),
-    facet_meshEco: byId('facet-meshEco'),
+    facet_meshEco: byId('facet-meshEco'), // reserved
     facet_wanTier: byId('facet-wanTier'),
     facet_lanCount: byId('facet-lanCount'),
     facet_multiGigLan: byId('facet-multiGigLan'),
@@ -159,44 +168,55 @@
     // mesh, coverage
     o.meshReady = !!o.meshReady;
     o.coverageSqft = num(o.coverageSqft);
-    o.coverageBucket = o.coverageBucket || coverageToBucket(o.coverageSqft) + ' (examples added in UI)';
+    o.coverageBucket = o.coverageBucket || coverageToBucket(o.coverageSqft);
 
     // WAN tier (prefer label if provided)
     o.maxWanSpeedMbps = num(o.maxWanSpeedMbps);
-    o.wanTierLabel = o.wanTierLabel || wanLabelFromMbps(o.maxWanSpeedMbps) + ' (for your plan)';
-    // keep numeric wanTier for legacy sort/chips if needed
+    o.wanTierLabel = o.wanTierLabel || wanLabelFromMbps(o.maxWanSpeedMbps);
     o.wanTier = o.wanTier ?? wanNumericFromLabel(o.wanTierLabel);
 
     // ports
-    const lc = o.lanCount;
-    o.lanCount = Number.isFinite(lc) ? Number(lc) : null; // null -> unknown (hide)
+    o.lanCount = isFinite(o.lanCount) ? Number(o.lanCount) : null;
     o.multiGigLan = !!o.multiGigLan;
     o.usb = !!o.usb;
 
-    // device capacity/load (prefer provided buckets)
+    // device capacity/load
     o.deviceCapacity = num(o.deviceCapacity);
-    if (!o.deviceLoad) o.deviceLoad = capacityToLoad(o.deviceCapacity) + ' devices';
+    if (!o.deviceLoad) o.deviceLoad = capacityToLoad(o.deviceCapacity); // bucket text (e.g., "16–30")
 
-    // uses (multi-label aware)
-    // primaryUses (array) optional; primaryUse (string) for chips/back-compat
-    if (!Array.isArray(o.primaryUses)) {
-      o.primaryUses = o.primaryUse ? [String(o.primaryUse)] : [];
-    }
-    if (!o.primaryUse && o.primaryUses.length) {
-      // pick first as fallback
-      o.primaryUse = o.primaryUses[0];
-    }
+    // uses (primaryUse + primaryUses; keep array + best single)
+    if (!Array.isArray(o.primaryUses)) o.primaryUses = o.primaryUse ? [String(o.primaryUse)] : [];
+    if (!o.primaryUse && o.primaryUses.length) o.primaryUse = o.primaryUses[0];
     o.primaryUse = o.primaryUse || 'All-Purpose';
+
+    // applicable* (capability envelopes for inclusive matching)
+    o.applicableDeviceLoads = Array.isArray(o.applicableDeviceLoads) && o.applicableDeviceLoads.length
+      ? uniq(o.applicableDeviceLoads)
+      : uniq([o.deviceLoad]);
+    o.applicableCoverageBuckets = Array.isArray(o.applicableCoverageBuckets) && o.applicableCoverageBuckets.length
+      ? uniq(o.applicableCoverageBuckets)
+      : uniq([o.coverageBucket]);
+    o.applicableWanTiers = Array.isArray(o.applicableWanTiers) && o.applicableWanTiers.length
+      ? uniq(o.applicableWanTiers)
+      : uniq([o.wanTierLabel]);
+    o.applicablePrimaryUses = Array.isArray(o.applicablePrimaryUses) && o.applicablePrimaryUses.length
+      ? uniq(o.applicablePrimaryUses.concat(o.primaryUses))
+      : uniq(o.primaryUses);
 
     // access & price
     o.accessSupport = Array.isArray(o.accessSupport) && o.accessSupport.length ? o.accessSupport : ['Cable', 'Fiber'];
     o.priceUsd = num(o.priceUsd);
     o.priceBucket = o.priceBucket || priceToBucket(o.priceUsd);
 
+    // reviews / rating (normalize field names)
+    o.reviewCount = num(o.reviewCount ?? o.reviews);
+    o.reviews = o.reviewCount; // maintain legacy key used by sorts
+    o.rating = Number.isFinite(Number(o.rating)) ? Number(o.rating) : 0;
+
     // misc
-    o.reviews = num(o.reviews);
-    o.img = o.img || o.image || '';
+    o.img = typeof o.img === 'string' ? o.img : (o.image || '');
     o.url = typeof o.url === 'string' ? o.url : '';
+    o.updatedAt = o.updatedAt || '';
 
     // relevance score (cheap)
     o._score =
@@ -214,16 +234,16 @@
   };
   const guessBrand = (m) => (m || '').split(' ')[0] || 'Unknown';
   const normWifi = (w) => {
-    const s = String(w).toUpperCase().replace('WIFI','WI-FI').replace('WI-FI ','').replace('WIFI ','');
-    if (/7/.test(s)) return '7';
-    if (/6E/.test(s)) return '6E';
-    if (/6/.test(s)) return '6';
-    if (/5/.test(s)) return '5';
+    const s = String(w).toUpperCase().replace(/\s+/g, '');
+    if (s.includes('7')) return '7';
+    if (s.includes('6E')) return '6E';
+    if (s.includes('6')) return '6';
+    if (s.includes('5')) return '5';
     return '6';
   };
   const guessBands = (wifiStandard) => (/6E|7/.test(String(wifiStandard)) ? ['2.4','5','6'] : ['2.4','5']);
 
-  // Coverage bucket: empty string when unknown (so facets don’t get junk)
+  // Coverage bucket: empty string when unknown
   const coverageToBucket = (sq) => {
     if (!sq) return '';
     if (sq < 1800) return 'Apartment/Small';
@@ -279,6 +299,7 @@
     if (state.page > 1) qs2.set('page', String(state.page));
     if (state.pageSize !== 12) qs2.set('ps', String(state.pageSize));
     if (!state.showRecos) qs2.set('recos', '0');
+    if (state.search) qs2.set('q', state.search);
     // facets
     for (const [k, vals] of Object.entries(state.facets)) {
       if (vals.size) qs2.set(k, [...vals].join(','));
@@ -296,6 +317,7 @@
         el: el.facet_brand,
         badge: el.badge_brand,
         getValues: (o) => [o.brand].filter(Boolean),
+        order: null,
       },
       wifi: {
         id: 'wifi',
@@ -303,12 +325,14 @@
         el: el.facet_wifiGen,
         badge: el.badge_wifi,
         getValues: (o) => [o.wifiStandard].filter(Boolean),
+        order: ['7','6E','6','5'],
       },
       bands: {
         id: 'bands',
         label: 'Bands',
         el: el.facet_wifiBands,
         getValues: (o) => Array.isArray(o.wifiBands) ? o.wifiBands.filter(Boolean) : [],
+        order: ['2.4','5','6'],
       },
       mesh: {
         id: 'mesh',
@@ -319,60 +343,75 @@
         map: {
           'Mesh-ready': (o) => !!o.meshReady,
           'Standalone':  (o) => !o.meshReady,
-        }
+        },
+        order: ['Mesh-ready','Standalone'],
       },
       wan: {
         id: 'wan',
         label: 'WAN Tier',
         el: el.facet_wanTier,
         badge: el.badge_wan,
-        getValues: (o) => [o.wanTierLabel || wanLabelFromMbps(o.maxWanSpeedMbps)].filter(Boolean),
+        // Inclusive: use applicableWanTiers if present
+        getValues: (o) => (Array.isArray(o.applicableWanTiers) && o.applicableWanTiers.length
+          ? o.applicableWanTiers : [o.wanTierLabel].filter(Boolean)),
+        order: ['10G','5G','2.5G','≤1G'],
       },
       lanCount: {
         id: 'lanCount',
         label: 'LAN Ports',
         el: el.facet_lanCount,
         getValues: (o) => Number.isFinite(o.lanCount) ? [String(o.lanCount)] : [],
+        order: null,
       },
       multiGigLan: {
         id: 'multiGigLan',
         label: 'Multi-Gig LAN',
         el: el.facet_multiGigLan,
         getValues: (o) => [o.multiGigLan ? 'Yes' : 'No'],
+        order: ['Yes','No'],
       },
       usb: {
         id: 'usb',
         label: 'USB',
         el: el.facet_usb,
         getValues: (o) => [o.usb ? 'Yes' : 'No'],
+        order: ['Yes','No'],
       },
       coverage: {
         id: 'coverage',
         label: 'Coverage',
         el: el.facet_coverageBucket,
         badge: el.badge_cov,
-        getValues: (o) => [o.coverageBucket].filter(Boolean),
+        // Inclusive: applicableCoverageBuckets if present
+        getValues: (o) => (Array.isArray(o.applicableCoverageBuckets) && o.applicableCoverageBuckets.length
+          ? o.applicableCoverageBuckets : [o.coverageBucket].filter(Boolean)),
+        order: ['Apartment/Small','2–3 Bedroom','Large/Multi-floor'],
       },
       device: {
         id: 'device',
         label: 'Device Load',
         el: el.facet_deviceLoad,
         badge: el.badge_dev,
-        getValues: (o) => [o.deviceLoad].filter(Boolean),
+        // Inclusive: applicableDeviceLoads if present
+        getValues: (o) => (Array.isArray(o.applicableDeviceLoads) && o.applicableDeviceLoads.length
+          ? o.applicableDeviceLoads : [o.deviceLoad].filter(Boolean)),
+        order: ['1–5','6–15','16–30','31–60','61–100','100+'],
       },
       use: {
         id: 'use',
         label: 'Primary Use',
         el: el.facet_primaryUse,
         badge: el.badge_use,
-        // Prefer multi-label primaryUses, fallback to single primaryUse
-        getValues: (o) => Array.isArray(o.primaryUses) && o.primaryUses.length ? o.primaryUses : [o.primaryUse].filter(Boolean),
+        // Union: primaryUses ∪ applicablePrimaryUses
+        getValues: (o) => uniq([...(o.primaryUses || []), ...(o.applicablePrimaryUses || []), o.primaryUse]).filter(Boolean),
+        order: null,
       },
       access: {
         id: 'access',
         label: 'Access',
         el: el.facet_access,
         getValues: (o) => Array.isArray(o.accessSupport) ? o.accessSupport.filter(Boolean) : [],
+        order: ['Cable','Fiber','FixedWireless5G','Satellite','DSL'],
       },
       price: {
         id: 'price',
@@ -380,6 +419,7 @@
         el: el.facet_priceBucket,
         badge: el.badge_price,
         getValues: (o) => [o.priceBucket].filter(Boolean).filter(x => x !== 'N/A'),
+        order: ['<150','150–299','300–599','600+'],
       },
     };
 
@@ -390,61 +430,59 @@
     }
   }
 
+  // Build facet option lists (raw values only; display text handled separately)
   function facetOptionsFromData() {
-    const opts = {};
-    for (const key of Object.keys(state.facetDefs)) opts[key] = new Set();
+    const setmap = {};
+    for (const key of Object.keys(state.facetDefs)) setmap[key] = new Set();
     for (const o of state.data) {
       for (const [key, def] of Object.entries(state.facetDefs)) {
         def.getValues(o).forEach(v => {
           const s = String(v || '').trim();
-          if (s) opts[key].add(s);
+          if (s) setmap[key].add(s);
         });
       }
     }
-    // curated orders
-    order(opts.wifi, ['7','6E','6','5']);
-    order(opts.mesh, ['Mesh-ready','Standalone']);
-    order(opts.wan, ['10G','5G','2.5G','≤1G']);
-    order(opts.price, ['<150','150–299','300–599','600+']);
 
-    // Enhance labels for user-friendliness
-    opts.device = new Set([...opts.device].map(v => `${v} (e.g., ${v === '1–5' ? 'phone + laptop' : 'family with TVs and smart devices'})`));
-    opts.wan = new Set([...opts.wan].map(v => `${v} ${v === '≤1G' ? '(basic streaming)' : '(high-speed gaming/work)'}`));
-    opts.coverage = new Set([...opts.coverage].map(v => `${v} ${v === 'Apartment/Small' ? '(studio/1-bed)' : '(big house)'}`));
-    opts.price = new Set([...opts.price].map(v => `${v} ${v === '<150' ? '(budget)' : '(premium)'}`));
-
-    return opts;
-
-    function order(set, arr) {
-      if (!set) return;
-      const ordered = new Set(arr.filter(x => set.has(x)));
-      [...set].forEach(x => { if (!ordered.has(x)) ordered.add(x); });
-      // replace
-      const k = Object.keys(opts).find(k0 => opts[k0] === set);
-      if (k) opts[k] = ordered;
+    // Order each facet per curated order if defined
+    const opts = {};
+    for (const [key, def] of Object.entries(state.facetDefs)) {
+      const values = [...setmap[key]];
+      if (def.order) {
+        const ordered = def.order.filter(v => setmap[key].has(v));
+        for (const v of values) if (!ordered.includes(v)) ordered.push(v);
+        opts[key] = ordered.map(v => ({ value: v, label: v }));
+      } else {
+        opts[key] = values.map(v => ({ value: v, label: v }));
+      }
     }
+    return opts;
   }
 
-  function renderFacet(def, values) {
+  function renderFacet(def, options) {
     if (!def.el) return;
     const selected = state.facets[def.id];
     def.el.innerHTML = '';
-    for (const v of values) {
-      const id = `f_${def.id}_${v.replace(/\W+/g,'')}`;
+
+    for (const opt of options) {
+      const raw = typeof opt === 'string' ? opt : opt.value;
+      const labelText = typeof opt === 'string' ? opt : opt.label;
+      const id = `f_${def.id}_${raw.replace(/\W+/g,'')}`;
+
       const label = document.createElement('label');
       label.innerHTML = `
-        <input type="checkbox" id="${id}" value="${v}">
-        <span>${v}</span>
+        <input type="checkbox" id="${id}" value="${raw}">
+        <span>${labelText}</span>
       `;
       const input = label.querySelector('input');
-      input.checked = selected.has(v);
+      input.checked = selected.has(raw);
       input.addEventListener('change', () => {
-        if (input.checked) selected.add(v); else selected.delete(v);
+        if (input.checked) selected.add(raw); else selected.delete(raw);
         state.page = 1;
         onStateChanged({ focusAfter: label });
       });
       def.el.appendChild(label);
     }
+
     // update badge
     if (def.badge) {
       const n = selected.size;
@@ -456,34 +494,47 @@
   function renderAllFacets() {
     const opts = facetOptionsFromData();
     for (const [key, def] of Object.entries(state.facetDefs)) {
-      renderFacet(def, opts[key] ? [...opts[key]] : []);
-      // persist open/closed
+      renderFacet(def, opts[key] || []);
       const details = document.querySelector(`details.facet[data-facet="${key}"]`);
       if (details && typeof state.openDetails[key] === 'boolean') details.open = state.openDetails[key];
       details?.addEventListener('toggle', () => {
         state.openDetails[key] = details.open;
         LS.set('rh.details', state.openDetails);
-      }, { once: true });
+      }); // persist on every toggle (no {once:true})
     }
   }
 
-  // ---------- Filtering ----------
+  // ---------- Filtering (facet + search; inclusive with applicable* arrays) ----------
   function applyFilters() {
     const selected = state.facets;
-    const activeAny = Object.values(selected).some(s => s.size);
+    const anyFacet = Object.values(selected).some(s => s.size);
+    const term = state.search;
 
     const out = state.data.filter(o => {
+      // Text search (brand/model/uses)
+      if (term) {
+        const hay = [
+          o.brand, o.model,
+          ...(o.primaryUses || []),
+          ...(o.applicablePrimaryUses || []),
+          ...(o.useTags || [])
+        ].join(' ').toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+
+      // Facet constraints
       for (const [key, def] of Object.entries(state.facetDefs)) {
         const sel = selected[key];
         if (!sel || sel.size === 0) continue;
 
-        // support boolean maps (mesh)
         if (def.map) {
+          // boolean map (mesh)
           const any = [...sel].some(v => !!def.map[v]?.(o));
           if (!any) return false;
           continue;
         }
 
+        // Raw values emitted by def.getValues (inclusive-ready)
         const vals = new Set(def.getValues(o).map(String));
         let any = false;
         for (const v of sel) { if (vals.has(v)) { any = true; break; } }
@@ -493,7 +544,7 @@
     });
 
     state.filtered = out;
-    el.emptyState.classList.toggle('hide', !(activeAny && out.length === 0));
+    el.emptyState.classList.toggle('hide', !(anyFacet && out.length === 0));
     return out;
   }
 
@@ -506,12 +557,12 @@
     'coverage-desc': (a, b) => (b.coverageSqft - a.coverageSqft) || cmpPriceAsc(a, b),
     'wan-desc': (a, b) => (wanRank(b) - wanRank(a)) || cmpPriceAsc(a, b),
     'reviews-desc': (a, b) => (b.reviews - a.reviews) || cmpPriceAsc(a, b),
+    'rating-desc': (a, b) => (b.rating - a.rating) || (b.reviews - a.reviews) || cmpPriceAsc(a, b),
   };
   function cmpPriceAsc(a, b) { return (a.priceUsd || Infinity) - (b.priceUsd || Infinity); }
   function rankWifi(o) { return o.wifiStandard === '7' ? 4 : o.wifiStandard === '6E' ? 3 : o.wifiStandard === '6' ? 2 : 1; }
 
   function sortResults() {
-    (comparators[state.sort] || comparators.relevance)(state.filtered[0] || {}, state.filtered[0] || {}); // ensure fn exists
     state.filtered.sort(comparators[state.sort] || comparators.relevance);
   }
 
@@ -616,6 +667,9 @@
       }
     }
     el.activeChips.style.display = any ? '' : 'none';
+    // Update mobile FAB badge
+    const activeCount = Object.values(state.facets).reduce((n, s) => n + (s?.size || 0), 0);
+    if (el.activeCountBadge) el.activeCountBadge.textContent = String(activeCount);
   }
 
   // Esc removes something (last non-empty facet)
@@ -690,16 +744,24 @@
   });
 
   // ---------- Recommendations ----------
+  function quizMatch(o, q) {
+    // Inclusive matching using applicable* if available
+    const covOK = !q.coverage || (o.applicableCoverageBuckets || [o.coverageBucket]).includes(q.coverage);
+    const devOK = !q.devices  || (o.applicableDeviceLoads || [o.deviceLoad]).includes(q.devices);
+    const useOK = !q.use      || (uniq([...(o.primaryUses||[]), ...(o.applicablePrimaryUses||[]), o.primaryUse])).includes(q.use);
+    return covOK && devOK && useOK;
+  }
+
   function computeRecommendations() {
-    if (!state.quiz) return [];
-    const { coverage, devices, use } = state.quiz;
+    if (!state.quiz) return state.data
+      .slice()
+      .sort((a,b) => (rankWifi(b)-rankWifi(a)) || (wanRank(b)-wanRank(a)) || (b._score-a._score))
+      .slice(0,8);
+
+    const q = state.quiz;
     return state.data
-      .filter(o => (
-        (!coverage || o.coverageBucket === coverage) &&
-        (!devices || o.deviceLoad === devices) &&
-        (!use || (Array.isArray(o.primaryUses) ? o.primaryUses.includes(use) : o.primaryUse === use))
-      ))
-      .sort((a,b) => (rankWifi(b) - rankWifi(a)) || (b._score - a._score))
+      .filter(o => quizMatch(o, q))
+      .sort((a,b) => (rankWifi(b)-rankWifi(a)) || (wanRank(b)-wanRank(a)) || (b._score-a._score))
       .slice(0, 8);
   }
 
@@ -748,7 +810,6 @@
           wanChip(o) || null
         ].filter(Boolean);
     chipTexts.forEach(t => chips.appendChild(chip(t)));
-    // Add coverage chip if we still have room and have value
     if (chipTexts.length < 3 && o.coverageBucket) chips.appendChild(chip(o.coverageBucket));
 
     // Friendlier bullets first (fallback to builder)
@@ -761,7 +822,7 @@
     // Price + CTA
     node.querySelector('.price').textContent = fmtMoney(o.priceUsd);
     const buy = node.querySelector('.ctaRow a');
-    if (o.url) { buy.href = o.url; buy.removeAttribute('aria-disabled'); buy.classList.remove('disabled'); }
+    if (o.url) { buy.href = o.url; buy.removeAttribute('aria-disabled'); buy.classList.remove('disabled'); buy.textContent = 'Buy'; }
     else { buy.href = '#'; buy.setAttribute('aria-disabled','true'); buy.classList.add('disabled'); buy.textContent = 'Details'; }
 
     // Compare toggle
@@ -789,7 +850,6 @@
     if (l) out.push(`Internet: ${l === '≤1G' ? 'up to 1 Gbps' : l + 'bps'}`);
     if (o.primaryUse) out.push(`Best for: ${o.primaryUse}`);
 
-    // sensible fallbacks if thin
     if (out.length < 3 && Array.isArray(o.wifiBands) && o.wifiBands.length) out.push(`${o.wifiBands.join(' / ')} GHz`);
     if (out.length < 3 && o.multiGigLan) out.push('Multi-Gig LAN');
     if (out.length < 3 && Number.isFinite(o.lanCount)) out.push(`${o.lanCount} LAN ports`);
@@ -823,15 +883,21 @@
       });
     }
     el.openFiltersHeader?.addEventListener('click', openDrawer);
+    el.filtersFab?.addEventListener('click', () => {
+      openDrawer();
+      el.filtersFab.setAttribute('aria-expanded', 'true');
+    });
 
-    // Wire search input
+    // Wire search input (debounced; participates in facet filtering)
     const searchInput = byId('searchInput');
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        state.filtered = state.data.filter(o => o.model.toLowerCase().includes(term) || o.brand.toLowerCase().includes(term));
+      searchInput.value = state.search;
+      const onType = debounce((e) => {
+        state.search = (e.target.value || '').trim().toLowerCase();
+        state.page = 1;
         onStateChanged({});
-      });
+      }, 220);
+      searchInput.addEventListener('input', onType);
     }
   }
 
@@ -862,6 +928,7 @@
   }
   function closeDrawer() {
     el.filtersDrawer.setAttribute('aria-hidden', 'true');
+    el.filtersFab?.setAttribute('aria-expanded', 'false');
     document.documentElement.classList.remove('scroll-lock');
   }
 
@@ -932,10 +999,8 @@
     el.quickChips.innerHTML = '';
     el.emptyQuickChips.innerHTML = '';
     for (const [l, fn] of picks) {
-      const b = make(l, fn);
-      el.quickChips.appendChild(b.cloneNode(true));
-      const b2 = make(l, fn);
-      el.emptyQuickChips.appendChild(b2);
+      const b1 = make(l, fn); el.quickChips.appendChild(b1);
+      const b2 = make(l, fn); el.emptyQuickChips.appendChild(b2);
     }
   }
 
@@ -956,8 +1021,10 @@
     state.pageSize = 12;
     state.showRecos = true;
     state.quiz = null;
+    state.search = '';
     state.compare.clear();
     $$('input[type="checkbox"]', el.filtersForm).forEach(i => { i.checked = false; });
+    const searchInput = byId('searchInput'); if (searchInput) searchInput.value = '';
     if (el.sortSelect) el.sortSelect.value = state.sort;
     if (el.pageSizeSelect) el.pageSizeSelect.value = String(state.pageSize);
     if (el.toggleRecos) el.toggleRecos.checked = state.showRecos;
@@ -978,15 +1045,14 @@
   };
   el.editQuiz?.addEventListener('click', () => document.dispatchEvent(new CustomEvent('quiz:edit')));
 
-  // New: Quiz progress
+  // New: Quiz progress (lightweight)
   document.addEventListener('quiz:open', () => {
     const steps = $$('.q-group', byId('quizForm')).length;
     const stepEl = byId('quizStep');
-    // Simple progress: Update on change (or use tabs for multi-step if complex)
-    $$('select, input', byId('quizForm')).forEach(el => el.addEventListener('change', () => {
+    $$('select, input', byId('quizForm')).forEach(ctrl => ctrl.addEventListener('change', () => {
       let current = 1;
-      $$('.q-group').forEach((g, i) => { if (g.querySelector('select, input:checked').value) current = i + 2; });
-      stepEl.textContent = Math.min(current, steps);
+      $$('.q-group').forEach((g, i) => { const c = g.querySelector('select, input:checked'); if (c && (c as HTMLInputElement).value) current = i + 2; });
+      stepEl.textContent = String(Math.min(current, steps));
     }));
   });
 
@@ -1053,13 +1119,7 @@
     if (opts?.scrollToRecos) el.recommendations?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ---------- Card click delegation ----------
-  el.resultsGrid.addEventListener('click', (e) => {
-    const btn = e.target.closest('.compare-btn');
-    if (!btn) return;
-    const id = e.target.closest('.product')?.dataset?.id;
-    if (id) toggleCompare(id);
-  });
+  // (Removed duplicate grid-level compare click handler to avoid double toggles)
 
   // Quiz deep link
   document.addEventListener('DOMContentLoaded', () => {
@@ -1070,3 +1130,4 @@
   // Start
   document.addEventListener('DOMContentLoaded', init);
 })();
+
