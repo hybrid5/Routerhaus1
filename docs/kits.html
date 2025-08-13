@@ -275,14 +275,28 @@
     <!-- ===== Content ===== -->
     <section class="content" aria-live="polite">
       <header class="page-header">
-        <div class="header-actions">
-          <button id="openQuiz" class="btn primary" type="button">Help Me Find a Kit <i class="fas fa-question-circle" aria-hidden="true"></i></button>
-          <button id="editQuiz" class="btn ghost" type="button" hidden>Edit My Answers</button>
-          <input type="text" id="searchInput" placeholder="Search by brand or model..." aria-label="Search routers">
-          <button id="copyLink" class="btn glass" type="button">Copy link</button>
-          <button id="resetAll" class="btn ghost" type="button">Reset</button>
-        </div>
-      </header>
+  <div class="command-bar glass" role="region" aria-label="Search and actions">
+    <div class="primary">
+      <button id="openQuiz" class="btn primary" type="button">
+        Help Me Find a Kit <i class="fas fa-question-circle" aria-hidden="true"></i>
+      </button>
+      <button id="editQuiz" class="btn link-btn" type="button" hidden>
+        Edit my answers
+      </button>
+    </div>
+
+    <label class="search" for="searchInput">
+      <span class="sr-only">Search routers</span>
+      <input type="text" id="searchInput" placeholder="Search by brand or model…" aria-label="Search routers">
+    </label>
+
+    <div class="actions">
+      <button id="openFiltersHeader" class="btn glass" type="button">Filters</button>
+      <button id="copyLink" class="btn glass" type="button">Copy link</button>
+      <button id="resetAll" class="btn ghost" type="button">Reset</button>
+    </div>
+  </div>
+</header>
 
       <!-- Active filters -->
       <div id="activeChips" class="active-chips" role="list" aria-label="Active filters"></div>
