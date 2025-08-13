@@ -5,6 +5,12 @@
  * - applicableDeviceLoads, applicableCoverageBuckets, applicableWanTiers, applicablePrimaryUses
  * - chipsOverride, fitBullets, updatedAt
  * Robust data load + URL sync, facets, inclusive filtering, sorting, pagination, chips, compare, recos, a11y.
+ *
+ * Enhancements:
+ * - Command bar condensation on scroll
+ * - Powerful search (tokenized; brand/model/uses/tech terms)
+ * - Search hotkeys: "/" or "Ctrl/Cmd+K" to focus, "Esc" to clear
+ * - Optional clear button when input sits inside .search wrapper
  */
 
 (() => {
@@ -511,15 +517,20 @@
     const term = state.search;
 
     const out = state.data.filter(o => {
-      // Text search (brand/model/uses)
+      // Text search (brand/model/uses/tech); tokenized AND
       if (term) {
         const hay = [
           o.brand, o.model,
+          'wifi', o.wifiStandard,  // allow "wifi 7" / "wifi7"
+          o.wanTierLabel,
           ...(o.primaryUses || []),
           ...(o.applicablePrimaryUses || []),
-          ...(o.useTags || [])
+          ...(o.useTags || []),
         ].join(' ').toLowerCase();
-        if (!hay.includes(term)) return false;
+        const tokens = term.split(/\s+/).filter(Boolean);
+        for (const t of tokens) {
+          if (!hay.includes(t)) return false;
+        }
       }
 
       // Facet constraints
@@ -672,9 +683,17 @@
     if (el.activeCountBadge) el.activeCountBadge.textContent = String(activeCount);
   }
 
-  // Esc removes something (last non-empty facet)
+  // Esc removes something (or clears search if focused)
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    const searchInput = byId('searchInput');
+    if (document.activeElement === searchInput && state.search) {
+      searchInput.value = '';
+      state.search = '';
+      state.page = 1;
+      onStateChanged({});
+      return;
+    }
     const keys = Object.keys(state.facetDefs);
     for (let i = keys.length - 1; i >= 0; i--) {
       const sel = state.facets[keys[i]];
@@ -856,7 +875,7 @@
     return out.slice(0,4);
   }
 
-  // ---------- Toolbar ----------
+  // ---------- Toolbar / Search / Header ----------
   function wireToolbar() {
     if (el.sortSelect) {
       el.sortSelect.value = state.sort;
@@ -888,17 +907,76 @@
       el.filtersFab.setAttribute('aria-expanded', 'true');
     });
 
-    // Wire search input (debounced; participates in facet filtering)
-    const searchInput = byId('searchInput');
-    if (searchInput) {
-      searchInput.value = state.search;
-      const onType = debounce((e) => {
-        state.search = (e.target.value || '').trim().toLowerCase();
+    wireSearch();
+    wireCommandBarCondense();
+  }
+
+  // Search bar UX: focus hotkeys, clear button, debounced filtering
+  function wireSearch() {
+    const input = byId('searchInput');
+    if (!input) return;
+
+    // If wrapped in .search, inject a clear button (optional)
+    const wrap = input.closest('.search');
+    let clearBtn = null;
+    if (wrap) {
+      clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'icon-btn';
+      clearBtn.setAttribute('aria-label', 'Clear search');
+      clearBtn.textContent = '✕';
+      clearBtn.style.marginLeft = '8px';
+      wrap.appendChild(clearBtn);
+      const updateClear = () => clearBtn.style.display = input.value ? '' : 'none';
+      updateClear();
+      input.addEventListener('input', updateClear);
+      clearBtn.addEventListener('click', () => {
+        input.value = '';
+        state.search = '';
         state.page = 1;
         onStateChanged({});
-      }, 220);
-      searchInput.addEventListener('input', onType);
+        input.focus();
+      });
     }
+
+    input.value = state.search;
+
+    const onType = debounce((e) => {
+      state.search = (e.target.value || '').trim().toLowerCase();
+      state.page = 1;
+      onStateChanged({});
+    }, 220);
+    input.addEventListener('input', onType);
+
+    // Keyboard: "/" or Ctrl/Cmd+K focuses; Enter just applies (already applied); Esc clears
+    document.addEventListener('keydown', (e) => {
+      const modK = (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey));
+      if (modK || (e.key === '/' && !/input|textarea|select/i.test(document.activeElement?.tagName || ''))) {
+        e.preventDefault();
+        input.focus();
+        input.select();
+      }
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && input.value) {
+        input.value = '';
+        state.search = '';
+        state.page = 1;
+        onStateChanged({});
+      }
+    });
+  }
+
+  // Condense the command bar on scroll (if present)
+  function wireCommandBarCondense() {
+    const bar = $('.command-bar');
+    if (!bar) return;
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      bar.classList.toggle('is-condensed', y > 80);
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
   // ---------- Drawer (mobile filters) ----------
@@ -1098,6 +1176,9 @@
     }
 
     onStateChanged({ initial: true });
+
+    // Focus search if q= is present
+    if (state.search) byId('searchInput')?.focus();
   }
 
   function onStateChanged(opts) {
