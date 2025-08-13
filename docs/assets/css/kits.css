@@ -275,8 +275,10 @@ details.facet[open] .chev { transform: rotate(180deg); }
   background: color-mix(in oklab, var(--card) 82%, var(--glass-tint));
   border: 1px solid var(--border); box-shadow: var(--shadow-sm);
   overflow: hidden; transition: transform var(--t), box-shadow var(--t), border-color var(--t);
+  will-change: transform, filter;
+  filter: drop-shadow(0 6px 22px color-mix(in oklab, var(--accent) 22%, transparent));
 }
-.product:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: color-mix(in oklab, var(--primary) 35%, var(--border)); }
+.product:hover { box-shadow: var(--shadow), 0 0 48px 12px color-mix(in oklab, var(--accent) 35%, transparent); }
 
 .product .product-media {
   width: 100%; aspect-ratio: 16/9; min-height: 180px; max-height: 220px;
