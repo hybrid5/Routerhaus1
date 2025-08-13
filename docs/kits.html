@@ -21,37 +21,44 @@
   <!-- Styles -->
   <link rel="stylesheet" href="main.css" />
   <link rel="stylesheet" href="assets/css/kits.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <!-- For icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <!-- Header partial mounts BEFORE main to avoid CLS -->
   <div id="header-placeholder" data-partial="header.html"></div>
 
   <main class="container kits-layout">
-    <!-- ===== Desktop filter rail (all facets split for 1:1 with kits.js) ===== -->
+    <!-- ===== Desktop filter rail ===== -->
     <aside id="filtersAside" class="filters-rail glass" aria-label="Filters">
       <div class="filters-header">
         <h2>Filters</h2>
         <small id="matchCount" aria-live="polite"></small>
       </div>
 
-      <div class="facet-toolbar">
+      <div class="facet-toolbar" role="group" aria-label="Facet tools">
         <button type="button" id="expandAll" class="btn small">Expand all</button>
         <button type="button" id="collapseAll" class="btn small">Collapse all</button>
         <button type="button" id="clearAllFacets" class="btn small ghost">Clear all</button>
       </div>
 
       <form id="filtersForm" class="filters-form" aria-describedby="matchCount">
-        <!-- Quick picks -->
-        <section class="facet" data-facet="quick">
+        <!-- Quick Picks -->
+        <section class="facet" data-facet="quick" aria-labelledby="quick-picks-h">
           <div class="facet-head">
-            <h3>Quick Picks <i class="fas fa-lightbulb" title="Easy starting points for common needs"></i></h3>
+            <h3 id="quick-picks-h">Quick Picks <i class="fas fa-lightbulb" title="Easy starting points for common needs"></i></h3>
             <button type="button" class="btn tiny facet-clear" data-clear="quick">Clear</button>
           </div>
-          <div class="chips" id="quickChips"></div>
+          <div class="chips" id="quickChips" role="group" aria-label="Quick picks">
+            <button type="button" class="chip" data-qpick="families">Best for Families</button>
+            <button type="button" class="chip" data-qpick="budget">Budget-Friendly</button>
+            <button type="button" class="chip" data-qpick="gaming">Gaming Ready</button>
+            <button type="button" class="chip" data-qpick="mesh">Whole-Home Wi-Fi</button>
+            <button type="button" class="chip" data-qpick="fast">Fast Internet</button>
+            <button type="button" class="chip" data-qpick="wfh">Work from Home</button>
+          </div>
         </section>
 
-        <div class="divider"></div>
+        <div class="divider" aria-hidden="true"></div>
 
         <!-- Brand -->
         <details class="facet" data-facet="brand" open>
@@ -83,13 +90,11 @@
           <div class="options two-cols" id="facet-wifiGen"></div>
         </details>
 
-        <!-- Bands (own facet so drawer sync + persistence work) -->
+        <!-- Bands -->
         <details class="facet" data-facet="bands">
           <summary>
-            <span>Wi-Fi Bands <i class="fas fa-signal" title="More bands mean better coverage for different devices (e.g., 2.4GHz for smart home gadgets)"></i></span>
-            <span class="facet-meta">
-              <span class="chev" aria-hidden>▾</span>
-            </span>
+            <span>Wi-Fi Bands <i class="fas fa-signal" title="More bands mean better coverage (e.g., 2.4GHz for smart home)"></i></span>
+            <span class="facet-meta"><span class="chev" aria-hidden>▾</span></span>
           </summary>
           <div class="facet-controls">
             <button type="button" class="btn tiny facet-clear" data-clear="bands">Clear</button>
@@ -100,7 +105,7 @@
         <!-- Mesh -->
         <details class="facet" data-facet="mesh" open>
           <summary>
-            <span>Whole-Home Coverage (Mesh) <i class="fas fa-home" title="Mesh spreads Wi-Fi evenly, great for big houses—no dead spots!"></i></span>
+            <span>Whole-Home Coverage (Mesh) <i class="fas fa-home" title="Mesh spreads Wi-Fi evenly, great for big houses"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-meshReady">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -116,7 +121,7 @@
         <!-- WAN Tier -->
         <details class="facet" data-facet="wan">
           <summary>
-            <span>Internet Speed Support <i class="fas fa-tachometer-alt" title="Matches your internet plan (e.g., basic for streaming, high for gaming)"></i></span>
+            <span>Internet Speed Support <i class="fas fa-tachometer-alt" title="Match to your internet plan"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-wanTier">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -131,10 +136,8 @@
         <!-- LAN count -->
         <details class="facet" data-facet="lanCount">
           <summary>
-            <span>Wired Ports (LAN) <i class="fas fa-plug" title="For connecting devices with cables, like desktops or printers"></i></span>
-            <span class="facet-meta">
-              <span class="chev" aria-hidden>▾</span>
-            </span>
+            <span>Wired Ports (LAN) <i class="fas fa-plug" title="For wired devices like desktops or printers"></i></span>
+            <span class="facet-meta"><span class="chev" aria-hidden>▾</span></span>
           </summary>
           <div class="facet-controls">
             <button type="button" class="btn tiny facet-clear" data-clear="lanCount">Clear</button>
@@ -145,10 +148,8 @@
         <!-- Multi-Gig LAN -->
         <details class="facet" data-facet="multiGigLan">
           <summary>
-            <span>Super-Fast Wired Ports <i class="fas fa-bolt" title="For high-speed wired connections, like to a NAS or gaming PC"></i></span>
-            <span class="facet-meta">
-              <span class="chev" aria-hidden>▾</span>
-            </span>
+            <span>Super-Fast Wired Ports <i class="fas fa-bolt" title="Great for NAS or gaming PC"></i></span>
+            <span class="facet-meta"><span class="chev" aria-hidden>▾</span></span>
           </summary>
           <div class="facet-controls">
             <button type="button" class="btn tiny facet-clear" data-clear="multiGigLan">Clear</button>
@@ -159,10 +160,8 @@
         <!-- USB -->
         <details class="facet" data-facet="usb">
           <summary>
-            <span>USB Ports <i class="fas fa-usb" title="For plugging in external drives or printers"></i></span>
-            <span class="facet-meta">
-              <span class="chev" aria-hidden>▾</span>
-            </span>
+            <span>USB Ports <i class="fas fa-usb" title="Plug in external drives or printers"></i></span>
+            <span class="facet-meta"><span class="chev" aria-hidden>▾</span></span>
           </summary>
           <div class="facet-controls">
             <button type="button" class="btn tiny facet-clear" data-clear="usb">Clear</button>
@@ -173,7 +172,7 @@
         <!-- Coverage -->
         <details class="facet" data-facet="coverage" open>
           <summary>
-            <span>Home Size Coverage <i class="fas fa-ruler-combined" title="How much area the router covers without weak signals"></i></span>
+            <span>Home Size Coverage <i class="fas fa-ruler-combined" title="Area a single kit covers"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-coverageBucket">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -188,7 +187,7 @@
         <!-- Device load -->
         <details class="facet" data-facet="device" open>
           <summary>
-            <span>Number of Devices on Wi-Fi <i class="fas fa-mobile-alt" title="How many gadgets connect? E.g., phones, laptops, smart TVs, thermostats, lights"></i></span>
+            <span>Number of Devices on Wi-Fi <i class="fas fa-mobile-alt" title="Phones, laptops, TVs, smart devices"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-deviceLoad">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -203,7 +202,7 @@
         <!-- Primary use -->
         <details class="facet" data-facet="use" open>
           <summary>
-            <span>Main Use <i class="fas fa-tasks" title="What do you use Wi-Fi for most? E.g., streaming movies or working from home"></i></span>
+            <span>Main Use <i class="fas fa-tasks" title="What you do most on Wi-Fi"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-primaryUse">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -218,10 +217,8 @@
         <!-- Access -->
         <details class="facet" data-facet="access">
           <summary>
-            <span>Internet Type <i class="fas fa-globe" title="How you get internet: cable, fiber, etc."></i></span>
-            <span class="facet-meta">
-              <span class="chev" aria-hidden>▾</span>
-            </span>
+            <span>Internet Type <i class="fas fa-globe" title="Cable, fiber, 5G, etc."></i></span>
+            <span class="facet-meta"><span class="chev" aria-hidden>▾</span></span>
           </summary>
           <div class="facet-controls">
             <button type="button" class="btn tiny facet-clear" data-clear="access">Clear</button>
@@ -232,7 +229,7 @@
         <!-- Price -->
         <details class="facet" data-facet="price">
           <summary>
-            <span>Price Range <i class="fas fa-dollar-sign" title="Find options that fit your budget"></i></span>
+            <span>Price Range <i class="fas fa-dollar-sign" title="Options that fit your budget"></i></span>
             <span class="facet-meta">
               <span class="badge count" id="badge-priceBucket">0</span>
               <span class="chev" aria-hidden>▾</span>
@@ -245,9 +242,9 @@
         </details>
 
         <!-- Compare Panel (desktop) -->
-        <section id="comparePanel" class="facet" data-facet="compare">
+        <section id="comparePanel" class="facet" data-facet="compare" aria-labelledby="compare-h">
           <div class="facet-head">
-            <h3>Compare</h3>
+            <h3 id="compare-h">Compare</h3>
             <button id="clearCompare" class="btn tiny ghost" type="button">Clear</button>
           </div>
           <div id="compareItemsPanel" class="compare-items"></div>
@@ -279,15 +276,15 @@
     <section class="content" aria-live="polite">
       <header class="page-header">
         <div class="header-actions">
-          <button id="openQuiz" class="btn primary" type="button">Help Me Find a Kit <i class="fas fa-question-circle"></i></button>
+          <button id="openQuiz" class="btn primary" type="button">Help Me Find a Kit <i class="fas fa-question-circle" aria-hidden="true"></i></button>
           <button id="editQuiz" class="btn ghost" type="button" hidden>Edit My Answers</button>
-          <input type="text" id="searchInput" placeholder="Search by brand or model..." aria-label="Search routers"> <!-- New: Quick search -->
+          <input type="text" id="searchInput" placeholder="Search by brand or model..." aria-label="Search routers">
           <button id="copyLink" class="btn glass" type="button">Copy link</button>
           <button id="resetAll" class="btn ghost" type="button">Reset</button>
         </div>
       </header>
 
-      <!-- Active filters (URL-synced, keyboard dismissible via JS) -->
+      <!-- Active filters -->
       <div id="activeChips" class="active-chips" role="list" aria-label="Active filters"></div>
 
       <!-- Toolbar -->
@@ -348,8 +345,15 @@
         <!-- Empty state -->
         <div id="emptyState" class="empty hide" role="note" aria-live="polite">
           <h3>No matches</h3>
-          <p>Try adjusting filters or pick one of these quick options:</p>
-          <div class="chips" id="emptyQuickChips"></div>
+          <p>Try adjusting filters or tap a quick option:</p>
+          <div class="chips" id="emptyQuickChips" role="group" aria-label="Quick picks (empty results)">
+            <button type="button" class="chip" data-qpick="families">Best for Families</button>
+            <button type="button" class="chip" data-qpick="budget">Budget-Friendly</button>
+            <button type="button" class="chip" data-qpick="gaming">Gaming Ready</button>
+            <button type="button" class="chip" data-qpick="mesh">Whole-Home Wi-Fi</button>
+            <button type="button" class="chip" data-qpick="fast">Fast Internet</button>
+            <button type="button" class="chip" data-qpick="wfh">Work from Home</button>
+          </div>
         </div>
       </section>
 
@@ -372,16 +376,16 @@
     <div id="compareItems" class="compare-items"></div>
   </aside>
 
-  <!-- Quiz modal (aligned to quiz-modal.js expectations) -->
+  <!-- Quiz modal -->
   <dialog id="quizModal" class="modal glass" aria-labelledby="quizTitle" aria-modal="true">
     <div class="modal-content">
       <header class="modal-header">
-        <h2 id="quizTitle">Let's Find Your Perfect Router Kit</h2> <!-- Friendlier title -->
+        <h2 id="quizTitle">Let's Find Your Perfect Router Kit</h2>
         <button type="button" class="quiz-close modal-close" aria-label="Close">&times;</button>
       </header>
 
       <form id="quizForm" class="quiz-body">
-        <div class="quiz-progress">Step <span id="quizStep">1</span>/7</div> <!-- New: Progress indicator -->
+        <div class="quiz-progress">Step <span id="quizStep">1</span>/7</div>
 
         <!-- ENVIRONMENT -->
         <fieldset class="q-group">
@@ -392,7 +396,7 @@
               <option value="">Select...</option>
               <option value="Apartment/Small">Apartment or Small Home (studio, 1-bed, under 1,800 sq ft)</option>
               <option value="2–3 Bedroom">Medium Home (2-3 bedrooms, up to 3,200 sq ft)</option>
-              <option value="Large/Multi-floor">Large or Multi-Floor Home (over 3,200 sq ft, big families)</option>
+              <option value="Large/Multi-floor">Large or Multi-Floor Home (over 3,200 sq ft)</option>
               <option value="">I'm not sure – suggest based on other answers</option>
             </select>
           </label>
@@ -437,7 +441,7 @@
 
         <!-- ACCESS -->
         <fieldset class="q-group">
-          <legend>What type of internet do you have? <i class="fas fa-info-circle" title="Check your bill or ask your provider (e.g., Comcast cable)"></i></legend>
+          <legend>What type of internet do you have? <i class="fas fa-info-circle" title="Check your bill or ask your provider"></i></legend>
           <label>
             <span class="sr-only">Access type</span>
             <select id="qAccess">
@@ -451,21 +455,21 @@
           </label>
         </fieldset>
 
-        <!-- SPEED (quiz-modal.js reads qSpeedLabel values: '', '≤1G','2.5G','5G','10G') -->
+        <!-- SPEED -->
         <fieldset class="q-group">
-          <legend>Your Internet Plan Speed <i class="fas fa-info-circle" title="Check your bill; higher speeds need better routers"></i></legend>
+          <legend>Your Internet Plan Speed <i class="fas fa-info-circle" title="Higher speeds need better routers"></i></legend>
           <div class="speed-grid" role="group" aria-label="Plan speed">
-            <label><input type="radio" name="qSpeedLabel" value="≤1G"> Basic (up to 1 Gbps – good for streaming)</label>
-            <label><input type="radio" name="qSpeedLabel" value="2.5G"> Medium (2.5 Gbps – for gaming/work)</label>
-            <label><input type="radio" name="qSpeedLabel" value="5G"> High (5 Gbps – fast downloads)</label>
-            <label><input type="radio" name="qSpeedLabel" value="10G"> Ultra (10 Gbps – pro use)</label>
-            <label><input type="radio" name="qSpeedLabel" value=""> I'm not sure – suggest based on other answers</label>
+            <label><input type="radio" name="qSpeedLabel" value="≤1G"> Basic (up to 1 Gbps)</label>
+            <label><input type="radio" name="qSpeedLabel" value="2.5G"> Medium (2.5 Gbps)</label>
+            <label><input type="radio" name="qSpeedLabel" value="5G"> High (5 Gbps)</label>
+            <label><input type="radio" name="qSpeedLabel" value="10G"> Ultra (10 Gbps)</label>
+            <label><input type="radio" name="qSpeedLabel" value=""> I'm not sure</label>
           </div>
         </fieldset>
 
         <!-- MESH PREFERENCE -->
         <fieldset class="q-group">
-          <legend>Do you want whole-home coverage? <i class="fas fa-info-circle" title="Mesh is like Wi-Fi extenders built-in"></i></legend>
+          <legend>Do you want whole-home coverage?</legend>
           <label class="mesh-row">
             <input type="checkbox" id="qMeshAuto" checked>
             <span>Auto decide for me (recommended)</span>
@@ -479,15 +483,15 @@
 
         <!-- BUDGET (optional) -->
         <fieldset class="q-group">
-          <legend>What's your budget? <i class="fas fa-info-circle" title="We can find great options at any price"></i></legend>
+          <legend>What's your budget?</legend>
           <label>
             <span class="sr-only">Budget</span>
             <select id="qPrice">
               <option value="">No preference / Show all</option>
-              <option value="<150">$ (Under $150 – budget basics)</option>
-              <option value="150–299">$$ ($150-299 – good value)</option>
-              <option value="300–599">$$$ ($300-599 – premium features)</option>
-              <option value="600+">$$$$ ($600+ – top-of-the-line)</option>
+              <option value="<150">$ (Under $150)</option>
+              <option value="150–299">$$ ($150-299)</option>
+              <option value="300–599">$$$ ($300-599)</option>
+              <option value="600+">$$$$ ($600+)</option>
             </select>
           </label>
         </fieldset>
@@ -558,6 +562,48 @@
   <script src="scripts.js" defer></script>
   <script type="module" src="assets/js/kits.js"></script>
   <script type="module" src="assets/js/quiz-modal.js"></script>
+
+  <!-- Quick Pick wiring via URL params (works without touching kits.js) -->
+  <script>
+    (function () {
+      // Map each quick pick to facet query values
+      const MAP = {
+        families: { use: 'Family Streaming', device: '16–30' },
+        budget:   { price: '<150' },
+        gaming:   { use: 'Gaming', wan: '2.5G' },
+        mesh:     { mesh: 'Mesh-ready' },
+        fast:     { wifi: '7' },
+        wfh:      { use: 'Work-From-Home' }
+      };
+
+      function applyQuickPick(key) {
+        const spec = MAP[key];
+        if (!spec) return;
+
+        // Build new query string from current, then apply quick-pick facets
+        const qs = new URLSearchParams(location.search);
+
+        // Remove any previous value for the facets we're setting (to avoid OR combos)
+        Object.keys(spec).forEach(k => qs.delete(k));
+
+        for (const [facet, value] of Object.entries(spec)) qs.set(facet, value);
+
+        // Fresh view: reset page and show recos
+        qs.delete('page');
+        qs.set('recos', '1');
+
+        // Navigate (kits.js reads facets from URL on load)
+        location.search = qs.toString();
+      }
+
+      // Delegate clicks from any [data-qpick] button, including the empty-state row
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-qpick]');
+        if (!btn) return;
+        applyQuickPick(btn.dataset.qpick);
+      });
+    })();
+  </script>
 
   <noscript>Enable JavaScript to load filters and results.</noscript>
 </body>
