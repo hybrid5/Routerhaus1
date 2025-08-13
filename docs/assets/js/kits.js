@@ -176,7 +176,7 @@
     o.wanTier = o.wanTier ?? wanNumericFromLabel(o.wanTierLabel);
 
     // ports
-    o.lanCount = isFinite(o.lanCount) ? Number(o.lanCount) : null;
+    o.lanCount = Number.isFinite(Number(o.lanCount)) ? Number(o.lanCount) : null;
     o.multiGigLan = !!o.multiGigLan;
     o.usb = !!o.usb;
 
@@ -500,7 +500,7 @@
       details?.addEventListener('toggle', () => {
         state.openDetails[key] = details.open;
         LS.set('rh.details', state.openDetails);
-      }); // persist on every toggle (no {once:true})
+      }); // persist on every toggle
     }
   }
 
@@ -1045,15 +1045,24 @@
   };
   el.editQuiz?.addEventListener('click', () => document.dispatchEvent(new CustomEvent('quiz:edit')));
 
-  // New: Quiz progress (lightweight)
+  // Quiz progress (plain JS, no TS casts)
   document.addEventListener('quiz:open', () => {
-    const steps = $$('.q-group', byId('quizForm')).length;
+    const form = byId('quizForm');
+    if (!form) return;
+    const steps = $$('.q-group', form).length || 1;
     const stepEl = byId('quizStep');
-    $$('select, input', byId('quizForm')).forEach(ctrl => ctrl.addEventListener('change', () => {
+
+    const update = () => {
       let current = 1;
-      $$('.q-group').forEach((g, i) => { const c = g.querySelector('select, input:checked'); if (c && (c as HTMLInputElement).value) current = i + 2; });
-      stepEl.textContent = String(Math.min(current, steps));
-    }));
+      $$('.q-group', form).forEach((g, i) => {
+        const c = g.querySelector('select, input:checked');
+        if (c && c.value) current = i + 2;
+      });
+      if (stepEl) stepEl.textContent = String(Math.min(current, steps));
+    };
+
+    $$('.q-group select, .q-group input', form).forEach(el => el.addEventListener('change', update));
+    update();
   });
 
   // Updated emptyState: Add quiz button
@@ -1119,8 +1128,6 @@
     if (opts?.scrollToRecos) el.recommendations?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // (Removed duplicate grid-level compare click handler to avoid double toggles)
-
   // Quiz deep link
   document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(location.search);
@@ -1130,4 +1137,3 @@
   // Start
   document.addEventListener('DOMContentLoaded', init);
 })();
-
