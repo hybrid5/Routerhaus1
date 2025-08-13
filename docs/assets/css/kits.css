@@ -270,15 +270,23 @@ details.facet[open] .chev { transform: rotate(180deg); }
   gap: clamp(12px, 1.5vw, 20px);
 }
 .product {
-  display: grid; grid-template-rows: auto auto 1fr auto; gap: 10px;
-  padding: 14px; border-radius: var(--radius-lg);
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--radius-lg);
   background: color-mix(in oklab, var(--card) 82%, var(--glass-tint));
-  border: 1px solid var(--border); box-shadow: var(--shadow-sm);
-  overflow: hidden; transition: transform var(--t), box-shadow var(--t), border-color var(--t);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform var(--t), box-shadow var(--t), border-color var(--t);
   will-change: transform, filter;
-  filter: drop-shadow(0 6px 22px color-mix(in oklab, var(--accent) 22%, transparent));
+  filter: drop-shadow(0 4px 10px color-mix(in oklab, var(--accent) 22%, transparent));
 }
-.product:hover { box-shadow: var(--shadow), 0 0 48px 12px color-mix(in oklab, var(--accent) 35%, transparent); }
+
+.product:hover {
+  box-shadow: var(--shadow), 0 0 18px 4px color-mix(in oklab, var(--accent) 35%, transparent);
+}
 
 .product .product-media {
   width: 100%; aspect-ratio: 16/9; min-height: 180px; max-height: 220px;
