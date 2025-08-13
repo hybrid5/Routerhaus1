@@ -269,7 +269,7 @@ details.facet label .count{ opacity:.7; margin-left:.35rem; font-variant-numeric
   transform: translateY(-4px);
   box-shadow: var(--shadow);
   border-color: var(--border-strong);
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 28%, transparent));
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--accent) 28%, transparent));
 }
 
 /* Media placeholder with depth */
