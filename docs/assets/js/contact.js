@@ -6,6 +6,7 @@
  * - Contact form validation
  * - Submit via optional backend (window.RH_CONTACT.action) or mailto fallback
  * - Downloadable summary after submit
+ * - Testing
  */
 (() => {
   const $ = (sel, root=document) => root.querySelector(sel);
