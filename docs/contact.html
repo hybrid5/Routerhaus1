@@ -1,40 +1,244 @@
 <!-- ===========================
-     RouterHaus v1 – contact.html
+     RouterHaus v2 – contact.html
      =========================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Contact RouterHaus for support or consultation." />
-  <title>Contact – RouterHaus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Contact RouterHaus — expert support, design inquiries, and partnerships." />
+  <title>Contact · RouterHaus</title>
 
-  <!-- Fonts & Styles -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Fonts & Base Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="assets/css/contact.css" />
+
+  <!-- Theme sync -->
+  <meta name="color-scheme" content="light dark" />
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const apply = () => root.setAttribute('data-theme', media.matches ? 'dark' : 'light');
+      apply(); media.addEventListener('change', apply);
+    })();
+  </script>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-  <div id="header-placeholder"></div>
+  <!-- Header partial -->
+  <div id="header-placeholder" data-partial="header.html"></div>
 
-  <main>
+  <main class="contact-main">
+    <!-- ===== Hero ===== -->
+    <section class="contact-hero">
+      <div class="container hero-inner">
+        <div class="hero-copy reveal">
+          <h1>Let’s talk networks</h1>
+          <p>Whether it’s a complex property or a growing team, we’ll help you plan, harden, and deliver a network that just works.</p>
+          <div class="hero-ctas">
+            <a class="btn primary" href="mailto:support@routerhaus.com?subject=RouterHaus%20Inquiry">Email support</a>
+            <a class="btn ghost" href="consult.html">Enterprise consulting</a>
+          </div>
+          <p class="eta"><i class="fa-regular fa-clock"></i> <span id="replyEta">Typically replies within a few hours.</span></p>
+        </div>
 
-  <!-- ===== Contact Hero ===== -->
-  <section class="hero">
-    <h1>Contact RouterHaus</h1>
-    <p>Reach out and we'll help plan your ideal network.</p>
-  </section>
-  <section class="content"><p>Email us at support@routerhaus.com</p></section>
+        <aside class="hero-card glass reveal">
+          <h3>How we can help</h3>
+          <ul class="hero-list">
+            <li>Design & upgrade guidance</li>
+            <li>Coverage and roaming issues</li>
+            <li>AP placement & PoE planning</li>
+            <li>Guest networks & VLANs</li>
+          </ul>
+          <div class="hero-mini">
+            <span><i class="fa-solid fa-shield-halved"></i> WPA3 / VLAN best practices</span>
+            <span><i class="fa-solid fa-bolt"></i> Multi-gig backbones</span>
+          </div>
+        </aside>
+      </div>
+    </section>
 
-  <section class="footer-cta" id="start">
-    <h2>Design Your Network</h2>
-    <p>From a 1-bed flat to a full campus — we’ve got you covered.</p>
-    <a href="kits.html" class="btn">Start Matching →</a>
-    <a href="consult.html" class="btn-secondary">Enterprise Consult</a>
-  </section>
+    <!-- ===== Channels ===== -->
+    <section class="channels">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Choose a channel</h2>
+          <p>Pick what’s most convenient — we’ll route it to the right engineer.</p>
+        </header>
+        <div class="grid cards-4">
+          <article class="card reveal">
+            <div class="icon"><i class="fa-regular fa-envelope"></i></div>
+            <h3>Email</h3>
+            <p><a id="mailtoMain" href="mailto:support@routerhaus.com">support@routerhaus.com</a></p>
+            <button class="btn small" id="copyEmail" type="button">Copy address</button>
+          </article>
+
+          <article class="card reveal">
+            <div class="icon"><i class="fa-solid fa-calendar-days"></i></div>
+            <h3>Strategy call</h3>
+            <p>Prefer to talk it through? We’ll review goals and constraints.</p>
+            <a class="btn small" href="consult.html#intake">Schedule options</a>
+          </article>
+
+          <article class="card reveal">
+            <div class="icon"><i class="fa-solid fa-life-ring"></i></div>
+            <h3>Priority support</h3>
+            <p>For active ProCare clients. Include your site code for fastest routing.</p>
+            <a class="btn small" href="mailto:priority@routerhaus.com?subject=ProCare%20Priority%20Ticket">Open priority ticket</a>
+          </article>
+
+          <article class="card reveal">
+            <div class="icon"><i class="fa-solid fa-handshake-angle"></i></div>
+            <h3>Partnerships & press</h3>
+            <p>Media, partnerships, and speaking requests.</p>
+            <a class="btn small" href="mailto:press@routerhaus.com?subject=Press%20/ %20Partnership">Contact team</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Contact form ===== -->
+    <section class="contact-form">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Send us a message</h2>
+          <p>Give us a bit of context — we’ll follow up shortly.</p>
+        </header>
+
+        <form id="contactForm" class="glass" novalidate>
+          <!-- honeypot -->
+          <input type="text" name="company" autocomplete="organization" tabindex="-1" aria-hidden="true" class="hp" />
+
+          <div class="form-grid">
+            <label>
+              <span>Your name</span>
+              <input type="text" name="name" autocomplete="name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span>Topic</span>
+              <select name="topic" required>
+                <option value="">Select…</option>
+                <option>Support</option>
+                <option>Design/Upgrade</option>
+                <option>Consulting</option>
+                <option>Partnership</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label>
+              <span>Property / Company (optional)</span>
+              <input type="text" name="org" autocomplete="organization" />
+            </label>
+            <label class="full">
+              <span>Subject</span>
+              <input type="text" name="subject" placeholder="e.g., Roaming issues on 2nd floor" required />
+            </label>
+            <label class="full">
+              <span>Message</span>
+              <textarea name="message" rows="6" required placeholder="What’s the goal or issue? Any details on layout, materials, or current gear help a ton."></textarea>
+            </label>
+            <label class="full">
+              <span>Links (optional)</span>
+              <input type="url" name="link" placeholder="Floor plan, screenshots, prior spec, etc." />
+            </label>
+            <label class="agree">
+              <input type="checkbox" name="consent" required />
+              <span>I’m okay with you contacting me about this inquiry.</span>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn ghost" type="reset">Clear</button>
+            <button class="btn primary" type="submit" id="submitBtn">Send message</button>
+          </div>
+
+          <p id="formMsg" class="form-msg" role="alert" aria-live="polite"></p>
+        </form>
+
+        <div id="afterContact" class="after-contact glass" hidden>
+          <h3>Thanks — your message is on the way.</h3>
+          <p>We’ve captured your details. You can also keep a copy:</p>
+          <div class="stack">
+            <a id="downloadMsg" class="btn" href="#" download>Download summary</a>
+            <a id="mailtoFallback" class="btn ghost" href="#">Open in email</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Locations / Coverage ===== -->
+    <section class="coverage">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Where we operate</h2>
+          <p>Remote everywhere. On-site by arrangement.</p>
+        </header>
+        <div class="grid cards-3">
+          <article class="card reveal">
+            <h3>Remote expertise</h3>
+            <p>Diagnostics, design reviews, controller tuning, and staging — done remotely with secure access.</p>
+          </article>
+          <article class="card reveal">
+            <h3>On-site deployment</h3>
+            <p>Installation, validation, and handover available for residences, offices, and hospitality.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Vendor-agnostic</h3>
+            <p>We recommend the right solution for your goals and scale, not the other way around.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="faq">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Quick answers</h2>
+        </header>
+        <div class="grid faq-grid">
+          <details class="reveal">
+            <summary>How fast do you respond?</summary>
+            <p>During business hours you’ll typically hear back within a few hours; priority clients have guaranteed SLAs.</p>
+          </details>
+          <details class="reveal">
+            <summary>Can you work with my builder/IT?</summary>
+            <p>Yes. We coordinate with your GC, AV, or IT provider for clean installs and handoffs.</p>
+          </details>
+          <details class="reveal">
+            <summary>Do you sell hardware?</summary>
+            <p>We can source gear or design against your preferred vendors. Either way, the plan comes first.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Footer CTA ===== -->
+    <section class="footer-cta">
+      <div class="container cta-inner">
+        <h2>Ready to get started?</h2>
+        <p>Tell us about your space — we’ll propose the best path forward.</p>
+        <div class="cta-actions">
+          <a class="btn primary" href="#contactForm">Send a message</a>
+          <a class="btn ghost" href="consult.html">Explore consulting</a>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <div id="footer-placeholder"></div>
+  <!-- Footer partial -->
+  <div id="footer-placeholder" data-partial="footer.html"></div>
 
+  <!-- Scripts -->
   <script src="scripts.js" defer></script>
+  <script type="module" src="assets/js/contact.js"></script>
 </body>
 </html>
