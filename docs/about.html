@@ -1,91 +1,114 @@
 <!-- ===========================
-     RouterHaus v1 – about.html
+     RouterHaus v1 — about.html
      =========================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Learn how RouterHaus makes networking simple with AI-powered recommendations." />
   <title>About – RouterHaus</title>
 
-  <!-- Fonts & Styles -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Fonts & Global Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="main.css" />
+  <!-- Page Styles -->
+  <link rel="stylesheet" href="assets/css/about.css" />
 </head>
 <body>
+  <!-- Header partial -->
   <div id="header-placeholder"></div>
 
-  <main>
-
-  <!-- ===== About Hero ===== -->
-  <section class="hero">
-    <h1>About RouterHaus</h1>
-    <p>Learn how we simplify networking with AI-powered recommendations.</p>
-  </section>
-
-  <!-- ===== Why RouterHaus ===== -->
-  <section id="why" class="value-grid">
-    <h2>Why RouterHaus? The Upgrade Every Internet User Needs.</h2>
-
-    <div class="value-cards">
-      <div class="value-card glass">
-        <h3>AI-Powered, Unbiased Picks</h3>
-        <p>Instantly surface the best router for your setup — across all leading brands.</p>
+  <main class="about-page">
+    <!-- ===== About Hero ===== -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">Our mission</span>
+          <h1>About <span class="grad">RouterHaus</span></h1>
+          <p class="lede">We make network design simple with AI-driven recommendations and vetted, real-world hardware picks.</p>
+        </div>
       </div>
-      <div class="value-card glass">
-        <h3>Unlock Every Device’s Potential</h3>
-        <p>Enjoy the speed your phones, TVs, and smart-home gear were built for.</p>
-      </div>
-      <div class="value-card glass">
-        <h3>Easy Setup & Real Support</h3>
-        <p>Step-by-step install guides plus ongoing troubleshooting help.</p>
-      </div>
-    </div>
+    </section>
 
-    <h3 class="persona-heading">Made For…</h3>
-    <div class="persona-grid">
-      <div class="persona-card glass">
-        <h4>Apartments & Condos</h4>
-        <p>Kill dead zones and dropped calls in compact spaces.</p>
-      </div>
-      <div class="persona-card glass">
-        <h4>Large Homes</h4>
-        <p>Whole-home mesh for every floor and corner.</p>
-      </div>
-      <div class="persona-card glass">
-        <h4>Remote Work / Home Office</h4>
-        <p>Crystal-clear video calls and faster uploads.</p>
-      </div>
-      <div class="persona-card glass">
-        <h4>Gamers & Streamers</h4>
-        <p>Lowest latency and highest speeds — no lag, no buffering.</p>
-      </div>
-    </div>
-  </section>
+    <!-- ===== Why RouterHaus ===== -->
+    <section id="why" class="why">
+      <div class="container">
+        <header class="section-head">
+          <h2>Why RouterHaus?</h2>
+          <p class="subtle">Clarity from the first click to final install.</p>
+        </header>
 
+        <div class="value-cards">
+          <article class="value-card glass">
+            <div class="icon"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
+            <h3>AI-Powered, Unbiased Picks</h3>
+            <p>Cross-brand matching based on your space, devices, ISP speed, and budget.</p>
+          </article>
 
-  <!-- ===== FAQ ===== -->
-  <section id="faq" class="accordion">
-    <h2>FAQ</h2>
-    <div class="accordion-item">
-      <h4>How do you serve business clients?</h4><span>+</span>
-      <p>We design multi-site networks with VPN, VLAN, and remote management.</p>
-    </div>
-    <div class="accordion-item">
-      <h4>What counts as a “large-scale” setup?</h4><span>+</span>
-      <p>Anything with multiple routers / switches or PoE devices like cameras.</p>
-    </div>
-    <div class="accordion-item">
-      <h4>Is RouterHaus only for homes?</h4><span>+</span>
-      <p>No — we cover apartments, smart homes, SMB, and enterprise networks.</p>
-    </div>
-  </section>
+          <article class="value-card glass">
+            <div class="icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
+            <h3>Unlock Device Potential</h3>
+            <p>Right radios, channels, and backhaul so phones, TVs, and smart devices fly.</p>
+          </article>
 
+          <article class="value-card glass">
+            <div class="icon"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i></div>
+            <h3>Easy Setup & Real Support</h3>
+            <p>Step-by-step guides, remote staging, and optional on-site handoff.</p>
+          </article>
+        </div>
+
+        <h3 class="persona-heading">Built for</h3>
+        <div class="persona-grid">
+          <article class="persona-card glass">
+            <h4>Apartments & Condos</h4>
+            <p>Kill dead zones and buffer spinners in compact spaces.</p>
+          </article>
+          <article class="persona-card glass">
+            <h4>Large Homes</h4>
+            <p>Whole-home mesh across floors, garages, and yards.</p>
+          </article>
+          <article class="persona-card glass">
+            <h4>Remote Work / Home Office</h4>
+            <p>Stable low-latency calls and faster uploads.</p>
+          </article>
+          <article class="persona-card glass">
+            <h4>Gamers & Streamers</h4>
+            <p>Lowest jitter, highest throughput — no excuses.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="faq">
+      <div class="container">
+        <h2 class="faq-title">FAQ</h2>
+
+        <div class="accordion">
+          <div class="accordion-item">
+            <h4>How do you serve business clients?</h4><span>+</span>
+            <p>We design controller-based networks with VLANs, VPN, Wi-Fi roaming, and remote management for offices, hospitality, and retail.</p>
+          </div>
+          <div class="accordion-item">
+            <h4>What counts as a “large-scale” setup?</h4><span>+</span>
+            <p>Multi-AP or multi-switch environments, PoE devices (cameras, APs, phones), and multi-gig backbones.</p>
+          </div>
+          <div class="accordion-item">
+            <h4>Is RouterHaus only for homes?</h4><span>+</span>
+            <p>No. We cover apartments, smart homes, SMB, and enterprise — and we’re vendor-agnostic.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
+  <!-- Footer partial -->
   <div id="footer-placeholder"></div>
 
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
   <script src="scripts.js" defer></script>
 </body>
 </html>
