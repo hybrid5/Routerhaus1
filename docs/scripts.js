@@ -1,7 +1,7 @@
 // ============================
 //   RouterHaus v5 – scripts.js
-//   Single owner of header/footer partials
-//   Emits `partials:loaded` for page scripts
+//   Partials + global UI wiring
+//   Emits `partials:loaded`
 // ============================
 "use strict";
 
@@ -34,8 +34,7 @@ function showToast(msg, type = "success") {
   }
   const t = document.createElement("div");
   t.textContent = msg;
-  const bg =
-    type === "error" ? "#FF6B7B" : type === "info" ? "#00CFFD" : "#37C978";
+  const bg = type === "error" ? "#FF6B7B" : type === "info" ? "#00CFFD" : "#37C978";
   Object.assign(t.style, {
     padding: "0.8rem 1.2rem",
     borderRadius: "8px",
@@ -72,7 +71,6 @@ async function loadPartials() {
       if (f.ok) footHolder.outerHTML = await f.text();
     } catch {}
   }
-  // 🔔 Page scripts (kits.js, home.js) can safely bind to header/footer now
   document.dispatchEvent(new CustomEvent("partials:loaded"));
 }
 
@@ -84,7 +82,7 @@ function initUI() {
   const overlay = document.getElementById("sidebar-overlay");
   const themeToggle = document.getElementById("theme-toggle");
 
-  /* Sticky header blur / subtle elevation */
+  /* Sticky header blur / elevation */
   if (header) {
     const onScroll = debounce(() => {
       const active = (window.scrollY || document.documentElement.scrollTop) > 50;
@@ -96,14 +94,15 @@ function initUI() {
     onScroll();
   }
 
-  /* Sidebar (mobile nav) */
+  /* Sidebar (mobile nav) + body lock */
   if (hamburger && sidebar && overlay) {
     const lock = (on) => {
       document.documentElement.style.overflow = on ? "hidden" : "";
       document.body.style.overflow = on ? "hidden" : "";
     };
+    const isOpen = () => sidebar.classList.contains("active");
     const toggleSidebar = (force) => {
-      const open = typeof force === "boolean" ? force : !sidebar.classList.contains("active");
+      const open = typeof force === "boolean" ? force : !isOpen();
       sidebar.classList.toggle("active", open);
       hamburger.classList.toggle("active", open);
       overlay.classList.toggle("active", open);
@@ -113,24 +112,63 @@ function initUI() {
     };
     hamburger.addEventListener("click", () => toggleSidebar());
     overlay.addEventListener("click", () => toggleSidebar(false));
+
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && sidebar.classList.contains("active")) toggleSidebar(false);
+      if (e.key === "Escape" && isOpen()) toggleSidebar(false);
     });
-    // Close sidebar after in-page anchor click
-    $$('a[href^="#"]').forEach((link) => {
-      link.addEventListener("click", (e) => {
-        const href = link.getAttribute("href");
-        const target = href ? document.querySelector(href) : null;
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-          toggleSidebar(false);
-        }
-      });
+
+    // Delegated smooth-scroll for in-page anchors; also closes sidebar if open
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest('a[href^="#"]');
+      if (!link) return;
+      const href = link.getAttribute("href");
+      const target = href ? document.querySelector(href) : null;
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (isOpen()) toggleSidebar(false);
+    });
+  } else {
+    // Smooth-scroll on pages without sidebar
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest('a[href^="#"]');
+      if (!link) return;
+      const href = link.getAttribute("href");
+      const target = href ? document.querySelector(href) : null;
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
-  /* Simple accordion (for any .accordion-item on the page) */
+  /* Theme toggle — respects system; persists manual override; toast only on manual */
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  let userOverride = localStorage.getItem("themeOverride");
+
+  const applyTheme = (mode, silent = false) => {
+    document.documentElement.dataset.theme = mode;
+    if (themeToggle) themeToggle.textContent = mode === "dark" ? "Light Mode" : "Dark Mode";
+    if (!silent) showToast(mode === "dark" ? "Dark mode on" : "Light mode on", "info");
+  };
+
+  const initialAttr = document.documentElement.getAttribute("data-theme");
+  const initialMode = userOverride || initialAttr || (prefersDark.matches ? "dark" : "light");
+  applyTheme(initialMode, true);
+
+  prefersDark.addEventListener("change", (e) => {
+    if (!userOverride) applyTheme(e.matches ? "dark" : "light", true);
+  });
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      const newMode = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      userOverride = newMode;
+      localStorage.setItem("themeOverride", newMode);
+      applyTheme(newMode, false);
+    });
+  }
+
+  /* Simple accordion (any .accordion-item) */
   $$(".accordion-item").forEach((item) => {
     item.addEventListener("click", () => item.classList.toggle("open"));
     item.addEventListener("keydown", (e) => {
@@ -140,38 +178,6 @@ function initUI() {
       }
     });
     item.setAttribute("tabindex", "0");
-  });
-
-  /* Theme toggle — follows system by default, button overrides */
-  const applyTheme = (mode) => {
-    document.documentElement.dataset.theme = mode;
-    if (themeToggle) themeToggle.textContent = mode === "dark" ? "Light Mode" : "Dark Mode";
-    showToast(mode === "dark" ? "Dark mode on" : "Light mode on", "info");
-  };
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
-  // Set initial mode from system
-  applyTheme(prefersDark.matches ? "dark" : "light");
-  // Respond to system changes
-  prefersDark.addEventListener("change", (e) => applyTheme(e.matches ? "dark" : "light"));
-  // Manual toggle
-  if (themeToggle) {
-    themeToggle.addEventListener("click", () => {
-      const newMode = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-      applyTheme(newMode);
-    });
-  }
-
-  /* Smooth scroll for any anchor (backup for non-sidebar contexts) */
-  $$('a[href^="#"]').forEach((link) => {
-    link.addEventListener("click", (e) => {
-      const href = link.getAttribute("href");
-      if (!href) return;
-      const target = document.querySelector(href);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
   });
 }
 
