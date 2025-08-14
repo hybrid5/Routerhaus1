@@ -1,52 +1,44 @@
 /* ============================
    RouterHaus – home.js
    Page-only behavior for index.html
-   - Persona hover/focus effect
-   - Section reveal on scroll
-   - Lightweight value-card tilt (optional)
-   - Hooks into `partials:loaded` if header elements are needed later
 ============================ */
 (() => {
   "use strict";
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  /* ---- Persona interactions ---- */
-  function wirePersonas() {
-    const cards = $$(".persona-card");
-    if (!cards.length) return;
+  /* ---- Persona quick chips → route to kits with mapped filters ---- */
+  function wireQuickChips() {
+    const chips = $$(".persona-chips .chip");
+    if (!chips.length) return;
 
-    cards.forEach((card) => {
-      // Accessible hover/focus state
-      const setActive = (on) => card.classList.toggle("is-active", on);
-      card.addEventListener("mouseenter", () => setActive(true));
-      card.addEventListener("mouseleave", () => setActive(false));
-      card.addEventListener("focusin", () => setActive(true));
-      card.addEventListener("focusout", () => setActive(false));
+    const map = {
+      apt: "coverage=Apartment%2FSmall&recos=1",
+      large: "coverage=Large%2FMulti-floor&mesh=Mesh-ready&recos=1",
+      wfh: "use=Work%20from%20Home&recos=1",
+      gaming: "use=Gaming&wan=2.5G&recos=1",
+    };
 
-      // Keyboard click
-      card.setAttribute("tabindex", "0");
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          card.classList.toggle("is-active");
-        }
+    chips.forEach((btn) => {
+      if (!btn.getAttribute("type")) btn.setAttribute("type", "button");
+      btn.addEventListener("click", () => {
+        const key = btn.dataset.qpick;
+        const qs = map[key] || "quiz=1";
+        window.location.href = `kits.html?${qs}`;
       });
     });
   }
 
-  /* ---- Reveal animations on scroll ---- */
+  /* ---- Reveal animations on scroll (aligns with .reveal/.in-view in CSS) ---- */
   function revealify() {
-    const els = $$(
-      ".value-card, .persona-card, .product, .hero .hero-actions a, .product-row article, .footer-cta, .value-grid h2, .persona-heading"
-    );
+    const els = $$(".reveal");
     if (!els.length || !("IntersectionObserver" in window)) return;
-    els.forEach((el) => el.classList.add("will-reveal"));
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
           if (en.isIntersecting) {
-            en.target.classList.add("is-in");
+            en.target.classList.add("in-view");
             io.unobserve(en.target);
           }
         });
@@ -56,7 +48,7 @@
     els.forEach((el) => io.observe(el));
   }
 
-  /* ---- Optional: slight tilt on value cards (no external libs) ---- */
+  /* ---- Optional: slight tilt on value/product cards ---- */
   function tiltCards() {
     const cards = $$(".value-card, .product");
     if (!cards.length) return;
@@ -70,9 +62,9 @@
         const dy = (e.clientY - cy) / rect.height;
         cancelAnimationFrame(rAF);
         rAF = requestAnimationFrame(() => {
-          card.style.transform = `perspective(800px) rotateX(${(-dy * 6).toFixed(
-            2
-          )}deg) rotateY(${(dx * 6).toFixed(2)}deg) translateY(-6px)`;
+          card.style.transform =
+            `perspective(800px) rotateX(${(-dy * 6).toFixed(2)}deg) ` +
+            `rotateY(${(dx * 6).toFixed(2)}deg) translateY(-6px)`;
         });
       };
       const reset = () => {
@@ -85,16 +77,14 @@
     });
   }
 
-  /* ---- If header buttons are needed on the home page, bind after partials ---- */
+  /* ---- Hooks after header/footer partials (if needed later) ---- */
   function wireHeaderHooks() {
-    // Example: deep-link to kits quiz when a header button is present
-    // const quizBtn = document.getElementById('openQuiz');
-    // if (quizBtn) quizBtn.addEventListener('click', () => {/* optional analytics */});
+    // Example: const quizBtn = document.getElementById('openQuiz');
   }
 
   /* ---- Init ---- */
   document.addEventListener("DOMContentLoaded", () => {
-    wirePersonas();
+    wireQuickChips();
     revealify();
     tiltCards();
   });
