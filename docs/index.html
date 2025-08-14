@@ -1,171 +1,186 @@
 <!-- ===========================
-     RouterHaus v1 – index.html (updated with CTA deep-link)
+     RouterHaus v2 – index.html
      =========================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="RouterHaus – AI-powered router recommendations for every space." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="RouterHaus – AI-powered router recommendations for every space, from studio flats to multi-floor estates and offices." />
   <title>RouterHaus</title>
 
-  <!-- Theme Toggle -->
+  <!-- Theme sync -->
+  <meta name="color-scheme" content="light dark" />
   <script>
-(function () {
-  const KEY = 'rh-theme';
-  const root = document.documentElement;
-  const media = window.matchMedia('(prefers-color-scheme: dark)');
-  const apply = () => root.setAttribute('data-theme', media.matches ? 'dark' : 'light');
-  apply();
-  media.addEventListener('change', apply);
-})();
-</script>
+    (() => {
+      const root = document.documentElement;
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const apply = () => root.setAttribute('data-theme', media.matches ? 'dark' : 'light');
+      apply(); media.addEventListener('change', apply);
+    })();
+  </script>
 
-  <!-- Fonts & Styles -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Fonts & Base Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="assets/css/home.css" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-  <div id="header-placeholder"></div>
+  <!-- Header partial mounts BEFORE main to avoid CLS -->
+  <div id="header-placeholder" data-partial="header.html"></div>
 
   <main>
-  <!-- ===== Hero ===== -->
-  <section class="hero">
-    <h1>Lightning-Fast Wi-Fi, Zero Guesswork</h1>
-    <p>Your personalised network in under 60 seconds — for homes, apartments, and offices.</p>
-    <div class="hero-actions">
-      <!-- Deep-link CTA with quiz trigger -->
-      <a href="kits.html?quiz=1" class="btn">Start Recommendation</a>
-      <a href="consult.html" class="btn-secondary">Consult an Expert</a>
-    </div>
-  </section>
+    <!-- ===== HERO (split) ===== -->
+    <section class="hero index-hero">
+      <div class="hero-wrap container">
+        <div class="hero-copy reveal">
+          <h1>Lightning-Fast Wi-Fi, Zero Guesswork</h1>
+          <p>Answer a few questions and get a dialed-in setup — for apartments, large homes, and growing teams.</p>
+          <div class="hero-actions">
+            <a href="kits.html?quiz=1" class="btn">Start Recommendation</a>
+            <a href="consult.html" class="btn-secondary">Talk to an Engineer</a>
+          </div>
+          <ul class="stats">
+            <li><strong>3-step</strong> kit finder</li>
+            <li><strong>Multi-gig</strong> ready picks</li>
+            <li><strong>Mesh</strong> for whole-home coverage</li>
+          </ul>
+        </div>
 
-  <!-- ===== Why RouterHaus ===== -->
-  <section id="why" class="value-grid">
-    <h2>Why RouterHaus? The Upgrade Every Internet User Needs.</h2>
-
-    <div class="value-cards">
-      <div class="value-card glass">
-        <h3>AI-Powered, Unbiased Picks</h3>
-        <p>Instantly surface the best router for your setup — across all leading brands.</p>
+        <aside class="hero-card glass reveal">
+          <h3>What best describes you?</h3>
+          <div class="persona-chips">
+            <button class="chip" data-qpick="apt"><i class="fa-solid fa-city"></i> Apartment / Condo</button>
+            <button class="chip" data-qpick="large"><i class="fa-solid fa-house-chimney"></i> Large Home</button>
+            <button class="chip" data-qpick="wfh"><i class="fa-solid fa-briefcase"></i> Work from Home</button>
+            <button class="chip" data-qpick="gaming"><i class="fa-solid fa-gamepad"></i> Gaming</button>
+          </div>
+          <p class="mini subtle"><i class="fa-regular fa-lightbulb"></i> We’ll pre-apply the right filters — you can tweak anytime.</p>
+        </aside>
       </div>
-      <div class="value-card glass">
-        <h3>Unlock Every Device’s Potential</h3>
-        <p>Enjoy the speed your phones, TVs, and smart-home gear were built for.</p>
-      </div>
-      <div class="value-card glass">
-        <h3>Easy Setup & Real Support</h3>
-        <p>Step-by-step install guides plus ongoing troubleshooting help.</p>
-      </div>
-    </div>
+    </section>
 
-    <h3 class="persona-heading">Made For…</h3>
-    <div class="persona-grid">
-      <div class="persona-card glass">
-        <h4>Apartments & Condos</h4>
-        <p>Kill dead zones and dropped calls in compact spaces.</p>
+    <!-- ===== TRUST ===== -->
+    <section class="trust">
+      <div class="container trust-inner reveal">
+        <span class="kicker">Trusted designs</span>
+        <div class="trust-logos" aria-label="Vendors we work with">
+          <span class="pill">UniFi</span>
+          <span class="pill">Aruba</span>
+          <span class="pill">TP-Link</span>
+          <span class="pill">ASUS</span>
+          <span class="pill">Synology</span>
+          <span class="pill">MikroTik</span>
+        </div>
       </div>
-      <div class="persona-card glass">
-        <h4>Large Homes</h4>
-        <p>Whole-home mesh for every floor and corner.</p>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="steps">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>How it works</h2>
+          <p class="subtle">From quiz to install — clarity at every step.</p>
+        </header>
+        <div class="grid cards-3">
+          <article class="card reveal">
+            <div class="icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>1) Quick quiz</h3>
+            <p>Tell us about your space, devices, and plan speed. We translate that into real-world requirements.</p>
+          </article>
+          <article class="card reveal">
+            <div class="icon"><i class="fa-solid fa-sliders"></i></div>
+            <h3>2) Compare picks</h3>
+            <p>Sort by Wi-Fi gen, mesh, WAN tier, and price. Add up to four to compare.</p>
+          </article>
+          <article class="card reveal">
+            <div class="icon"><i class="fa-solid fa-diagram-project"></i></div>
+            <h3>3) Deploy</h3>
+            <p>Use our guides or book an engineer. We can stage, tune, and hand off remotely or on-site.</p>
+          </article>
+        </div>
       </div>
-      <div class="persona-card glass">
-        <h4>Remote Work / Home Office</h4>
-        <p>Crystal-clear video calls and faster uploads.</p>
+    </section>
+
+    <!-- ===== FEATURED PICKS (Consumer) ===== -->
+    <section class="product-grid">
+      <h2>Great Consumer Picks</h2>
+      <div class="product-row">
+        <article class="product glass reveal">
+          <img src="Deco-BE25.png" alt="TP-Link Deco BE25">
+          <h4>TP-Link Deco BE25</h4>
+          <p class="tag">Apartments & small homes</p>
+          <p>≈ 6,600 sq ft • $249.99</p>
+          <a class="btn-secondary" href="kits.html?coverage=Apartment/Small&recos=1">View options</a>
+        </article>
+        <article class="product glass reveal">
+          <img src="google-nest-wi-fi.png" alt="Google Nest Wi-Fi Pro 3-pack">
+          <h4>Google Nest Wi-Fi Pro (3-pack)</h4>
+          <p class="tag">Seamless setup</p>
+          <p>≈ 6,600 sq ft • $399.99</p>
+          <a class="btn-secondary" href="kits.html?mesh=Mesh-ready&recos=1">View options</a>
+        </article>
+        <article class="product glass reveal">
+          <img src="ASUS-BE98.png" alt="Asus ROG GT-BE98 Pro">
+          <h4>ASUS ROG GT-BE98 Pro</h4>
+          <p class="tag">Gaming & performance</p>
+          <p>≈ 4,800 sq ft • $629.99</p>
+          <a class="btn-secondary" href="kits.html?use=Gaming&wan=2.5G&recos=1">View options</a>
+        </article>
       </div>
-      <div class="persona-card glass">
-        <h4>Gamers & Streamers</h4>
-        <p>Lowest latency and highest speeds — no lag, no buffering.</p>
+    </section>
+
+    <!-- ===== ENTERPRISE STRIP ===== -->
+    <section class="enterprise-band">
+      <div class="container band-inner">
+        <div class="band-copy reveal">
+          <h2>For businesses & large properties</h2>
+          <p class="subtle">Multi-floor roaming, VLAN separation, multi-gig backbones, and controller-based tuning.</p>
+        </div>
+        <div class="band-ctas reveal">
+          <a class="btn" href="consult.html">Enterprise / Large Home Consult</a>
+          <a class="btn-secondary" href="kits.html?mesh=Mesh-ready&coverage=Large/Multi-floor&recos=1">See mesh systems</a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===== Consumer Picks ===== -->
-  <section id="benefits" class="product-grid">
-    <h2>Top Consumer Picks</h2>
-    <div class="product-row">
-      <article class="product glass">
-        <img src="Deco-BE25.png" alt="TP-Link Deco BE25" />
-        <h4>TP-Link Deco BE25</h4>
-        <p class="tag">Apartments & small homes</p>
-        <p>≈ 6,600 sq ft • $249.99</p>
-        <a href="index.html" class="btn-secondary">View</a>
-      </article>
-      <article class="product glass">
-        <img src="google-nest-wi-fi.png" alt="Google Nest Wi-Fi" />
-        <h4>Google Nest Wi-Fi Pro 3-pack</h4>
-        <p class="tag">Seamless setup</p>
-        <p>≈ 6,600 sq ft • $399.99</p>
-        <a href="index.html" class="btn-secondary">View</a>
-      </article>
-      <article class="product glass">
-        <img src="ASUS-BE98.png" alt="Asus ROG GT-BE98" />
-        <h4>Asus ROG GT-BE98 Pro</h4>
-        <p class="tag">Gaming & performance</p>
-        <p>≈ 4,800 sq ft • $629.99</p>
-        <a href="index.html" class="btn-secondary">View</a>
-      </article>
-    </div>
-  </section>
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="accordion">
+      <h2>FAQ</h2>
 
-  <!-- ===== Enterprise Picks ===== -->
-  <section id="enterprise" class="product-grid">
-    <h2>Pro & Enterprise Gear</h2>
-    <div class="product-row">
-      <article class="product glass">
-        <img src="Ubiquiti-Dream-Router.png" alt="Ubiquiti UniFi Dream Router" />
-        <h4>UniFi Dream Router</h4>
-        <p class="tag">VLANs & remote control</p>
-        <p>Custom scale • $199</p>
-        <a href="consult.html" class="btn-secondary">Consult</a>
-      </article>
-      <article class="product glass">
-        <img src="Synology-RT6600ax-Router.png" alt="Synology RT6600AX" />
-        <h4>Synology RT6600AX</h4>
-        <p class="tag">SMB security</p>
-        <p>≈ 3 000 sq ft • $329.99</p>
-        <a href="consult.html" class="btn-secondary">Consult</a>
-      </article>
-      <article class="product glass">
-        <img src="mikrotik-rb5009.png" alt="MikroTik RB5009" />
-        <h4>MikroTik RB5009</h4>
-        <p class="tag">Custom routing</p>
-        <p>Modular • $219</p>
-        <a href="consult.html" class="btn-secondary">Consult</a>
-      </article>
-    </div>
-  </section>
+      <div class="accordion-item reveal">
+        <h4>Do you support on-site installs?</h4><span>+</span>
+        <p>Yes. We can coordinate on-site installation, validation, and handover. Remote staging and controller setup are also available.</p>
+      </div>
 
-  <!-- ===== FAQ ===== -->
-  <section id="faq" class="accordion">
-    <h2>FAQ</h2>
-    <div class="accordion-item">
-      <h4>How do you serve business clients?</h4><span>+</span>
-      <p>We design multi-site networks with VPN, VLAN, and remote management.</p>
-    </div>
-    <div class="accordion-item">
-      <h4>What counts as a “large-scale” setup?</h4><span>+</span>
-      <p>Anything with multiple routers / switches or PoE devices like cameras.</p>
-    </div>
-    <div class="accordion-item">
-      <h4>Is RouterHaus only for homes?</h4><span>+</span>
-      <p>No — we cover apartments, smart homes, SMB, and enterprise networks.</p>
-    </div>
-  </section>
+      <div class="accordion-item reveal">
+        <h4>Will the quiz work for office spaces?</h4><span>+</span>
+        <p>It’s a great start for sizing and features. For multi-tenant or multi-AP scenarios, book a consult and we’ll design the topology.</p>
+      </div>
 
-  <!-- ===== CTA ===== -->
-  <section class="footer-cta" id="start">
-    <h2>Design Your Network</h2>
-    <p>From a 1-bed flat to a full campus — we’ve got you covered.</p>
-    <!-- Deep-link CTA for quiz start -->
-    <a href="kits.html?quiz=1" class="btn">Start Matching →</a>
-    <a href="consult.html" class="btn-secondary">Enterprise Consult</a>
-  </section>
+      <div class="accordion-item reveal">
+        <h4>Do you only recommend one brand?</h4><span>+</span>
+        <p>No — we’re vendor-agnostic. We’ll suggest the right gear for your goals, scale, and environment.</p>
+      </div>
+    </section>
 
+    <!-- ===== CTA ===== -->
+    <section class="footer-cta" id="start">
+      <h2>Design Your Network</h2>
+      <p>From a studio flat to a full campus — we’ve got you covered.</p>
+      <a href="kits.html?quiz=1" class="btn">Start Matching →</a>
+      <a href="consult.html" class="btn-secondary">Enterprise Consult</a>
+    </section>
   </main>
 
-  <div id="footer-placeholder"></div>
+  <!-- Footer partial -->
+  <div id="footer-placeholder" data-partial="footer.html"></div>
 
+  <!-- Scripts -->
   <script src="scripts.js" defer></script>
+  <script type="module" src="assets/js/home.js"></script>
 </body>
 </html>
