@@ -1,0 +1,100 @@
+/* ======================================
+   RouterHaus — About page (scoped styles)
+   Works with refined main.css
+   ====================================== */
+
+.about-page section { padding: clamp(36px, 7vw, 88px) 0; }
+
+/* Reusable */
+.about-page .subtle { color: var(--text-muted); }
+.about-page .grad {
+  background: linear-gradient(90deg, var(--accent), var(--primary));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.about-page .eyebrow {
+  display:inline-block; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; font-size:.8rem; color: var(--text-muted);
+}
+
+/* ===== HERO ===== */
+.about-page .hero{
+  color: var(--text-primary);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--surface) 65%, transparent), transparent 60%),
+    var(--bg);
+  padding: clamp(48px, 8vw, 96px) 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--text-muted) 12%, transparent);
+}
+.about-page .hero-inner{ width: min(1000px, calc(100% - 2rem)); margin-inline: auto; }
+.about-page .hero-copy h1{
+  font-size: var(--fs-900); line-height: 1.05; margin: .25rem 0 .5rem;
+}
+.about-page .hero-copy .lede{
+  font-size: var(--fs-600); color: var(--text-muted); max-width: 60ch; margin: 0;
+}
+
+/* ===== WHY ===== */
+.about-page .why .section-head{ text-align:center; margin-bottom: clamp(12px, 1.8vw, 20px); }
+.about-page .why .section-head h2{ font-size: var(--fs-800); }
+.about-page .value-cards{
+  display:grid; gap: clamp(12px, 1.8vw, 18px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: clamp(8px, 1vw, 12px);
+}
+@media (max-width: 960px){ .about-page .value-cards{ grid-template-columns: 1fr; } }
+
+.about-page .value-card{
+  border-radius: var(--radius-lg);
+  border: var(--card-border);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(16px, 2vw, 20px);
+}
+.about-page .value-card .icon{
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border-radius: 12px; margin-bottom: .45rem;
+  background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 28%, transparent), transparent);
+  color: var(--nav-hover); font-size: 1.1rem;
+}
+.about-page .value-card h3{ margin: .2rem 0 .35rem; font-size: var(--fs-700); }
+.about-page .value-card p{ margin: 0; color: var(--text-muted); }
+
+/* Personas */
+.about-page .persona-heading{
+  margin: clamp(18px, 3vw, 28px) 0 clamp(8px, 1.4vw, 14px);
+  font-size: var(--fs-700); color: var(--secondary);
+}
+.about-page .persona-grid{
+  display:grid; gap: clamp(12px, 1.6vw, 16px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 1000px){ .about-page .persona-grid{ grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px){ .about-page .persona-grid{ grid-template-columns: 1fr; } }
+
+.about-page .persona-card{
+  border-radius: var(--radius-lg);
+  border: var(--card-border);
+  background: var(--card);
+  padding: clamp(14px, 2vw, 18px);
+  box-shadow: var(--shadow-sm);
+  transition: transform .18s ease;
+}
+.about-page .persona-card:hover{ transform: translateY(-3px); }
+.about-page .persona-card h4{ margin: 0 0 .25rem; font-size: 1.02rem; color: var(--accent); }
+.about-page .persona-card p{ margin: 0; color: var(--text-muted); }
+
+/* ===== FAQ ===== */
+.about-page .faq-title{ text-align:center; margin: 0 0 .6rem; }
+.about-page .accordion{ max-width: 800px; margin: 0 auto; }
+.about-page .accordion-item{
+  border-top: 1px solid color-mix(in oklab, var(--text-muted) 14%, transparent);
+  cursor: pointer; padding: 1rem 0; position: relative;
+}
+.about-page .accordion-item h4{ margin: 0; font-size: var(--fs-600); }
+.about-page .accordion-item span{
+  position: absolute; right: .25rem; top: .85rem; font-size: 1.2rem;
+  color: var(--primary); transition: transform .2s ease;
+}
+.about-page .accordion-item.open span{ transform: rotate(45deg); }
+.about-page .accordion-item p{ color: var(--text-muted); margin: .55rem 0 0; display: none; }
+.about-page .accordion-item.open p{ display: block; }
