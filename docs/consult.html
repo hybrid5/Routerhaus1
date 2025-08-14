@@ -1,39 +1,413 @@
 <!-- ===========================
-     RouterHaus v1 – consult.html
+     RouterHaus v2 – consult.html
+     Enterprise & Large-Home Consulting
      =========================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Expert network consulting for business and large-scale installs." />
-  <title>Consult – RouterHaus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Expert network consulting, design, and white-glove deployment for large homes, estates, offices, hospitality, and campuses." />
+  <title>Consult · RouterHaus</title>
 
-  <!-- Fonts & Styles -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Fonts & Base Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="main.css" />
+
+  <!-- Consult page styles -->
+  <link rel="stylesheet" href="assets/css/consult.css" />
+
+  <!-- Theme sync -->
+  <meta name="color-scheme" content="light dark" />
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const apply = () => root.setAttribute('data-theme', media.matches ? 'dark' : 'light');
+      apply(); media.addEventListener('change', apply);
+    })();
+  </script>
 </head>
 <body>
-  <div id="header-placeholder"></div>
+  <!-- Header partial -->
+  <div id="header-placeholder" data-partial="header.html"></div>
 
-  <main>
+  <main class="consult-main">
 
-  <!-- ===== Consult Hero ===== -->
-  <section class="hero">
-    <h1>Expert Network Consulting</h1>
-    <p>Tailored solutions for business and large-scale installs.</p>
-  </section>
+    <!-- ===== Hero ===== -->
+    <section class="consult-hero">
+      <div class="container hero-inner">
+        <div class="hero-copy reveal">
+          <h1>Enterprise-Grade Networks, Seamlessly Delivered</h1>
+          <p>From multi-wing residences to office floors and boutique hospitality — we design, harden, and optimize Wi-Fi and wired networks that simply work.</p>
+          <div class="hero-ctas">
+            <button class="btn primary js-open-intake" type="button">Book a strategy call</button>
+            <a class="btn ghost" href="kits.html">Explore recommended kits</a>
+          </div>
+          <ul class="hero-bullets">
+            <li>Whole-property coverage with roaming that feels invisible</li>
+            <li>Secure guest networks, VLANs, and smart home segmentation</li>
+            <li>Multi-gig core, PoE planning, and pro-grade mesh backhaul</li>
+          </ul>
+        </div>
+        <div class="hero-art glass reveal" aria-hidden="true">
+          <div class="rings"></div>
+          <div class="stats">
+            <div class="stat"><strong>10GbE</strong><span>backbone ready</span></div>
+            <div class="stat"><strong>200+</strong><span>devices optimized</span></div>
+            <div class="stat"><strong>0</strong><span>dead-zones goal</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <section class="footer-cta" id="start">
-    <h2>Design Your Network</h2>
-    <p>From a 1-bed flat to a full campus — we’ve got you covered.</p>
-    <a href="kits.html" class="btn">Start Matching →</a>
-    <a href="consult.html" class="btn-secondary">Enterprise Consult</a>
-  </section>
+    <!-- ===== Trust / Vertical Badges ===== -->
+    <section class="trustbar">
+      <div class="container trust-inner reveal">
+        <span class="kicker">Trusted for</span>
+        <ul>
+          <li><i class="fas fa-building"></i> Offices & Studios</li>
+          <li><i class="fas fa-hotel"></i> Hospitality</li>
+          <li><i class="fas fa-home"></i> Large Homes</li>
+          <li><i class="fas fa-warehouse"></i> MDUs & Builders</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Outcomes grid ===== -->
+    <section class="outcomes">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Outcomes we engineer</h2>
+          <p>Performance and resilience you can feel — and forget about.</p>
+        </header>
+        <div class="grid cards-4">
+          <article class="card reveal">
+            <h3>Seamless roaming</h3>
+            <p>Controller-driven steering, band-balancing, and sticky-client mitigation so calls don’t drop as you move.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Quiet reliability</h3>
+            <p>Wired backhaul, channel planning, DFS awareness, and RF hygiene reduce retries and latency spikes.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Segmented security</h3>
+            <p>Guest SSIDs, IoT VLANs, WPA3/802.1X options, and per-zone policies that protect core devices.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Multi-gig ready</h3>
+            <p>2.5G/10G aggregation, PoE budgets, and fiber runs sized for your next decade.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Services / Packages ===== -->
+    <section class="packages">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Engagement options</h2>
+          <p>Start where you are — scale as needed.</p>
+        </header>
+        <div class="grid cards-4">
+          <article class="card reveal">
+            <h3>Site Assessment</h3>
+            <ul class="list">
+              <li>Discovery call (30–45 min)</li>
+              <li>Plan review + RF risk mapping</li>
+              <li>Upgrade path recommendations</li>
+            </ul>
+            <button class="btn primary js-open-intake" type="button">Get started</button>
+          </article>
+          <article class="card reveal">
+            <h3>Design & Bill of Materials</h3>
+            <ul class="list">
+              <li>Floor-by-floor AP placement</li>
+              <li>Switching, PoE, and backhaul plan</li>
+              <li>Phased rollout + BOM</li>
+            </ul>
+            <button class="btn primary js-open-intake" type="button">Request a design</button>
+          </article>
+          <article class="card reveal">
+            <h3>White-Glove Deployment</h3>
+            <ul class="list">
+              <li>On-site install & validation</li>
+              <li>SSID/VLAN policy & hardening</li>
+              <li>Acceptance report & handover</li>
+            </ul>
+            <button class="btn primary js-open-intake" type="button">Plan my install</button>
+          </article>
+          <article class="card reveal">
+            <h3>ProCare Concierge</h3>
+            <ul class="list">
+              <li>24/7 monitoring & firmware policy</li>
+              <li>SLA response with remote fixes</li>
+              <li>Quarterly optimizations</li>
+            </ul>
+            <button class="btn primary js-open-intake" type="button">Talk to an expert</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Process timeline ===== -->
+    <section class="process">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>How we work</h2>
+          <p>Proven, repeatable, and efficient.</p>
+        </header>
+        <ol class="steps">
+          <li class="reveal"><span>1</span><strong>Discover</strong><em>Goals, constraints, and existing gear</em></li>
+          <li class="reveal"><span>2</span><strong>Survey</strong><em>Plans, materials, cable paths, and RF</em></li>
+          <li class="reveal"><span>3</span><strong>Design</strong><em>AP heatmap, switching, WAN, security</em></li>
+          <li class="reveal"><span>4</span><strong>Deploy</strong><em>Install, validate, and tune</em></li>
+          <li class="reveal"><span>5</span><strong>Support</strong><em>Monitoring and periodic optimization</em></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== Case studies scroller ===== -->
+    <section class="cases">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Recent projects</h2>
+          <p>Representative outcomes across properties and teams.</p>
+        </header>
+        <div class="case-scroller" id="caseScroller" aria-label="Case studies">
+          <article class="case glass">
+            <header><strong>Hillside Residence</strong><span>7,800 sq ft · 3 floors</span></header>
+            <p>Converted consumer mesh to wired backhaul + Wi-Fi 7 APs. Achieved <b>&lt;15 ms</b> latency median and <b>0 dead zones</b>.</p>
+          </article>
+          <article class="case glass">
+            <header><strong>Creative Studio</strong><span>12,000 sq ft</span></header>
+            <p>Segmented production and guest Wi-Fi, added 10GbE core, and hardened VLAN policies. <b>6×</b> faster asset transfers.</p>
+          </article>
+          <article class="case glass">
+            <header><strong>Boutique Inn</strong><span>28 rooms</span></header>
+            <p>Per-room APs with centralized control, rate-limited guest VLAN, and captive portal. <b>95%</b> fewer support tickets.</p>
+          </article>
+          <article class="case glass">
+            <header><strong>Developer MDU</strong><span>4 buildings</span></header>
+            <p>Fiber aggregation with PoE distribution, camera network isolation, and emergency failover WAN.</p>
+          </article>
+        </div>
+        <div class="case-controls">
+          <button class="icon-btn" id="casePrev" aria-label="Previous">&larr;</button>
+          <button class="icon-btn" id="caseNext" aria-label="Next">&rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Smart intake (multi-step) ===== -->
+    <section class="intake">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Tell us about your space</h2>
+          <p>Share a few details and we’ll propose the optimal plan.</p>
+        </header>
+
+        <form id="intakeForm" novalidate>
+          <div class="progress">
+            <div class="bar" id="progressBar" style="width: 20%"></div>
+          </div>
+
+          <!-- Step 1 -->
+          <fieldset class="step" data-step="1">
+            <legend>Property & use</legend>
+            <label>
+              <span>Property type</span>
+              <select name="propertyType" required>
+                <option value="">Select…</option>
+                <option>Large Home / Estate</option>
+                <option>Office / Studio</option>
+                <option>Hospitality</option>
+                <option>MDU / Developer</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label>
+              <span>Primary goals</span>
+              <select name="primaryGoal" required>
+                <option value="">Select…</option>
+                <option>Eliminate dead zones</option>
+                <option>High-capacity multi-gig backbone</option>
+                <option>Guest & IoT segmentation</option>
+                <option>Security hardening / monitoring</option>
+                <option>New build planning</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <!-- Step 2 -->
+          <fieldset class="step" data-step="2" hidden>
+            <legend>Scale & layout</legend>
+            <label>
+              <span>Approx. square footage</span>
+              <input type="number" name="sqft" min="500" step="100" placeholder="e.g., 7800" required />
+            </label>
+            <label>
+              <span>Floors</span>
+              <input type="number" name="floors" min="1" max="20" step="1" placeholder="e.g., 3" required />
+            </label>
+            <label>
+              <span>Wired backhaul possible?</span>
+              <select name="backhaul">
+                <option value="">Select…</option>
+                <option>Yes — Ethernet/fiber runs are feasible</option>
+                <option>Maybe — some paths exist</option>
+                <option>No — wireless backhaul only</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <!-- Step 3 -->
+          <fieldset class="step" data-step="3" hidden>
+            <legend>Connectivity & devices</legend>
+            <label>
+              <span>Internet plan</span>
+              <select name="wanTier">
+                <option value="">Select…</option>
+                <option>≤1G</option>
+                <option>2.5G</option>
+                <option>5G</option>
+                <option>10G</option>
+              </select>
+            </label>
+            <label>
+              <span>Connected devices (approx.)</span>
+              <select name="deviceLoad">
+                <option value="">Select…</option>
+                <option>1–5</option>
+                <option>6–15</option>
+                <option>16–30</option>
+                <option>31–60</option>
+                <option>61–100</option>
+                <option>100+</option>
+              </select>
+            </label>
+            <label>
+              <span>Special needs</span>
+              <input type="text" name="special" placeholder="VoIP, cameras, servers, guest portal, etc." />
+            </label>
+          </fieldset>
+
+          <!-- Step 4 -->
+          <fieldset class="step" data-step="4" hidden>
+            <legend>Timeline & budget</legend>
+            <label>
+              <span>Timeline</span>
+              <select name="timeline" required>
+                <option value="">Select…</option>
+                <option>ASAP (0–2 weeks)</option>
+                <option>Soon (2–6 weeks)</option>
+                <option>Planning (6+ weeks)</option>
+              </select>
+            </label>
+            <label>
+              <span>Investment range (hardware + services)</span>
+              <select name="budget">
+                <option value="">Select…</option>
+                <option>Custom assessment only</option>
+                <option>$5k–$10k</option>
+                <option>$10k–$25k</option>
+                <option>$25k–$50k</option>
+                <option>$50k+</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <!-- Step 5 -->
+          <fieldset class="step" data-step="5" hidden>
+            <legend>Contact</legend>
+            <label>
+              <span>Your name</span>
+              <input type="text" name="name" autocomplete="name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span>Phone (optional)</span>
+              <input type="tel" name="phone" autocomplete="tel" />
+            </label>
+            <label>
+              <span>Notes (optional)</span>
+              <textarea name="notes" rows="4" maxlength="1200" placeholder="Anything else we should know? Materials, prior gear, drawings, constraints…"></textarea>
+            </label>
+          </fieldset>
+
+          <div class="step-actions">
+            <button class="btn ghost" type="button" id="prevStep" disabled>Back</button>
+            <button class="btn primary" type="button" id="nextStep">Next</button>
+            <button class="btn primary" type="submit" id="submitIntake" hidden>Request proposal</button>
+          </div>
+
+          <p class="form-msg" id="formMsg" role="alert" aria-live="polite"></p>
+        </form>
+
+        <div class="after-intake" id="afterIntake" hidden>
+          <div class="glass thanks">
+            <h3>Thanks — we’re on it.</h3>
+            <p>We’ve captured your details. A specialist will reach out shortly.</p>
+            <div class="stack">
+              <a id="downloadBrief" class="btn" href="#" download>Download your intake summary</a>
+              <a id="mailtoLink" class="btn ghost" href="#">Open in email</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="faq">
+      <div class="container">
+        <header class="section-head reveal">
+          <h2>Common questions</h2>
+        </header>
+        <div class="grid faq-grid">
+          <details class="reveal">
+            <summary>Can you work with my builder or GC?</summary>
+            <p>Yes — we coordinate with architects, builders, electricians, and AV teams to plan conduit, low-voltage, and AP placement before drywall.</p>
+          </details>
+          <details class="reveal">
+            <summary>Do you support remote properties?</summary>
+            <p>We can ship pre-configured gear and travel for on-site deployment. Remote monitoring keeps everything healthy after we leave.</p>
+          </details>
+          <details class="reveal">
+            <summary>Which brands do you specify?</summary>
+            <p>Solution-first. We select hardware that fits your goals — Wi-Fi 7 APs, multi-gig switching, and reliable gateways from proven vendors.</p>
+          </details>
+          <details class="reveal">
+            <summary>What about privacy and security?</summary>
+            <p>Principle of least privilege, segmented networks, and firmware policies. We’ll align to your compliance needs where applicable.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Bottom CTA ===== -->
+    <section class="footer-cta">
+      <div class="container cta-inner">
+        <h2>Ready to blueprint your network?</h2>
+        <p>We’ll scope, design, and deliver a solution that just works.</p>
+        <div class="cta-actions">
+          <button class="btn primary js-open-intake" type="button">Start the consult</button>
+          <a class="btn ghost" href="kits.html">Browse kits</a>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <div id="footer-placeholder"></div>
+  <!-- Footer partial -->
+  <div id="footer-placeholder" data-partial="footer.html"></div>
 
+  <!-- Scripts -->
   <script src="scripts.js" defer></script>
+  <script type="module" src="assets/js/consult.js"></script>
+
+  <!-- Icons (Font Awesome) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </body>
 </html>
