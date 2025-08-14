@@ -1,23 +1,27 @@
 /* assets/js/quiz-modal.js
- * Reimagined Quiz (robust to late-mounted header):
- * - Delegated click handlers (#openQuiz / #editQuiz / [data-open-quiz] / [data-edit-quiz])
- * - Works even if header.html mounts after this script
- * - Progress, mesh hint, focus trap, a11y, LS restore
- * - Submits to window.RH_APPLY_QUIZ(answers)
+ * Robust Quiz Modal
+ * - Delegated open/edit handlers (works even if header mounts later)
+ * - Focus trap, Esc/outer-click close, a11y wiring
+ * - LocalStorage restore/persist
+ * - Deep-link support (?quiz=1) independent of script order
+ * - Emits 'quiz:ready' when wired; listens for 'quiz:open'
+ * - Submits to window.RH_APPLY_QUIZ(answers) if present
  */
 (() => {
   const dlg = document.getElementById('quizModal');
   if (!dlg) return; // no-op if modal not present
 
-  // Local helpers (don't rely on globals)
+  // ---------- Utilities ----------
   const all = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const firstFocusable = (root) =>
-    all('a[href],button:not([disabled]),select:not([disabled]),input:not([disabled]):not([type=hidden]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])", root)
-      .filter(el => el.offsetParent !== null)[0] || root;
+    all(
+      'a[href], button:not([disabled]), select:not([disabled]), input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      root
+    ).filter(el => el.offsetParent !== null)[0] || root;
 
   const LS_KEY = 'rh.quiz.answers';
 
-  // Core nodes (form & fields exist in page HTML already)
+  // Core nodes
   const form        = document.getElementById('quizForm');
   const selCoverage = document.getElementById('qCoverage');
   const selDevices  = document.getElementById('qDevices');
@@ -36,31 +40,46 @@
   function openModal(from = document.activeElement) {
     lastOpener = from || document.activeElement || null;
     prefillForm();
-    dlg.showModal();
+
+    // Ensure dialog is visible
+    try {
+      if (typeof dlg.showModal === 'function') dlg.showModal();
+      else dlg.setAttribute('open', ''); // soft fallback
+    } catch {
+      dlg.setAttribute('open', '');
+    }
+
     dlg.classList.add('is-open');
     queueMicrotask(() => firstFocusable(dlg)?.focus());
     attachTrap();
     updateMeshHint();
     updateProgress();
   }
+
   function closeModal() {
     detachTrap();
     dlg.classList.remove('is-open');
-    setTimeout(() => { if (dlg.open) dlg.close(); restoreFocus(); }, 0);
+    setTimeout(() => {
+      try { if (dlg.open) dlg.close(); else dlg.removeAttribute('open'); } catch {}
+      restoreFocus();
+    }, 0);
   }
-  function restoreFocus() { try { lastOpener?.focus?.(); } catch {} }
 
-  // Backdrop click closes
+  function restoreFocus() {
+    try { lastOpener?.focus?.(); } catch {}
+  }
+
+  // Backdrop (outside content rect) click -> close
   dlg.addEventListener('click', (e) => {
     const r = dlg.getBoundingClientRect();
     const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
     if (!inside) closeModal();
   });
 
-  // Native Esc
+  // Native Esc (dialog "cancel")
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); });
 
-  // Header buttons may mount later — use **delegation**
+  // Header buttons may mount later — use delegation
   document.addEventListener('click', (e) => {
     const openProxy = e.target.closest('#openQuiz,[data-open-quiz]');
     if (openProxy) { e.preventDefault(); openModal(openProxy); return; }
@@ -81,11 +100,16 @@
     trapHandler = (e) => {
       if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
       if (e.key !== 'Tab') return;
-      const items = all('a[href],button:not([disabled]),select:not([disabled]),input:not([disabled]):not([type=hidden]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])', dlg)
-        .filter(el => el.offsetParent !== null);
+
+      const items = all(
+        'a[href], button:not([disabled]), select:not([disabled]), input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        dlg
+      ).filter(el => el.offsetParent !== null);
+
       if (!items.length) return;
       const idx = items.indexOf(document.activeElement);
       const last = items.length - 1;
+
       if (e.shiftKey) {
         if (idx <= 0 || idx === -1) { e.preventDefault(); items[last].focus(); }
       } else {
@@ -94,14 +118,22 @@
     };
     document.addEventListener('keydown', trapHandler, true);
   }
-  function detachTrap() { if (trapHandler) document.removeEventListener('keydown', trapHandler, true); trapHandler = null; }
+  function detachTrap() {
+    if (trapHandler) document.removeEventListener('keydown', trapHandler, true);
+    trapHandler = null;
+  }
 
-  // ---------- Prefill ----------
-  function getStored() { try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { return null; } }
-  function setStored(a) { try { localStorage.setItem(LS_KEY, JSON.stringify(a)); } catch {} }
+  // ---------- Prefill / Persist ----------
+  function getStored() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { return null; }
+  }
+  function setStored(a) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(a)); } catch {}
+  }
 
   function prefillForm() {
     const a = getStored() || {};
+
     if (selCoverage) selCoverage.value = a.coverage || '';
     if (selDevices)  selDevices.value  = a.devices  || '';
     if (selUse)      selUse.value      = a.use      || '';
@@ -111,15 +143,18 @@
     const qSpeed = form?.elements?.qSpeedLabel;
     if (qSpeed) {
       const target = String(a.wanTierLabel || '');
-      [...qSpeed].forEach(r => r.checked = (r.value === target));
-      if (!target) [...qSpeed].find(r => r.value === '')?.setAttribute('checked','');
+      [...qSpeed].forEach(r => { r.checked = (r.value === target); });
+      if (!target) {
+        const unsure = [...qSpeed].find(r => r.value === '');
+        if (unsure) unsure.checked = true;
+      }
     }
 
     if (meshAuto) meshAuto.checked = a.meshAuto !== false;
     const meshRadios = form?.elements?.qMesh;
     if (meshRadios) {
       const meshVal = a.mesh || '';
-      [...meshRadios].forEach(r => r.checked = (r.value === meshVal));
+      [...meshRadios].forEach(r => { r.checked = (r.value === meshVal); });
     }
   }
 
@@ -128,6 +163,7 @@
     const cov = selCoverage?.value || '';
     const auto = !!meshAuto?.checked;
     if (!meshHint) return;
+
     if (cov === 'Large/Multi-floor') {
       meshHint.textContent = auto
         ? 'Large / multi-floor detected — we’ll prefer mesh systems for even coverage.'
@@ -173,6 +209,7 @@
     let mesh = readMeshChoice();
     const meshAutoVal = !!meshAuto?.checked;
 
+    // Auto-upgrade to mesh when requested and large homes
     if (!mesh && meshAutoVal && coverage === 'Large/Multi-floor') mesh = 'yes';
 
     const answers = { coverage, devices, use, access, wanTierLabel, mesh, meshAuto: meshAutoVal, price };
@@ -194,13 +231,26 @@
     return (v === 'yes' || v === 'no') ? v : '';
   }
 
-  // A11y: connect legends to hints when present
+  // ---------- A11y: connect legends to hints ----------
   all('.q-group').forEach(group => {
     const legend = group.querySelector('legend');
     const hint = group.querySelector('.hint');
     if (legend && hint) {
-      hint.id = hint.id || `hint-${Math.random().toString(36).slice(2)}`;
+      if (!hint.id) hint.id = `hint-${Math.random().toString(36).slice(2)}`;
       legend.setAttribute('aria-describedby', hint.id);
     }
   });
+
+  // ---------- Ready signal + deep-link ----------
+  // Signal that the quiz module is ready (for any orchestrators)
+  document.dispatchEvent(new Event('quiz:ready'));
+
+  // Auto-open via URL param ?quiz=1 (robust to script order & header timing)
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.get('quiz') === '1') {
+      // Defer slightly to allow any late style/layout work
+      setTimeout(() => openModal(), 0);
+    }
+  } catch {}
 })();
