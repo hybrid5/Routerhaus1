@@ -1,206 +1,93 @@
-<!-- ===========================
-     RouterHaus v2 — index.html
-     =========================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="RouterHaus – AI-powered router recommendations for every space, from studio flats to multi-floor estates and offices." />
+  <script>
+    (function(){
+      try{
+        var ov = localStorage.getItem('themeOverride');
+        var mode = ov || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', mode);
+      }catch(e){}
+    })();
+  </script>
   <meta name="color-scheme" content="light dark" />
-  <title>RouterHaus</title>
-
-  <!-- Fonts & Styles -->
+  <title>RouterHaus — Smarter Home Networking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="main.css" />
   <link rel="stylesheet" href="assets/css/home.css" />
-
-  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-  <!-- Header partial mounts BEFORE main to avoid CLS -->
   <div id="header-placeholder" data-partial="header.html"></div>
 
   <main>
-    <!-- ===== HERO ===== -->
-    <section class="hero index-hero">
-      <div class="container hero-grid">
-        <div class="hero-copy reveal">
-          <span class="eyebrow">AI-tuned network plans</span>
-          <h1>Lightning-Fast Wi-Fi, <span class="grad">Zero Guesswork</span></h1>
-          <p class="lede">Answer a few questions and get a dialed-in setup — sized to your space, devices, and plan speed.</p>
-          <div class="hero-actions">
-            <a href="kits.html?quiz=1" class="btn">Start Recommendation</a>
-            <a href="consult.html" class="btn-secondary">Talk to an Engineer</a>
-          </div>
-          <ul class="stat-pills">
-            <li><i class="fa-solid fa-list-check" aria-hidden="true"></i> 3-step kit finder</li>
-            <li><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Multi-gig ready</li>
-            <li><i class="fa-solid fa-sitemap" aria-hidden="true"></i> Mesh for whole-home</li>
-          </ul>
-        </div>
-
-        <aside class="hero-card glass reveal">
-          <h3>What best describes you?</h3>
-          <div class="persona-chips">
-            <button class="chip" data-qpick="apt"><i class="fa-solid fa-city"></i> Apartment / Condo</button>
-            <button class="chip" data-qpick="large"><i class="fa-solid fa-house-chimney"></i> Large Home</button>
-            <button class="chip" data-qpick="wfh"><i class="fa-solid fa-briefcase"></i> Work from Home</button>
-            <button class="chip" data-qpick="gaming"><i class="fa-solid fa-gamepad"></i> Gaming</button>
-          </div>
-          <p class="mini subtle"><i class="fa-regular fa-lightbulb"></i> We’ll pre-apply the right filters — tweak anytime.</p>
-        </aside>
+    <!-- Hero -->
+    <section class="hero reveal">
+      <h1>Find the right Wi-Fi for your place</h1>
+      <p>Simple, honest picks for routers and mesh kits — no jargon, no fluff.</p>
+      <div class="cta-row">
+        <a class="btn" href="kits.html?quiz=1">Take the quick quiz</a>
+        <a class="btn-secondary" href="kits.html">Browse all kits</a>
       </div>
     </section>
 
-    <!-- ===== TRUST ===== -->
-    <section class="trust">
-      <div class="container">
-        <div class="trust-head reveal">
-          <span class="eyebrow">Trusted designs</span>
-        </div>
-        <div class="trust-logos reveal" aria-label="Vendors we work with">
-          <span class="pill">UniFi</span>
-          <span class="pill">Aruba</span>
-          <span class="pill">TP-Link</span>
-          <span class="pill">ASUS</span>
-          <span class="pill">Synology</span>
-          <span class="pill">MikroTik</span>
-        </div>
+    <!-- Value props -->
+    <section class="values reveal">
+      <div class="value-card">
+        <i class="fas fa-wifi"></i>
+        <h3>Wi-Fi that actually works</h3>
+        <p>We test coverage, stability, and throughput — the stuff that matters.</p>
+      </div>
+      <div class="value-card">
+        <i class="fas fa-screwdriver-wrench"></i>
+        <h3>Install in minutes</h3>
+        <p>Clear guidance, no surprises. Get online fast and stay online.</p>
+      </div>
+      <div class="value-card">
+        <i class="fas fa-leaf"></i>
+        <h3>No hype, no junk</h3>
+        <p>Just well-priced, proven gear. We skip the clickbait.</p>
       </div>
     </section>
 
-    <!-- ===== HOW IT WORKS ===== -->
-    <section class="steps">
-      <div class="container">
-        <header class="section-head reveal">
-          <h2>How it works</h2>
-          <p class="subtle">From quiz to install — clarity at every step.</p>
-        </header>
-
-        <div class="cards cards-3">
-          <article class="card step reveal">
-            <div class="step-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-            <h3>1) Quick quiz</h3>
-            <p>Tell us about your space, devices, and plan speed. We turn that into real-world requirements.</p>
-          </article>
-
-          <article class="card step reveal">
-            <div class="step-icon"><i class="fa-solid fa-sliders"></i></div>
-            <h3>2) Compare picks</h3>
-            <p>Filter by Wi-Fi gen, mesh, WAN tier, and price. Add up to four to compare.</p>
-          </article>
-
-          <article class="card step reveal">
-            <div class="step-icon"><i class="fa-solid fa-diagram-project"></i></div>
-            <h3>3) Deploy</h3>
-            <p>Use our guides or book an engineer. We can stage, tune, and hand off remotely or on-site.</p>
-          </article>
-        </div>
+    <!-- Personas / quick chips -->
+    <section class="persona-chips reveal">
+      <h2>Popular starting points</h2>
+      <div class="chips">
+        <button class="chip" data-qpick="apt" type="button">Apartment</button>
+        <button class="chip" data-qpick="large" type="button">Large Home</button>
+        <button class="chip" data-qpick="wfh" type="button">Work from Home</button>
+        <button class="chip" data-qpick="gaming" type="button">Gaming</button>
       </div>
     </section>
 
-    <!-- ===== FEATURED PICKS ===== -->
-    <section class="product-grid">
-      <div class="container">
-        <header class="section-head reveal">
-          <h2>Great Consumer Picks</h2>
-          <p class="subtle">Fast, reliable, and simple to manage.</p>
-        </header>
-
-        <div class="product-row">
-          <article class="product glass reveal">
-            <div class="product-media">
-              <img src="Deco-BE25.png" alt="TP-Link Deco BE25" />
-            </div>
-            <h4>TP-Link Deco BE25</h4>
-            <p class="tag">Apartments & small homes</p>
-            <p class="meta">≈ 6,600 sq ft • $249.99</p>
-            <a class="btn-secondary" href="kits.html?coverage=Apartment/Small&recos=1">View options</a>
-          </article>
-
-          <article class="product glass reveal">
-            <div class="product-media">
-              <img src="google-nest-wi-fi.png" alt="Google Nest Wi-Fi Pro 3-pack" />
-            </div>
-            <h4>Google Nest Wi-Fi Pro (3-pack)</h4>
-            <p class="tag">Seamless setup</p>
-            <p class="meta">≈ 6,600 sq ft • $399.99</p>
-            <a class="btn-secondary" href="kits.html?mesh=Mesh-ready&recos=1">View options</a>
-          </article>
-
-          <article class="product glass reveal">
-            <div class="product-media">
-              <img src="ASUS-BE98.png" alt="ASUS ROG GT-BE98 Pro" />
-            </div>
-            <h4>ASUS ROG GT-BE98 Pro</h4>
-            <p class="tag">Gaming & performance</p>
-            <p class="meta">≈ 4,800 sq ft • $629.99</p>
-            <a class="btn-secondary" href="kits.html?use=Gaming&wan=2.5G&recos=1">View options</a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== ENTERPRISE STRIP ===== -->
-    <section class="enterprise-band">
-      <div class="container band-grid">
-        <div class="band-copy reveal">
-          <h2>For businesses & large properties</h2>
-          <p class="subtle">Multi-floor roaming, VLAN separation, multi-gig backbones, and controller-based tuning.</p>
-        </div>
-        <div class="band-ctas reveal">
-          <a class="btn" href="consult.html">Enterprise / Large Home Consult</a>
-          <a class="btn-secondary" href="kits.html?mesh=Mesh-ready&coverage=Large/Multi-floor&recos=1">See mesh systems</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== FAQ ===== -->
-    <section id="faq" class="faq">
-      <div class="container">
-        <h2 class="faq-title reveal">FAQ</h2>
-
-        <div class="accordion">
-          <div class="accordion-item reveal">
-            <h4>Do you support on-site installs?</h4><span>+</span>
-            <p>Yes. We can coordinate on-site installation, validation, and handover. Remote staging and controller setup are also available.</p>
+    <!-- Featured cards (optional) -->
+    <section class="featured reveal">
+      <article class="product">
+        <img src="assets/img/sample-kit.jpg" alt="Sample kit" />
+        <div class="content">
+          <h3 class="title">Solid Wi-Fi 6 Mesh</h3>
+          <p>Great for families who stream a lot and want reliable coverage.</p>
+          <div class="chips line">
+            <span class="chip">Wi-Fi 6</span>
+            <span class="chip">Mesh-ready</span>
+            <span class="chip">2.5G WAN</span>
           </div>
-
-          <div class="accordion-item reveal">
-            <h4>Will the quiz work for office spaces?</h4><span>+</span>
-            <p>It’s a great start for sizing and features. For multi-tenant or multi-AP scenarios, book a consult and we’ll design the topology.</p>
-          </div>
-
-          <div class="accordion-item reveal">
-            <h4>Do you only recommend one brand?</h4><span>+</span>
-            <p>No — we’re vendor-agnostic. We’ll suggest the right gear for your goals, scale, and environment.</p>
+          <div class="ctaRow">
+            <a class="btn" href="kits.html">Browse kits</a>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ===== CTA ===== -->
-    <section class="footer-cta" id="start">
-      <div class="container">
-        <div class="cta-inner reveal">
-          <h2>Design Your Network</h2>
-          <p>From a studio flat to a full campus — we’ve got you covered.</p>
-          <div class="hero-actions">
-            <a href="kits.html?quiz=1" class="btn">Start Matching →</a>
-            <a href="consult.html" class="btn-secondary">Enterprise Consult</a>
-          </div>
-        </div>
-      </div>
+      </article>
     </section>
   </main>
 
-  <!-- Footer partial -->
   <div id="footer-placeholder" data-partial="footer.html"></div>
 
-  <!-- Scripts -->
   <script src="scripts.js" defer></script>
-  <script type="module" src="assets/js/home.js"></script>
+  <script src="assets/js/home.js" defer></script>
 </body>
 </html>
