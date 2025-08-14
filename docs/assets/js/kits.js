@@ -914,8 +914,8 @@
 
   // Search bar UX: focus hotkeys, clear button, debounced filtering, Search button, Enter apply
   function wireSearch() {
-    const input = byId('searchInput');   // lives in header.html
-    const btn   = byId('searchBtn');     // lives in header.html
+    const input = byId('searchInput');   // lives in kits.html
+    const btn   = byId('searchBtn');     // lives in kits.html
     if (!input) return;
 
     // If wrapped in .search, inject a clear button (optional)
@@ -1152,21 +1152,43 @@
     el.emptyState.appendChild(b);
   })();
 
+  // ---------- Header quiz bridges (since header inline script won't run when injected) ----------
+  function wireHeaderQuizBridges() {
+    // Forward mobile CTA clicks to main quiz actions (or event fallback)
+    document.addEventListener('click', (e) => {
+      const openBtn = e.target.closest('[data-open-quiz]');
+      if (openBtn) {
+        const t = document.getElementById('openQuiz');
+        if (t) t.click();
+        else document.dispatchEvent(new CustomEvent('quiz:open'));
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('[data-edit-quiz]');
+      if (editBtn) {
+        const t = document.getElementById('editQuiz');
+        if (t && !t.hasAttribute('hidden')) t.click();
+      }
+    });
+
+    // Keep mobile [data-edit-quiz] visibility in sync with #editQuiz
+    const editHeader = document.getElementById('editQuiz');
+    const editMobile = document.querySelector('[data-edit-quiz]');
+    if (editHeader && editMobile) {
+      const sync = () => { editMobile.hidden = editHeader.hasAttribute('hidden'); };
+      new MutationObserver(sync).observe(editHeader, { attributes: true, attributeFilter: ['hidden'] });
+      sync();
+    }
+  }
+
   // ---------- Lifecycle ----------
   async function init() {
     // 1) Mount header/footer so header controls exist before wiring
     await Promise.all([mountPartial(el.headerMount), mountPartial(el.footerMount)]);
+    wireHeaderQuizBridges(); // ensure mobile quiz CTAs work even when header script didn't execute
 
-    // 2) Handle quiz deep-link AFTER header exists
-    const params = new URLSearchParams(location.search);
-    if (params.get('quiz') === '1') {
-      // Click header's Find a Kit button if present, else dispatch event quiz:open
-      const opener = byId('openQuiz') || $('[data-open-quiz]');
-      if (opener) opener.click();
-      else document.dispatchEvent(new CustomEvent('quiz:open'));
-    }
-
-    // 3) Show skeletons while we load
+    // 2) Show skeletons while we load
     renderSkeletons(12);
 
     try {
